@@ -23,7 +23,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <undertow.version>2.0.19.Final</undertow.version>
+        <undertow.version>2.0.29.Final</undertow.version>
         <springfox.swagger2.version>2.9.2</springfox.swagger2.version>
         <aws.sdk.version>1.11.380</aws.sdk.version>
         <java.jwt.version>3.8.0</java.jwt.version>
