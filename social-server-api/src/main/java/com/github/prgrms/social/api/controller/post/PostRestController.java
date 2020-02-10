@@ -45,8 +45,8 @@ public class PostRestController {
     @GetMapping(path = "user/{userId}/post/list")
     @ApiOperation(value = "포스트 목록 조회")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "offset", dataType = "integer", paramType = "query", defaultValue = "0", value = "페이징 offset"),
-            @ApiImplicitParam(name = "limit", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
+            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", defaultValue = "0", value = "페이징 offset"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
     })
     public ApiResult<List<Post>> posts(
             @AuthenticationPrincipal JwtAuthentication authentication,

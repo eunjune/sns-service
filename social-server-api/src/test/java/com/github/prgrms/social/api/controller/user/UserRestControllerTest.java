@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.controller.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
@@ -17,13 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -42,16 +41,11 @@ class UserRestControllerTest {
     MockMvc mockMvc;
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
     EntityManager entityManager;
 
     @MockBean
     UserService userService;
+
     @Value("${jwt.token.issuer}") String issuer;
     @Value("${jwt.token.clientSecret}") String clientSecret;
     @Value("${jwt.token.expirySeconds}") int expirySeconds;
@@ -115,17 +109,8 @@ class UserRestControllerTest {
 
     @Test
     void connections() throws Exception {
-        User user1 = User.builder().seq(1L).name("test1").email(new Email("test1@gmail.com")).password("1234").build();
-        User user2 = User.builder().seq(2L).name("test2").email(new Email("test2@gmail.com")).password("1234").build();
-        User user3 = User.builder().seq(3L).name("test3").email(new Email("test2@gmail.com")).password("1234").build();
-
         ConnectedUser connectedUser1 = new ConnectedUser(null, null);
-        connectedUser1.setTargetUser(user2);
-        user1.addConnectedUser(connectedUser1);
-
         ConnectedUser connectedUser2 = new ConnectedUser(null, null);
-        connectedUser1.setTargetUser(user3);
-        user1.addConnectedUser(connectedUser2);
 
         List<ConnectedUser> givenConnected = new ArrayList<>();
         givenConnected.add(connectedUser1);
@@ -140,7 +125,7 @@ class UserRestControllerTest {
 
         mockMvc.perform(get("/api/user/connections").header(tokenHeader,apiToken))
                 .andExpect(status().isOk())
-                //.andExpect(jsonPath("$.response.seq").value(1L))
+                .andExpect(jsonPath("$.response.*",hasSize(2)))
                 .andDo(print());
 
         then(userService).should(times(1)).findAllConnectedUser(any());
