@@ -1,7 +1,6 @@
 package com.github.prgrms.social.api.model.api.request.post;
 
 import com.github.prgrms.social.api.model.post.Post;
-import com.github.prgrms.social.api.model.post.Writer;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,20 +21,4 @@ public class PostingRequest {
                 .contents(contents)
                 .build();
     }
-/*
-    protected PostingRequest() {}
-
-    public String getContents() {
-        return contents;
-    }
-
-
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("contents", contents)
-                .toString();
-    }*/
-
 }

@@ -28,24 +28,4 @@ public class Writer {
     public Optional<String> getName() {
         return ofNullable(name);
     }
-
-    /*public Writer(Email email, String name) {
-        checkNotNull(email, "email must be provided.");
-
-        this.email = email;
-        this.name = name;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("email", email)
-                .append("name", name)
-                .toString();
-    }*/
-
 }

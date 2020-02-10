@@ -5,8 +5,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.http.HttpStatus;
 
 // 응답 VO
@@ -35,32 +33,4 @@ public class ApiResult<T> {
     public static ApiResult ERROR(String errorMessage, HttpStatus status) {
         return new ApiResult<>(false, null, new ApiError(errorMessage, status.value()));
     }
-
-    /*private ApiResult(boolean success, T response, ApiError error) {
-        this.success = success;
-        this.response = response;
-        this.error = error;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public ApiError getError() {
-        return error;
-    }
-
-    public T getResponse() {
-        return response;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("success", success)
-                .append("response", response)
-                .append("error", error)
-                .toString();
-    }*/
-
 }

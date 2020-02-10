@@ -2,7 +2,6 @@ package com.github.prgrms.social.api.controller.user;
 
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.api.request.user.CheckEmailRequest;
-import com.github.prgrms.social.api.model.user.Subscription;
 import com.github.prgrms.social.api.model.api.request.user.JoinRequest;
 import com.github.prgrms.social.api.model.api.request.user.SubscribeRequest;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
@@ -14,11 +13,10 @@ import com.github.prgrms.social.api.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
@@ -35,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 import static com.github.prgrms.social.api.model.commons.AttachedFile.toAttachedFile;
 
+@Slf4j
 @RestController
 @RequestMapping("api")
 @Api(tags = "사용자 APIs")
@@ -52,7 +51,6 @@ public class UserRestController {
     @Value("${spring.kafka.topic.response}")
     private String responseTopic;
 
-    private Logger log = LoggerFactory.getLogger(getClass());
 
     public UserRestController(JWT jwt, UserService userService, ReplyingKafkaTemplate<String, Subscription, Subscription> replyingKafkaTemplate) {
         this.jwt = jwt;
@@ -105,6 +103,7 @@ public class UserRestController {
 
         ProducerRecord<String, Subscription> record = new ProducerRecord<>(requestTopic,subscription);
         record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, responseTopic.getBytes()));
+
 
         RequestReplyFuture<String, Subscription, Subscription> replyFuture = replyingKafkaTemplate.sendAndReceive(record);
 

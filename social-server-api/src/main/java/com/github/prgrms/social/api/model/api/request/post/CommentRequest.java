@@ -18,20 +18,6 @@ public class CommentRequest {
         return Comment.builder()
                 .contents(contents)
                 .build();
-    }
-    /*
-    protected CommentRequest() {}
 
-    public String getContents() {
-        return contents;
     }
-
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("contents", contents)
-                .toString();
-    }
-*/
 }

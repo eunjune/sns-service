@@ -50,6 +50,7 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
         *
         * 그 외의 요청은 else로 간다.
         * */
+
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             String authorizationToken = obtainAuthorizationToken(request);
             if (authorizationToken != null) {
@@ -85,6 +86,8 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
                     SecurityContextHolder.getContext().getAuthentication());
         }
 
+        /*System.out.println("테스트 필터 : " + request == null);
+        System.out.println("테스트 필터 : " + response == null);*/
         chain.doFilter(request, response);
     }
 

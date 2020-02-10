@@ -7,8 +7,4 @@ import lombok.Getter;
 @Getter
 public class CheckEmailRequest {
     private String address;
-
-//    public String getEmail() {
-//        return address;
-//    }
 }

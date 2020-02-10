@@ -20,27 +20,4 @@ public class ApiError {
     ApiError(Throwable throwable, HttpStatus status) {
         this(throwable.getMessage(), status.value());
     }
-
-    /*
-    ApiError(String message, HttpStatus status) {
-        this.message = message;
-        this.status = status.value();
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("message", message)
-                .append("status", status)
-                .toString();
-    }*/
-
 }

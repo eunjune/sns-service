@@ -2,7 +2,7 @@ package com.github.prgrms.social.api.security;
 
 import com.github.prgrms.social.api.model.commons.Id;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.jpa.post.projection.ConnectedId;
+import com.github.prgrms.social.api.repository.post.projection.ConnectedId;
 import com.github.prgrms.social.api.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDecisionVoter;
