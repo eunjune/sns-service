@@ -33,4 +33,4 @@
 
 
 이전 Repository에 문제가 생겨서 다시 만듬. 이전 Repository에서 진행한 commit log
-![Alt text](./commit.png)
+![Alt text](./readme-img/commit.png)
