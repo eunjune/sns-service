@@ -29,8 +29,11 @@
 ### 개발 예정
 - 프론트엔드 개발
 - 팔로우, 언팔로우
+- 해시태그
 - oAuth
+- 배포
+- 검색엔진 최적화
 
 
 이전 Repository에 문제가 생겨서 다시 만듬. 이전 Repository에서 진행한 commit log
-![Alt text](./commit.png)
+![Alt text](./readme-img/commit.png)
