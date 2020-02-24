@@ -1,6 +1,18 @@
 import React from 'react';
 import Link from 'next/link';
-import {Menu, Input, Button} from 'antd';
+import PropTypes from 'prop-types';
+import {Menu, Input, Button, Row, Col, Card, Avatar} from 'antd';
+import LoginForm from '../components/LoginForm'
+
+const dummy = {
+    name: '이름' +
+        '' +
+        '',
+    Post: [],
+    Followings: [],
+    Followers: [],
+    isLogin: false,
+};
 
 const AppLayout = ({children}) => {
 
@@ -14,10 +26,41 @@ const AppLayout = ({children}) => {
                 </Menu.Item>
             </Menu>
             <Link href="/signup"><Button>회원가입</Button></Link>
-            {children}
+            <Row gutter={8}>
+                <Col xs={24} md={6}>
+                    {dummy.isLogin ?
+                        <Card
+                            action={[
+                                <div key="twit">짹짹<br/>{dummy.Post.length}</div>,
+                                <div key="following">팔로윙<br/>{dummy.Followings.length}</div>,
+                                <div key="twit">팔로워<br/>{dummy.Followers.length}</div>,
+                            ]}
+                        >
+                            <Card.Meta avatar={<Avatar>{dummy.name[0]}</Avatar>}
+                                       title={dummy.name}
+                            />
+
+                        </Card>
+
+                        :
+
+                        <LoginForm />
+                    }
+                </Col>
+                <Col xs={24} md={12}>
+                    {children}
+                </Col>
+                <Col xs={24} md={6}>
+
+                </Col>
+            </Row>
+
         </div>
     );
-
 };
+
+AppLayout.propTypes = {
+    children: PropTypes.node,
+}
 
 export default AppLayout;
