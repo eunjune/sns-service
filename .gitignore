@@ -4,6 +4,7 @@
 */src/test/resources/application.yml
 social-server-api/src/test/java/com/github/prgrms/social/api/aws/
 social-server-ui/node_modules
+social-server-ui/.next
 /target/
 target/
 !.mvn/wrapper/maven-wrapper.jar
