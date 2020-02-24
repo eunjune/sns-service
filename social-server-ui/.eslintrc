@@ -11,7 +11,7 @@
     "node": true
   },
   "extends": [
-    "eslint:recomended",
+    "eslint:recommended",
     "plugin:react/recommended"
   ],
   "plugins": [
