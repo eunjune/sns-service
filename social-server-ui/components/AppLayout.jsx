@@ -1,21 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
-import {Menu, Input, Button, Row, Col, Card, Avatar} from 'antd';
+import {Menu, Input, Button, Row, Col} from 'antd';
 import LoginForm from '../components/LoginForm'
 import UserProfile from "./UserProfile";
-
-const dummy = {
-    name: '이름' +
-        '' +
-        '',
-    Post: [],
-    Followings: [],
-    Followers: [],
-    isLogin: false,
-};
+import {useSelector} from "react-redux";
 
 const AppLayout = ({children}) => {
+
+    const {isLogin} = useSelector(state => state.user);
 
     return (
         <div>
@@ -29,7 +22,7 @@ const AppLayout = ({children}) => {
             <Link href="/signup"><Button>회원가입</Button></Link>
             <Row gutter={8}>
                 <Col xs={24} md={6}>
-                    {dummy.isLogin ? <UserProfile/> : <LoginForm />}
+                    {isLogin ? <UserProfile/> : <LoginForm />}
                 </Col>
                 <Col xs={24} md={12}>
                     {children}
@@ -45,6 +38,6 @@ const AppLayout = ({children}) => {
 
 AppLayout.propTypes = {
     children: PropTypes.node,
-}
+};
 
 export default AppLayout;
