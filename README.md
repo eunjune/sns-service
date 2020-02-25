@@ -6,9 +6,9 @@
 
 
 ### 사용 스텍
-- 백엔드 : Spring Boot, Spring Security, Spring Data JPA, JWT, Swagger, Apache Maven, MySql, AWS S3, Apache Kafka, MSA 
-- 프론트 : React 개발 예정
-- 기타 : Git
+- 백엔드 : Spring Boot, Spring Security, Spring Data JPA, JWT, JUnit, Mockito, Lombok, Swagger, Apache Maven, MySql, Apache Kafka, MSA 
+- 프론트 : React, React-Hooks, Redux, Redux-Saga, ESLint, Next.js, Webpack 
+- 기타 : Git, AWS S3
 
 
 ### 개발 내용
@@ -31,8 +31,9 @@
 - 팔로우, 언팔로우
 - 해시태그
 - oAuth
-- 배포
 - 검색엔진 최적화
+- 배포
+- Notification
 
 
 이전 Repository에 문제가 생겨서 다시 만듬. 이전 Repository에서 진행한 commit log
