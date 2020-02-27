@@ -10,7 +10,7 @@ export const initialState = {
     isLoggingOut: false,
     isLoggingIn: false,
     loginErrorReason: '',
-    signedUp: false,
+    isSignedUp: false,
     isSigningUp: false,
     signUpErrorReason: '',
     me: null,
@@ -22,10 +22,6 @@ export const initialState = {
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
 export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
-
-export const LOG_me_REQUEST = 'LOG_me_REQUEST';
-export const LOG_me_SUCCESS = 'LOG_me_SUCCESS';
-export const LOG_me_FAILURE = 'LOG_me_FAILURE';
 
 export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
 export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
@@ -71,7 +67,7 @@ const reducer = (state = initialState, action) => {
                 isLoggingIn: false,
                 isLogin: true,
                 me: dumyme,
-            }
+            };
         }
 
         case LOG_IN_FAILURE: {
@@ -81,7 +77,7 @@ const reducer = (state = initialState, action) => {
                 isLogin: false,
                 loginErrorReason: action.error,
                 me: null,
-            }
+            };
         }
 
         case LOG_OUT_REQUEST: {
@@ -89,7 +85,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isLogin: false,
                 me: null,
-            }
+            };
         }
 
         case LOG_OUT_SUCCESS: {
@@ -97,7 +93,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isLogin: false,
                 me: null,
-            }
+            };
         }
 
         case LOG_OUT_FAILURE: {
@@ -105,34 +101,40 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isLogin: false,
                 me: null,
-            }
+                loginErrorReason: '',
+            };
         }
 
         case SIGN_UP_REQUEST: {
+            console.log('요청');
             return {
                 ...state,
-                signUpData: action.data,
-            }
+                isSigningUp: true,
+                isSignedUp: false,
+                signUpErrorReason: ''
+            };
         }
 
         case SIGN_UP_SUCCESS: {
             return {
                 ...state,
-                signUpData: action.data,
-            }
+                isSigningUp: false,
+                isSignedUp: true,
+            };
         }
 
         case SIGN_UP_FAILURE: {
             return {
                 ...state,
-                signUpData: action.data,
-            }
+                isSigningUp: false,
+                signUpErrorReason: action.error,
+            };
         }
 
         default: {
             return {
                 ...state
-            }
+            };
         }
     }
 };

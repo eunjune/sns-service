@@ -1,3 +1,11 @@
+const dummyPost = {
+    User: {
+        id: 1,
+        name: '이름',
+    },
+    content : '나는 더미',
+};
+
 export const initialState = {
     mainPosts: [{
         User: {
@@ -10,11 +18,13 @@ export const initialState = {
     imagePaths: [],
     addPostError: false,
     isAddingPost: false,
+    addPostErrorReason: '',
+    addedPost: false,
 };
 
-const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
-const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
-const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
+export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
+export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
+export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
 
 export const LOAD_MAIN_POSTS_REQUEST = 'LOAD_MAIN_POSTS_REQUEST';
 export const LOAD_MAIN_POSTS_SUCCESS = 'LOAD_MAIN_POSTS_SUCCESS';
@@ -34,9 +44,9 @@ export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE';
 
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
-const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
-const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
-const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
+export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
+export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
+export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 
 export const LOAD_COMMENTS_REQUEST = 'LOAD_COMMENTS_REQUEST';
 export const LOAD_COMMENTS_SUCCESS = 'LOAD_COMMENTS_SUCCESS';
@@ -68,15 +78,24 @@ const addDummy = {
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case ADD_COMMENT_REQUEST: {
+        case ADD_POST_REQUEST: {
             return {
                 ...state,
+                isAddingPost: true,
             }
         }
-        case '': {
+        case ADD_POST_SUCCESS: {
             return {
                 ...state,
-                mainPosts: [action,data, ...state.mainPosts],
+                isAddingPost: false,
+                mainPosts: [dummyPost, ...state.mainPosts],
+            }
+        }
+        case ADD_POST_FAILURE: {
+            return {
+                ...state,
+                isAddingPost: false,
+                addPostErrorReason: action.error,
             }
         }
 

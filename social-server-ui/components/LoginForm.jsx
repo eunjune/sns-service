@@ -2,7 +2,7 @@ import React, {useState, useCallback} from 'react';
 import Link from 'next/link';
 import {Form, Input, Button} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { LOG_IN_REQUEST, loginAction } from '../reducers/user';
+import { LOG_IN_REQUEST } from '../reducers/user';
 
 const LoginForm = () => {
     const [id, setId] = useState('');

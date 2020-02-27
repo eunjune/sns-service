@@ -38,21 +38,26 @@ function signUpAPI() {
 
 
 function* signUp() {
+
+    console.log('signUp');
     try {
-        yield call(signUpAPI);
+        //yield call(signUpAPI);
+        yield delay(2000);
+        throw new Error('에러');
         yield put({
             type: SIGN_UP_SUCCESS
         });
     } catch (e) { // 실패
         console.error(e);
         yield put({
-            type: SIGN_UP_FAILURE
+            type: SIGN_UP_FAILURE,
+            error: e
         });
     }
 }
 
 function* watchSignUp() {
-    return takeEvery(SIGN_UP_REQUEST, signUp);
+    yield takeEvery(SIGN_UP_REQUEST, signUp);
 }
 
 
