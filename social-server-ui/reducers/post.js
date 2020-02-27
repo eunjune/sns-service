@@ -1,25 +1,43 @@
 const dummyPost = {
+    id: 1,
     User: {
         id: 1,
         name: '이름',
     },
     content : '나는 더미',
+    Comments: [],
+};
+
+const dummyComment = {
+    id: 2,
+    User: {
+        id: 1,
+        name: 2,
+    },
+    createdAt: new Date(),
+    content: '더미 입니다.',
 };
 
 export const initialState = {
     mainPosts: [{
+        id : 1,
         User: {
             id: 1,
             name: '이름'
         },
         content: '첫번째 게시글',
         img: '',
+        Comments: [],
     }],
     imagePaths: [],
-    addPostError: false,
     isAddingPost: false,
-    addPostErrorReason: '',
     addedPost: false,
+    addPostError: false,
+    addPostErrorReason: '',
+    isAddingComment: false,
+    addedComment: false,
+    addCommentError: false,
+    addCommentErrorReason: '',
 };
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
@@ -96,6 +114,38 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isAddingPost: false,
                 addPostErrorReason: action.error,
+            }
+        }
+
+        case ADD_COMMENT_REQUEST: {
+            return {
+                ...state,
+                isAddingComment: true,
+                addCommentErrorReason: '',
+                addedComment: false,
+            }
+        }
+        case ADD_COMMENT_SUCCESS: {
+            const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId);
+            const post = state.mainPosts[postIndex];
+            const Comments = [...post.Comments, dummyComment];
+            console.log('before');
+            const mainPosts = [...state.mainPosts];
+            mainPosts[postIndex] = {...post, Comments};
+            console.log('after');
+
+            return {
+                ...state,
+                isAddingComment: false,
+                addedComment: true,
+                mainPosts,
+            }
+        }
+        case ADD_COMMENT_FAILURE: {
+            return {
+                ...state,
+                isAddingComment: false,
+                addCommentErrorReason: action.error,
             }
         }
 

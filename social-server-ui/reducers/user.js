@@ -3,6 +3,7 @@ const dumyme = {
     Post: [],
     Followings: [],
     Followers: [],
+    id:1
 };
 
 export const initialState = {

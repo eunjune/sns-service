@@ -43,7 +43,7 @@ function* signUp() {
     try {
         //yield call(signUpAPI);
         yield delay(2000);
-        throw new Error('에러');
+        //throw new Error('에러');
         yield put({
             type: SIGN_UP_SUCCESS
         });
