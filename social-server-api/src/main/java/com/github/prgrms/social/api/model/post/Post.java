@@ -18,7 +18,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Entity
 @Getter
 @NoArgsConstructor(force = true)
-@ToString(exclude = {"user","likeList","commentList"})
+@ToString(exclude = {"user","likeList","commentList", "imageList"})
 @EqualsAndHashCode(of = "seq")
 public class Post {
 
@@ -44,13 +44,21 @@ public class Post {
     @Setter
     private User user;
 
-    @ApiModelProperty(value = "좋아요 리스트", required = true)
+    @ApiModelProperty(value = "이미지 리스트")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Image> imageList = new ArrayList<>();
+
+    @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Likes> likeList = new ArrayList<>();
 
-    @ApiModelProperty(value = "댓글 리스트", required = true)
+    @ApiModelProperty(value = "댓글 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> commentList = new ArrayList<>();
+
+    @ApiModelProperty(value = "해쉬태그 리스트")
+    @ManyToMany
+    private List<HashTag> hashTagList = new ArrayList<>();
 
     @Builder
     private Post(Long seq, String contents, boolean likesOfMe, LocalDateTime createAt) {

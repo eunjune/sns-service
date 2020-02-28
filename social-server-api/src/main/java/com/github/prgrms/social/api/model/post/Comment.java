@@ -32,10 +32,12 @@ public class Comment {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createAt;
 
+    @ApiModelProperty(value = "댓글의 포스트")
     @ManyToOne
     @Setter
     private Post post;
 
+    @ApiModelProperty(value = "댓글 작성자")
     @ManyToOne
     @Setter
     private User user;

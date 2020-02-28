@@ -63,12 +63,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ConnectedUser> connectedUser = new ArrayList<>();
 
+    @ApiModelProperty(value = "사용자의 포스트")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
+    @ApiModelProperty(value = "사용자의 댓글")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> commentList = new ArrayList<>();
 
+    @ApiModelProperty(value = "사용자의 좋아요")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Likes> likeList = new ArrayList<>();
 
