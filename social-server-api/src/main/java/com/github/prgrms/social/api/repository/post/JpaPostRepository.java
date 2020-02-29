@@ -16,9 +16,11 @@ public interface JpaPostRepository extends JpaRepository<Post,Long>, JpaPostCust
     @Transactional(readOnly = true)
     Optional<Post> findBySeq(Long seq);
 
+    @Transactional(readOnly = true)
     @Override
     Optional<Post> findById(Long aLong);
 
+    @Transactional(readOnly = true)
     @Override
     List<Post> findAll(Long userSeq, Long postWriterSeq, Pageable pageable);
 }

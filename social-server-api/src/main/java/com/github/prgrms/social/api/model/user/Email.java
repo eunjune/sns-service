@@ -18,7 +18,7 @@ public class Email {
     @ApiModelProperty(value = "이메일 주소", required = true)
     private final String address;
 
-    private static boolean checkAddress(String address) {
+    public static boolean checkAddress(String address) {
         return matches("[\\w~\\-.+]+@[\\w~\\-]+(\\.[\\w~\\-]+)+", address);
     }
 

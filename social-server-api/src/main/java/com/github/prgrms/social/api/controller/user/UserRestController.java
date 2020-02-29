@@ -64,10 +64,7 @@ public class UserRestController {
             @ApiParam(value = "example: {\"address\": \"test00@gmail.com\"}")
             @RequestBody CheckEmailRequest checkEmailRequest
     ) {
-        return OK(
-                userService.findByEmail(new Email(checkEmailRequest.getAddress()))
-                        .isPresent()
-        );
+        return OK(userService.findByEmail(checkEmailRequest.emailOf()).isPresent());
     }
 
     @PostMapping(path = "user/join", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

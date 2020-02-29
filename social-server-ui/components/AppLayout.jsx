@@ -14,23 +14,23 @@ const AppLayout = ({children}) => {
         <div>
             <Menu mode="horizontal">
                 <Menu.Item key="home"><Link href="/"><a>SNS</a></Link></Menu.Item>
-                <Menu.Item key="profile"><Link href="/profile"><a>프로필</a></Link></Menu.Item>
-                <Menu.Item key="mail">
+                <Menu.Item key="profile" style={{float: 'right'}}><Link href="/profile"><a>프로필</a></Link></Menu.Item>
+                <Menu.Item key="mail" style={{float: 'right'}} >
                     <Input.Search enterButton style={{verticalAlign: 'middle'}}/>
                 </Menu.Item>
             </Menu>
             <Row gutter={8}>
-                <Col xs={24} md={6}>
+                {<Col xs={24} md={6}>
                     {isLogin ? <UserProfile/> : <LoginForm />}
-                </Col>
+                </Col>}
                 <Col xs={24} md={12}>
-                    {children}
-                </Col>
-                <Col xs={24} md={6}>
+                  {children}
 
                 </Col>
+                {<Col xs={24} md={6}>
+
+                </Col>}
             </Row>
-
         </div>
     );
 };

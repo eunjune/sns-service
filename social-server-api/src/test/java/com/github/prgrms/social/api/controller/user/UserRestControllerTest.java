@@ -68,6 +68,32 @@ class UserRestControllerTest {
         then(userService).should().findByEmail(any());
     }
 
+    @Test
+    void checkEmailFail() throws Exception {
+
+        given(userService.findByEmail(new Email("test@gmail.com"))).willReturn(Optional.empty());
+
+        mockMvc.perform(post("/api/user/exists")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"address\" : \"test@gmail.com\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("response").value("false"))
+                .andDo(print());
+
+        then(userService).should().findByEmail(any());
+    }
+
+    @Test
+    void emailMismatch() throws Exception {
+        mockMvc.perform(post("/api/user/exists")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"address\" : \"testm\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("success").value("false"))
+                .andDo(print());
+
+        then(userService).shouldHaveNoMoreInteractions();
+    }
 
     @Test
     void join() throws Exception {

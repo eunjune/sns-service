@@ -37,20 +37,21 @@ public class User {
     private final String name;
 
     @ApiModelProperty(value = "이메일", required = true)
-    @Column(nullable = false, unique = true)
+    @AttributeOverrides({
+            @AttributeOverride(name="address", column=@Column(name="email", nullable = false))
+    })
     private final Email email;
 
     @JsonIgnore
     @ApiModelProperty(hidden = true)
     @Column(nullable = false)
-    private String password;
+    private final String password;
 
     // TODO profileImageUrl 추가 (컬럼 profile_image_url varchar(255) 추가도 필요함)
     @ApiModelProperty(value = "프로필 이미지 URL")
     private String profileImageUrl;
 
     @ApiModelProperty(value = "로그인 횟수", required = true)
-    @Column(nullable = false)
     private int loginCount;
 
     @ApiModelProperty(value = "최종로그인일시")

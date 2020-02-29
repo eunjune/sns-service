@@ -14,8 +14,6 @@ public interface JpaCommentRepository extends JpaRepository<Comment,Long> {
     @Transactional(readOnly = true)
     Optional<Comment> findBySeq(Long commentSeq);
 
-    /*
-    특정 포스트의 댓글들*/
     @Transactional(readOnly = true)
-    List<Comment> findByPost_SeqOrderBySeqDesc(Long seq); // post의 id
+    List<Comment> findByPost_SeqOrderBySeqDesc(Long seq);
 }

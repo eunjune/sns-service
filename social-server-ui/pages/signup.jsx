@@ -1,7 +1,7 @@
 import React from 'react';
 import {useState, useCallback, useEffect} from 'react';
 import {Form, Button, Input, Checkbox} from 'antd';
-import { SIGN_UP_REQUEST } from '../reducers/user';
+import { EMAIL_CHECK_REQUEST, SIGN_UP_REQUEST } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
 
@@ -16,7 +16,7 @@ const Signup = () => {
     const [termError, setTermError] = useState(false);
 
     const dispatch = useDispatch();
-    const {isSigningUp,me} = useSelector(state => state.user);
+    const {isEmailOk, isEmailChecking,isSigningUp,me,emailCheckingErrorReason} = useSelector(state => state.user);
 
     useEffect(() => {
         if(me) {
@@ -68,12 +68,28 @@ const Signup = () => {
         setTerm(e.target.value);
     },[]);
 
+    const onClickChecking = useCallback( (e) => {
+        if(id === undefined) {
+            return;
+        }
+        dispatch({
+            type: EMAIL_CHECK_REQUEST,
+            data : {
+                address: id,
+            }
+        });
+    },[id]);
+
     return <>
         <Form onSubmit={onSubmit} style={{padding: 10}}>
             <div>
                 <label htmlFor="user-id">아이디</label>
                 <br/>
                 <Input name="user-id" value={id} required onChange={onChangeId}/>
+                <Button onClick={onClickChecking} loading={isEmailChecking}>중복확인</Button>
+                {isEmailOk === true ? <div style={{color: 'green'}}>사용 가능한 이메일입니다.</div> :
+                  (isEmailOk === false ? <div style={{color: 'red'}}>이메일이 중복입니다.</div> : undefined)}
+                {emailCheckingErrorReason !== '' ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : undefined}
             </div>
             <div>
                 <label htmlFor="user-name">닉네임</label>

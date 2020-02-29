@@ -7,6 +7,9 @@ const dumyme = {
 };
 
 export const initialState = {
+    isEmailOk: undefined,
+    isEmailChecking: false,
+    emailCheckingErrorReason: '',
     isLogin: false,
     isLoggingOut: false,
     isLoggingIn: false,
@@ -19,6 +22,10 @@ export const initialState = {
     followerList: [],
     meInfo: null,
 };
+
+export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
+export const EMAIL_CHECK_SUCCESS = 'EMAIL_CHECK_SUCCESS';
+export const EMAIL_CHECK_FAILURE = 'EMAIL_CHECK_FAILURE';
 
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
@@ -54,6 +61,31 @@ export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
+        case EMAIL_CHECK_REQUEST: {
+            return {
+                ...state,
+                isEmailOk: undefined,
+                isEmailChecking: true,
+                emailCheckingErrorReason: '',
+            };
+        }
+
+        case EMAIL_CHECK_SUCCESS: {
+            return {
+                ...state,
+                isEmailOk: action.data,
+                isEmailChecking: false,
+            };
+        }
+
+        case EMAIL_CHECK_FAILURE: {
+            return {
+                ...state,
+                emailCheckingErrorReason: action.error,
+                isEmailChecking: false,
+            };
+        }
+
         case LOG_IN_REQUEST: {
             return {
                 ...state,

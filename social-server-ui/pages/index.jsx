@@ -9,7 +9,6 @@ const Home = () => {
 
     return (
         <div>
-            {me ? <div>로그인 했습니다. {me.name}</div> : <div>로그아웃 했습니다.</div>}
             {isLogin && <PostForm />}
             {mainPosts.map((c) => {
                 return <PostCards key={c} post={c}/>;
