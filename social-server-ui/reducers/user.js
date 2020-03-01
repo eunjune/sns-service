@@ -1,22 +1,12 @@
-const dumyme = {
-    name: '이름',
-    Post: [],
-    Followings: [],
-    Followers: [],
-    id:1
-};
-
 export const initialState = {
-    isEmailOk: undefined,
+    isEmailOk: null,
     isEmailChecking: false,
-    emailCheckingErrorReason: '',
-    isLogin: false,
-    isLoggingOut: false,
+    emailCheckingErrorReason: null,
     isLoggingIn: false,
-    loginErrorReason: '',
+    loginErrorReason: null,
     isSignedUp: false,
     isSigningUp: false,
-    signUpErrorReason: '',
+    signUpErrorReason: null,
     me: null,
     followingList: [],
     followerList: [],
@@ -31,9 +21,14 @@ export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
 export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
 
-export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
-export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
-export const LOG_OUT_FAILURE = 'LOG_OUT_FAILURE';
+export const LOG_OUT = 'LOG_OUT';
+// export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
+// export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
+// export const LOG_OUT_FAILURE = 'LOG_OUT_FAILURE';
+
+export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST';
+export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS';
+export const LOAD_USER_FAILURE = 'LOAD_USER_FAILURE';
 
 export const LOAD_FOLLOW_REQUEST = 'LOAD_FOLLOW_REQUEST';
 export const LOAD_FOLLOW_SUCCESS = 'LOAD_FOLLOW_SUCCESS';
@@ -64,9 +59,9 @@ const reducer = (state = initialState, action) => {
         case EMAIL_CHECK_REQUEST: {
             return {
                 ...state,
-                isEmailOk: undefined,
+                isEmailOk: null,
                 isEmailChecking: true,
-                emailCheckingErrorReason: '',
+                emailCheckingErrorReason: null
             };
         }
 
@@ -86,73 +81,27 @@ const reducer = (state = initialState, action) => {
             };
         }
 
-        case LOG_IN_REQUEST: {
-            return {
-                ...state,
-                isLoggingIn: true,
-                loginErrorReason: '',
-            };
-        }
-
-        case LOG_IN_SUCCESS: {
-            return {
-                ...state,
-                isLoggingIn: false,
-                isLogin: true,
-                me: dumyme,
-            };
-        }
-
-        case LOG_IN_FAILURE: {
-            return {
-                ...state,
-                isLoggingIn: false,
-                isLogin: false,
-                loginErrorReason: action.error,
-                me: null,
-            };
-        }
-
-        case LOG_OUT_REQUEST: {
-            return {
-                ...state,
-                isLogin: false,
-                me: null,
-            };
-        }
-
-        case LOG_OUT_SUCCESS: {
-            return {
-                ...state,
-                isLogin: false,
-                me: null,
-            };
-        }
-
-        case LOG_OUT_FAILURE: {
-            return {
-                ...state,
-                isLogin: false,
-                me: null,
-                loginErrorReason: '',
-            };
-        }
-
         case SIGN_UP_REQUEST: {
-            console.log('요청');
             return {
                 ...state,
                 isSigningUp: true,
                 isSignedUp: false,
-                signUpErrorReason: ''
+                signUpErrorReason: null
             };
         }
 
         case SIGN_UP_SUCCESS: {
+            const me = action.data.response.user;
+            const apiToken = action.data.response.apiToken;
+
+            sessionStorage.setItem("apiToken", apiToken);
+
             return {
                 ...state,
                 isSigningUp: false,
                 isSignedUp: true,
+                me: me,
+                apiToken: apiToken,
             };
         }
 
@@ -161,6 +110,68 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isSigningUp: false,
                 signUpErrorReason: action.error,
+            };
+        }
+
+        case LOG_IN_REQUEST: {
+            return {
+                ...state,
+                isLoggingIn: true,
+                loginErrorReason: null,
+            };
+        }
+
+        case LOG_IN_SUCCESS: {
+            const me = action.data.response.user;
+            const apiToken = action.data.response.apiToken;
+
+            sessionStorage.setItem("apiToken", apiToken);
+
+            return {
+                ...state,
+                isLoggingIn: false,
+                me: me,
+                apiToken: apiToken,
+            };
+        }
+
+        case LOG_IN_FAILURE: {
+            return {
+                ...state,
+                isLoggingIn: false,
+
+                loginErrorReason: action.error,
+                me: null,
+                apiToken: null,
+            };
+        }
+
+        case LOG_OUT: {
+            sessionStorage.setItem("apiToken", null);
+            return {
+                ...state,
+                me: null,
+                apiToken: null,
+            };
+        }
+
+        case LOAD_USER_REQUEST: {
+
+            return {
+                ...state,
+            };
+        }
+
+        case LOAD_USER_SUCCESS: {
+            return {
+                ...state,
+                me: action.data,
+            };
+        }
+
+        case LOAD_USER_FAILURE: {
+            return {
+                ...state,
             };
         }
 

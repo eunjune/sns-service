@@ -1,13 +1,16 @@
 import React from 'react';
 import {useState, useCallback, useEffect} from 'react';
 import {Form, Button, Input, Checkbox} from 'antd';
-import { EMAIL_CHECK_REQUEST, SIGN_UP_REQUEST } from '../reducers/user';
+import {
+    EMAIL_CHECK_REQUEST,
+    SIGN_UP_REQUEST
+} from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
 
 const Signup = () => {
 
-    const [id, setId] = useState('');
+    const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [passwordCheck, setPasswordCheck] = useState('');
@@ -16,17 +19,23 @@ const Signup = () => {
     const [termError, setTermError] = useState(false);
 
     const dispatch = useDispatch();
-    const {isEmailOk, isEmailChecking,isSigningUp,me,emailCheckingErrorReason} = useSelector(state => state.user);
+    const {isEmailOk, isEmailChecking, emailCheckingErrorReason} = useSelector(state => state.user);
+    const {isSigningUp,signUpErrorReason} = useSelector(state => state.user);
+    const {me} = useSelector(state => state.user);
 
     useEffect(() => {
         if(me) {
-            alert('로그인 성공');
+            alert('회원가입 성공');
             Router.push('/');
         }
     }, [me && me.id]);
 
     const onSubmit = useCallback((e) => {
         e.preventDefault();
+
+        if(!isEmailOk) {
+            return;
+        }
 
         if(password !== passwordCheck) {
             return setPasswordError(true);
@@ -39,15 +48,15 @@ const Signup = () => {
         dispatch({
             type: SIGN_UP_REQUEST,
             data : {
-                id,
-                password,
                 name,
+                principal: email,
+                credentials: password,
             }
         });
     },[password, passwordCheck, term]);
 
-    const onChangeId = useCallback((e) => {
-        setId(e.target.value);
+    const onChangeEmail = useCallback((e) => {
+        setEmail(e.target.value);
     },[]);
 
     const onChangeName = useCallback((e) =>{
@@ -69,27 +78,27 @@ const Signup = () => {
     },[]);
 
     const onClickChecking = useCallback( (e) => {
-        if(id === undefined) {
+        if(email == null) {
             return;
         }
         dispatch({
             type: EMAIL_CHECK_REQUEST,
             data : {
-                address: id,
+                address: email,
             }
         });
-    },[id]);
+    },[email]);
 
     return <>
         <Form onSubmit={onSubmit} style={{padding: 10}}>
             <div>
-                <label htmlFor="user-id">아이디</label>
+                <label htmlFor="user-email">아이디</label>
                 <br/>
-                <Input name="user-id" value={id} required onChange={onChangeId}/>
+                <Input name="user-email" value={email} required onChange={onChangeEmail}/>
                 <Button onClick={onClickChecking} loading={isEmailChecking}>중복확인</Button>
                 {isEmailOk === true ? <div style={{color: 'green'}}>사용 가능한 이메일입니다.</div> :
-                  (isEmailOk === false ? <div style={{color: 'red'}}>이메일이 중복입니다.</div> : undefined)}
-                {emailCheckingErrorReason !== '' ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : undefined}
+                  (isEmailOk === false ? <div style={{color: 'red'}}>이메일이 중복입니다.</div> : null)}
+                {emailCheckingErrorReason !== '' ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : null}
             </div>
             <div>
                 <label htmlFor="user-name">닉네임</label>

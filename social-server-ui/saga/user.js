@@ -1,13 +1,18 @@
 import axios from 'axios';
+
 import {
     LOG_IN_REQUEST,
     LOG_IN_SUCCESS,
     LOG_IN_FAILURE,
     SIGN_UP_REQUEST,
     SIGN_UP_SUCCESS,
-    SIGN_UP_FAILURE, EMAIL_CHECK_REQUEST, EMAIL_CHECK_SUCCESS, EMAIL_CHECK_FAILURE,
+    SIGN_UP_FAILURE,
+    EMAIL_CHECK_REQUEST,
+    EMAIL_CHECK_SUCCESS,
+    EMAIL_CHECK_FAILURE,
+    LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOAD_USER_FAILURE,
 } from '../reducers/user';
-import { call,fork,takeEvery,delay,put,all } from 'redux-saga/effects';
+import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
 axios.defaults.baseURL = 'http://localhost:8080/api/';
 
@@ -32,70 +37,27 @@ function* emailCheck(action) {
 }
 
 function* watchEmailCheck() {
-    yield takeEvery(EMAIL_CHECK_REQUEST, emailCheck);
+    yield takeLatest(EMAIL_CHECK_REQUEST, emailCheck);
 }
 
 
-function loginAPI(loginData) {
-    return axios.post('login', loginData);
+function signUpAPI(joinRequest) {
+    const formData = new FormData();
+    formData.append('name', joinRequest.name);
+    formData.append('principal', joinRequest.principal);
+    formData.append('credentials', joinRequest.credentials);
+//data.append('file', new Blob(['test payload'], { type: 'text/csv' }));
+
+    return axios.post('user/join', formData);
 }
 
-function* login(action) {
+
+function* signUp(action) {
     try {
-        yield call(loginAPI, action.data);
-        //yield delay(2000);
+        const result = yield call(signUpAPI,action.data);
         yield put({
-            type: LOG_IN_SUCCESS
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: LOG_IN_FAILURE
-        });
-    }
-}
-
-function* watchLogin() {
-    yield takeEvery(LOG_IN_REQUEST, login);
-}
-
-function loginOutAPI(loginData) {
-    return axios.post('login', loginData);
-}
-
-function* loginOut(action) {
-    try {
-        yield call(loginAPI, action.data);
-        //yield delay(2000);
-        yield put({
-            type: LOG_IN_SUCCESS
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: LOG_IN_FAILURE
-        });
-    }
-}
-
-function* watchLoginOut() {
-    yield takeEvery(LOG_IN_REQUEST, login);
-}
-
-function signUpAPI() {
-
-}
-
-
-function* signUp() {
-
-    console.log('signUp');
-    try {
-        //yield call(signUpAPI);
-        yield delay(2000);
-        //throw new Error('에러');
-        yield put({
-            type: SIGN_UP_SUCCESS
+            type: SIGN_UP_SUCCESS,
+            data: result.data,
         });
     } catch (e) { // 실패
         console.error(e);
@@ -107,42 +69,65 @@ function* signUp() {
 }
 
 function* watchSignUp() {
-    yield takeEvery(SIGN_UP_REQUEST, signUp);
+    yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
 
 
-
-function loadUserAPI() {
-
+function loginAPI(loginData) {
+    return axios.post('auth', loginData);
 }
 
-
-function* loadUser() {
-
-    console.log('signUp');
+function* login(action) {
     try {
-        //yield call(signUpAPI);
-        yield delay(2000);
-        //throw new Error('에러');
+        const result = yield call(loginAPI, action.data);
         yield put({
-            type: SIGN_UP_SUCCESS
+            type: LOG_IN_SUCCESS,
+            data: result.data,
         });
     } catch (e) { // 실패
         console.error(e);
         yield put({
-            type: SIGN_UP_FAILURE,
+            type: LOG_IN_FAILURE,
+            error: e,
+        });
+    }
+}
+
+function* watchLogin() {
+    yield takeLatest(LOG_IN_REQUEST, login);
+}
+
+function loadUserAPI(token) {
+
+
+    return axios.get('user/me', {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+
+function* loadUser(action) {
+    try {
+        const result = yield call(loadUserAPI, action.data);
+        console.log(result.data.response);
+        yield put({
+            type: LOAD_USER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: LOAD_USER_FAILURE,
             error: e
         });
     }
 }
 
-
-
 function* watchLoadUser() {
-
+    yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
-
-
 
 export default function* userSaga() {
     yield all([

@@ -1,11 +1,11 @@
-import React, {useState, useCallback} from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import {Form, Input, Button} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { LOG_IN_REQUEST } from '../reducers/user';
 
 const LoginForm = () => {
-    const [id, setId] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const {isLoggingIn} = useSelector(state => state.user);
     const dispatch = useDispatch();
@@ -15,13 +15,14 @@ const LoginForm = () => {
         dispatch({
           type: LOG_IN_REQUEST,
           data: {
-            id,password,
+            principal: email,
+            credentials: password,
           }
         });
-    }, [id, password]);
+    }, [email, password]);
 
-    const onChangeId = (e) => {
-        setId(e.target.value);
+    const onChangeEmail = (e) => {
+        setEmail(e.target.value);
     };
 
     const onChangePassword = (e) => {
@@ -31,9 +32,9 @@ const LoginForm = () => {
     return (
         <Form onSubmit={onSubmitForm} style={{padding: '10px'}}>
             <div>
-                <label htmlFor="user-id">아이디</label>
+                <label htmlFor="user-email">이메일</label>
                 <br/>
-                <Input name="user-id" value={id} onChange={onChangeId} required/>
+                <Input name="user-email" value={email} onChange={onChangeEmail} required/>
             </div>
             <div>
                 <label htmlFor="user-password">비밀번호</label>

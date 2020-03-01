@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import {Menu, Input, Button, Row, Col} from 'antd';
 import LoginForm from '../components/LoginForm'
 import UserProfile from "./UserProfile";
-import {useSelector} from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
+import { LOAD_USER_REQUEST } from '../reducers/user';
 
 const AppLayout = ({children}) => {
 
-    const {isLogin} = useSelector(state => state.user);
+    const {me} = useSelector(state => state.user);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+      const apiToken = sessionStorage.getItem("apiToken");
+
+        if(apiToken) {
+          dispatch({
+              type: LOAD_USER_REQUEST,
+              data: apiToken,
+          });
+        }
+    }, []);
 
     return (
         <div>
@@ -21,7 +34,7 @@ const AppLayout = ({children}) => {
             </Menu>
             <Row gutter={8}>
                 {<Col xs={24} md={6}>
-                    {isLogin ? <UserProfile/> : <LoginForm />}
+                    {me ? <UserProfile/> : <LoginForm />}
                 </Col>}
                 <Col xs={24} md={12}>
                   {children}
