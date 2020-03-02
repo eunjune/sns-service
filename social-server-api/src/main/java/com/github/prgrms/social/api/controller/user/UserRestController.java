@@ -79,6 +79,7 @@ public class UserRestController {
                 joinRequest.getCredentials(),
                 toAttachedFile(file)
         );
+
         String apiToken = user.newApiToken(jwt, new String[]{Role.USER.getValue()});
         return OK(new JoinResult(apiToken, user));
     }
@@ -114,6 +115,7 @@ public class UserRestController {
     @GetMapping(path = "user/me")
     @ApiOperation(value = "내 정보")
     public ApiResult<User> me(@AuthenticationPrincipal JwtAuthentication authentication) {
+        System.out.println(authentication);
         return OK(
                 userService.findById(authentication.id.getValue())
                         .orElseThrow(() -> new NotFoundException(User.class, authentication.id))

@@ -32,7 +32,7 @@ public class HashTag {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createdAt;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "hashTagList", cascade = CascadeType.ALL)
     @Setter
     private List<Post> postList = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 package com.github.prgrms.social.api.configure;
 
 import com.github.prgrms.social.api.configure.support.PageableArgumentResolver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -13,6 +14,8 @@ import java.util.List;
 
 @Configuration
 public class WebMvcConfigure implements WebMvcConfigurer {
+
+    @Value("${jwt.token.header}") private String tokenHeader;
 
     private String baseApiPath = "/api";
 
@@ -48,5 +51,9 @@ public class WebMvcConfigure implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000");
+               /*
+                .allowedMethods("PUT", "PATCH", "GET", "POST", "OPTIONS")
+                .allowedHeaders("Origin", "X-Requested-With", "Content-Type","Accept","Authorization","access-control-allow-origin","Referer", tokenHeader)*/;
     }
+
 }

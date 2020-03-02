@@ -35,6 +35,7 @@ public class PostService {
     public Post write(Post post, Long userSeq) {
         return userRepository.findBySeq(userSeq)
                 .map(user -> {
+                    post.findHashTag();
                     user.addPost(post);
                     return postRepository.save(post);
                 })

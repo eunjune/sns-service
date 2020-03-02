@@ -9,6 +9,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.time.LocalDateTime.now;
@@ -58,6 +60,10 @@ public class Post {
 
     @ApiModelProperty(value = "해쉬태그 리스트")
     @ManyToMany
+    @JoinTable(
+            name = "post_hashtag",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
     private List<HashTag> hashTagList = new ArrayList<>();
 
     @Builder
@@ -103,5 +109,19 @@ public class Post {
             }
         }
         this.likesOfMe = false;
+    }
+
+    public void findHashTag() {
+        Pattern pattern = Pattern.compile("#[^\\s!@#$%^&*()+-=`~.;'\"?<>,./]+");
+        Matcher matcher = pattern.matcher(contents);
+
+        while(matcher.find()) {
+            addHashTag(HashTag.builder().name(matcher.toString()).build());
+        }
+    }
+
+    public void addHashTag(HashTag hashTag) {
+        this.getHashTagList().add(hashTag);
+        hashTag.getPostList().add(this);
     }
 }

@@ -52,7 +52,9 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
         * */
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
+
             String authorizationToken = obtainAuthorizationToken(request);
+
             if (authorizationToken != null) {
                 try {
                     JWT.Claims claims = verify(request, authorizationToken);
@@ -68,7 +70,6 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
                     String name = claims.name;
                     Email email = claims.email;
                     List<GrantedAuthority> authorities = obtainAuthorities(claims);
-
                     // 요청을 처리하는 다른 클래스에서 Authentication을 쓰도록 하기 위해 스레드 로컬에 저장
                     if (nonNull(userKey) && isNotEmpty(name) && nonNull(email) && authorities.size() > 0) {
                         JwtAuthenticationToken authentication =
@@ -121,6 +122,7 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
                     String credentials = parts[1];
                     return BEARER.matcher(scheme).matches() ? credentials : null;
                 }
+
             } catch (UnsupportedEncodingException e) {
                 log.error(e.getMessage(), e);
             }

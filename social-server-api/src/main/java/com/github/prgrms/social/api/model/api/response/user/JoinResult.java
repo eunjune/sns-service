@@ -18,4 +18,5 @@ public class JoinResult {
 
     @ApiModelProperty(value = "사용자 정보", required = true)
     private final User user;
+
 }

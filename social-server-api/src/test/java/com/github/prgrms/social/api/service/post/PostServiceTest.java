@@ -50,7 +50,7 @@ class PostServiceTest {
     @Test
     void write() {
         User user = User.builder().seq(1L).name("test").password("1234").email(new Email("test00@gmail.com")).build();
-        Post post = Post.builder().contents(randomAlphabetic(40)).build();
+        Post post = Post.builder().contents(randomAlphabetic(40) + "#hashtag1 #()** #Hashtag2 #hash_tag").build();
 
         Post givenPost = Post.builder().seq(1L).contents(randomAlphabetic(40)).build();
 
@@ -63,6 +63,7 @@ class PostServiceTest {
         then(postRepository).should(times(1)).save(any());
 
         assertNotNull(post.getUser());
+        assertEquals(post.getHashTagList().size(), 3);
     }
 
 

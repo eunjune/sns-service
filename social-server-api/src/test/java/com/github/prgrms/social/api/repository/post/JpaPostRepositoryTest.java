@@ -103,9 +103,10 @@ class JpaPostRepositoryTest {
         Post savedPost = jpaUserRepository.findBySeq(1L)
                 .map(user -> {
                     Post post = Post.builder()
-                            .contents("test01 fourth post")
+                            .contents("test01 fourth post #hashtag1 #()** #Hashtag2 #hash_tag")
                             .build();
                     user.addPost(post);
+                    post.findHashTag();
 
                     return jpaPostRepository.save(post);
                 })
@@ -113,6 +114,7 @@ class JpaPostRepositoryTest {
 
         assertEquals(savedPost.getSeq(), 5L);
         assertEquals(savedPost.getUser().getSeq(), 1L);
+        assertEquals(savedPost.getHashTagList().size(), 3);
     }
 
     @Test
