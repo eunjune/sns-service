@@ -1,7 +1,8 @@
-package com.github.prgrms.social.api.repository.user;
+package com.github.prgrms.social.api.repository.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.post.Comment;
+import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
@@ -14,20 +15,24 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 
 @DataJpaTest
-public class JpaUserRepositoryTests {
+class JpaHashTagRepositoryTest {
 
     @Autowired
     TestEntityManager entityManager;
 
     @Autowired
-    JpaUserRepository jpaUserRepository;
+    JpaHashTagRepository hashTagRepository;
+
+    @Autowired
+    JpaPostRepository postRepository;
 
     @BeforeEach
     void beforeEach() {
+        HashTag hashTag1 = HashTag.builder().name("first").build();
+        HashTag hashTag2 = HashTag.builder().name("second").build();
+
         Likes like = new Likes(null,null);
 
         Comment comment1 = Comment.builder()
@@ -39,23 +44,27 @@ public class JpaUserRepositoryTests {
                 .build();
 
         Post post1 = Post.builder()
-                .contents("test01 first post")
+                .contents("test01 first post #first")
                 .build();
         post1.incrementAndGetComments(comment1);
         post1.incrementAndGetLikes(like);
+        post1.addHashTag(hashTag1);
 
         Post post2 = Post.builder()
-                .contents("test01 second post")
+                .contents("test01 second post #second")
                 .build();
+
+        post2.addHashTag(hashTag2);
 
         Post post3 = Post.builder()
                 .contents("test01 third post")
                 .build();
 
         Post post4 = Post.builder()
-                .contents("test02 third post")
+                .contents("test02 third post #first")
                 .build();
         post4.incrementAndGetComments(comment2);
+        post4.addHashTag(hashTag1);
 
         User user1 = User.builder()
                 .name("tester01")
@@ -90,43 +99,19 @@ public class JpaUserRepositoryTests {
         entityManager.persist(user2);
         entityManager.persist(user3);
         entityManager.flush();
+
+
     }
 
     @Test
-    void save() {
-        User user = User.builder()
-                .name("jpatest")
-                .email(new Email("jpatest@gmail.com"))
-                .password("$2a$10$hO38hmoHN1k7Zm3vm95C2eZEtSOaiI/6xZrRAx8l0e78i9.NK8bHG")
-                .build();
+    void findByName() {
+        HashTag hashTag = hashTagRepository.findByName("first").orElseThrow(() -> new NotFoundException(HashTag.class, "first"));
 
-        User savedUser = jpaUserRepository.save(user);
+        assertEquals(hashTag.getPostList().size(),2);
 
-        System.out.println(savedUser);
+        HashTag hashTag2 = hashTagRepository.findByName("second").orElseThrow(() -> new NotFoundException(HashTag.class, "second"));
 
-        assertNotNull(savedUser.getSeq());
+        assertEquals(hashTag2.getPostList().size(),1);
+
     }
-
-    @Test
-    void findBySeq() {
-        User user1 = jpaUserRepository.findBySeq(1L).orElseThrow(()->new NotFoundException(User.class,1L));
-        User user2 = jpaUserRepository.findBySeq(2L).orElseThrow(()->new NotFoundException(User.class,2L));
-        User user3 = jpaUserRepository.findBySeq(3L).orElseThrow(()->new NotFoundException(User.class,3L));
-
-        assertEquals(user1.getSeq(),1L);
-        assertEquals(user2.getSeq(),2L);
-        assertEquals(user3.getSeq(),3L);
-    }
-
-    @Test
-    void findByEmail() {
-        User user1 = jpaUserRepository.findByEmail(new Email("test01@gmail.com")).orElseThrow(()->new NotFoundException(User.class,1L));
-        User user2 = jpaUserRepository.findByEmail(new Email("test02@gmail.com")).orElseThrow(()->new NotFoundException(User.class,2L));
-        User user3 = jpaUserRepository.findByEmail(new Email("test03@gmail.com")).orElseThrow(()->new NotFoundException(User.class,3L));
-
-        assertEquals(user1.getSeq(),1L);
-        assertEquals(user2.getSeq(),2L);
-        assertEquals(user3.getSeq(),3L);
-    }
-
 }

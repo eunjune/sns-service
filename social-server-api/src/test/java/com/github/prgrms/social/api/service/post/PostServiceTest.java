@@ -2,6 +2,7 @@
 
 package com.github.prgrms.social.api.service.post;
 
+import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
@@ -108,6 +109,41 @@ class PostServiceTest {
 
     }
 
+    @DisplayName("해시 태그의 포스트를 조회한다")
+    @Test
+    void findByHashTag() {
+        int size = 4;
+        int page = 0;
+        Pageable pageable = PageRequest.of(page,size);
+
+        String tag = "#hashtag";
+        HashTag hashTag = HashTag.builder().name(tag.substring(1)).build();
+
+        List<Post> givenPosts = new ArrayList<>();
+        Post post1 = Post.builder().seq(1L).contents(randomAlphabetic(40) + tag).build();
+        Post post2 = Post.builder().seq(2L).contents(randomAlphabetic(40) + tag).build();
+        Post post3 = Post.builder().seq(3L).contents(randomAlphabetic(40) + tag).build();
+        Post post4 = Post.builder().seq(4L).contents(randomAlphabetic(40) + tag).build();
+
+        givenPosts.add(post1);
+        givenPosts.add(post2);
+        givenPosts.add(post3);
+        givenPosts.add(post4);
+
+        post1.addHashTag(hashTag);
+        post2.addHashTag(hashTag);
+        post3.addHashTag(hashTag);
+        post4.addHashTag(hashTag);
+
+        given(hashTagRepository.findByName(tag.substring(1))).willReturn(Optional.of(hashTag));
+
+        List<Post> findByHashtagPosts = hashTagRepository.findByName(tag.substring(1)).orElseThrow(() -> new NotFoundException(HashTag.class, tag.substring(1))).getPostList();
+
+        then(hashTagRepository).should(times(1)).findByName(any());
+
+        assertEquals(findByHashtagPosts.size(), givenPosts.size());
+    }
+
 
     @DisplayName("포스트를 처음으로 좋아한다")
     @Test
@@ -171,5 +207,7 @@ class PostServiceTest {
 
         assertEquals(returnPost.getLikeList().size(), givenLikeSize);
     }
+
+
 
 }

@@ -10,7 +10,7 @@ export const initialState = {
     me: null,
     followingList: [],
     followerList: [],
-    meInfo: null,
+    useInfo: null,
 };
 
 export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
@@ -163,6 +163,13 @@ const reducer = (state = initialState, action) => {
         }
 
         case LOAD_USER_SUCCESS: {
+            if(state.user.me) {
+                return {
+                    ...state,
+                    userInfo: action.data,
+                }
+            }
+
             return {
                 ...state,
                 me: action.data,

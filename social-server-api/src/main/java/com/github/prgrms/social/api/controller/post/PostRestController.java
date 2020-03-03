@@ -58,6 +58,22 @@ public class PostRestController {
         return OK(postService.findAll(authentication.id.getValue(), userId, pageable));
     }
 
+    @GetMapping(path = "/post/{tag}/list")
+    @ApiOperation(value = "특정 해시태그의 포스트 목록 조회")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", defaultValue = "0", value = "페이징 offset"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
+    })
+    public ApiResult<List<Post>> postsOfHashTag(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable
+            @ApiParam(value = "해시태그", example = "1")
+            String tag,
+            Pageable pageable
+    ) {
+        return OK(postService.findByHashTag(authentication.id.getValue(), tag, pageable));
+    }
+
     @PatchMapping(path = "user/{userId}/post/{postId}/like")
     @ApiOperation(value = "포스트 좋아요")
     public ApiResult<Post> like(

@@ -2,6 +2,7 @@ package com.github.prgrms.social.api.controller.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prgrms.social.api.model.post.Comment;
+import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -116,6 +118,44 @@ class PostRestControllerTest {
                 .andDo(print());
 
         then(postService).should(times(1)).findAll(any(),any(),any());
+    }
+
+    @Test
+    void postsOfHashTag() throws Exception {
+
+        int size = 4;
+        int page = 0;
+        Pageable pageable = PageRequest.of(page,size);
+
+        String tag = "#hashtag";
+        HashTag hashTag = HashTag.builder().name(tag.substring(1)).build();
+
+        List<Post> givenPosts = new ArrayList<>();
+        Post post1 = Post.builder().seq(1L).contents(randomAlphabetic(40) + tag).build();
+        Post post2 = Post.builder().seq(2L).contents(randomAlphabetic(40) + tag).build();
+        Post post3 = Post.builder().seq(3L).contents(randomAlphabetic(40) + tag).build();
+        Post post4 = Post.builder().seq(4L).contents(randomAlphabetic(40) + tag).build();
+
+        givenPosts.add(post1);
+        givenPosts.add(post2);
+        givenPosts.add(post3);
+        givenPosts.add(post4);
+
+        post1.addHashTag(hashTag);
+        post2.addHashTag(hashTag);
+        post3.addHashTag(hashTag);
+        post4.addHashTag(hashTag);
+
+        given(postService.findByHashTag(1L, tag.substring(1), PageRequest.of(page,size))).willReturn(givenPosts.subList(page,page + size));
+
+        mockMvc.perform(get("/api/post/hashtag/list")
+                .header(tokenHeader, apiToken)
+                .param("page", String.valueOf(page)).param("size",String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.*", hasSize(size)))
+                .andDo(print());
+
+        then(postService).should(times(1)).findByHashTag(any(),any(),any());
     }
 
     @Test

@@ -97,5 +97,13 @@ public class PostService {
         return postRepository.findAll(userSeq, postWriterSeq, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public List<Post> findByHashTag(Long userSeq, String tag, Pageable pageable) {
+        checkNotNull(userSeq, "userId must be provided.");
+        checkNotNull(tag, "tag must be provided.");
 
+        return hashTagRepository.findByName(tag)
+                .map(HashTag::getPostList)
+                .orElseThrow(() -> new NotFoundException(HashTag.class, tag));
+    }
 }

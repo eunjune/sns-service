@@ -148,6 +148,44 @@ const reducer = (state = initialState, action) => {
             }
         }
 
+        case LOAD_HASHTAG_POSTS_REQUEST: {
+            console.log(action.data);
+            return {
+                ...state,
+                mainPosts: []
+            }
+        }
+        case LOAD_HASHTAG_POSTS_SUCCESS: {
+            return {
+                ...state,
+                mainPosts: action.data,
+            }
+        }
+        case LOAD_HASHTAG_POSTS_FAILURE: {
+            return {
+                ...state,
+            }
+        }
+        case LOAD_USER_POSTS_REQUEST: {
+            return {
+                ...state,
+                mainPosts: []
+            }
+        }
+
+        case LOAD_USER_POSTS_SUCCESS: {
+            console.log(action.data);
+            return {
+                ...state,
+                mainPosts: action.data,
+            }
+        }
+        case LOAD_USER_POSTS_FAILURE: {
+            return {
+                ...state,
+            }
+        }
+
         default: {
             return {
                 ...state

@@ -65,11 +65,7 @@ public class Post {
     private List<Comment> commentList = new ArrayList<>();
 
     @ApiModelProperty(value = "해쉬태그 리스트")
-    @ManyToMany
-    @JoinTable(
-            name = "post_hashtag",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
+    @ManyToMany(mappedBy = "postList", cascade = CascadeType.ALL)
     @JsonBackReference
     private List<HashTag> hashTagList = new ArrayList<>();
 
@@ -124,7 +120,7 @@ public class Post {
         List<HashTag> hashTags = new ArrayList<>();
 
         while(matcher.find()) {
-            hashTags.add(HashTag.builder().name(matcher.group()).build());
+            hashTags.add(HashTag.builder().name(matcher.group().substring(1)).build());
         }
 
         return hashTags;

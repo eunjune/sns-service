@@ -122,6 +122,16 @@ public class UserRestController {
         );
     }
 
+    @GetMapping(path = "user/{id}")
+    @ApiOperation(value = "내 정보")
+    public ApiResult<User> findUser(@PathVariable Long id) {
+
+        return OK(
+                userService.findById(id)
+                        .orElseThrow(() -> new NotFoundException(User.class, id))
+        );
+    }
+
     @GetMapping(path = "user/connections")
     @ApiOperation(value = "내 친구 목록")
     public ApiResult<List<ConnectedUser>> connections(@AuthenticationPrincipal JwtAuthentication authentication) {

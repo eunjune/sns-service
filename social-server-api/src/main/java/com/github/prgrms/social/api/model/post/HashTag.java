@@ -33,7 +33,11 @@ public class HashTag {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createdAt;
 
-    @ManyToMany(mappedBy = "hashTagList", cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "post_hashtag",
+            joinColumns = @JoinColumn(name = "hashtag_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
     @Setter
     @JsonManagedReference
     private List<Post> postList = new ArrayList<>();

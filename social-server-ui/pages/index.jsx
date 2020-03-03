@@ -28,8 +28,8 @@ const Home = () => {
     return (
         <div>
             {me && <PostForm />}
-            {mainPosts.map((c) => {
-                return <PostCards key={c} post={c}/>;
+            {mainPosts.map((post) => {
+                return <PostCards key={post.seq} post={post}/>;
             })}
         </div>
     );

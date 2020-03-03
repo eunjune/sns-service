@@ -95,10 +95,8 @@ function* watchLogin() {
     yield takeLatest(LOG_IN_REQUEST, login);
 }
 
-function loadUserAPI(token) {
-
-
-    return axios.get('user/me', {
+function loadUserAPI({userId, token}) {
+    return axios.get(userId === null ? 'user/me' : `user/${userId}`, !userId && {
         headers: {
             'api_key': 'Bearer ' + token,
         },
