@@ -1,5 +1,6 @@
 package com.github.prgrms.social.api.model.post;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -34,6 +35,7 @@ public class HashTag {
 
     @ManyToMany(mappedBy = "hashTagList", cascade = CascadeType.ALL)
     @Setter
+    @JsonManagedReference
     private List<Post> postList = new ArrayList<>();
 
     @Builder

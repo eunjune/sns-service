@@ -2,10 +2,12 @@
 
 package com.github.prgrms.social.api.service.post;
 
+import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Likes;
 import com.github.prgrms.social.api.model.user.User;
+import com.github.prgrms.social.api.repository.post.JpaHashTagRepository;
 import com.github.prgrms.social.api.repository.post.JpaPostLikeRepository;
 import com.github.prgrms.social.api.repository.post.JpaPostRepository;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
@@ -45,6 +47,9 @@ class PostServiceTest {
     @Mock
     private JpaPostLikeRepository postLikeRepository;
 
+    @Mock
+    private JpaHashTagRepository hashTagRepository;
+
 
     @DisplayName("포스트를 작성한다")
     @Test
@@ -56,11 +61,15 @@ class PostServiceTest {
 
         given(userRepository.findBySeq(1L)).willReturn(Optional.ofNullable(user));
         given(postRepository.save(post)).willReturn(givenPost);
+        given(hashTagRepository.save(HashTag.builder().name("#hashtag1").build())).willReturn(HashTag.builder().name("#hashtag1").build());
+        given(hashTagRepository.save(HashTag.builder().name("#Hashtag2").build())).willReturn(HashTag.builder().name("#Hashtag2").build());
+        given(hashTagRepository.save(HashTag.builder().name("#hash_tag").build())).willReturn(HashTag.builder().name("#hash_tag").build());
 
         postService.write(post, 1L);
 
         then(userRepository).should(times(1)).findBySeq(any());
         then(postRepository).should(times(1)).save(any());
+        then(hashTagRepository).should(times(3)).save(any());
 
         assertNotNull(post.getUser());
         assertEquals(post.getHashTagList().size(), 3);

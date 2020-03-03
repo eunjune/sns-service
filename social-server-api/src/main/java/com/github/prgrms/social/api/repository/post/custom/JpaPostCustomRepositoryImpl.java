@@ -37,9 +37,11 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
     @Transactional(readOnly = true)
     public List<Post> findAll(Long userSeq, Long postWriterSeq, Pageable pageable) {
 
-        List resultList = entityManager.createNativeQuery("SELECT p.*, NVL2(l.user_seq,true,false) likes_of_me " +
+        List resultList = entityManager.createNativeQuery("SELECT p.*, " +
+                /*"NVL2(l.user_seq,true,false) likes_of_me " +*/
+                "CASE WHEN l.user_seq = NULL THEN false ELSE true END AS likes_of_me " +
                 "FROM post p JOIN users u ON p.user_seq=u.seq LEFT JOIN likes l ON l.user_seq=:userSeq AND l.post_seq = p.seq " +
-                "WHERE p.user_seq=:postWriterSeq ORDER BY p.seq DESC LIMIT :size OFFSET :offset", Post.class)
+                "WHERE p.user_seq=:postWriterSeq ORDER BY p.create_at DESC LIMIT :size OFFSET :offset", Post.class)
                 .setParameter("userSeq", userSeq)
                 .setParameter("postWriterSeq", postWriterSeq)
                 .setParameter("size", pageable.getPageSize())

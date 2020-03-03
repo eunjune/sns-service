@@ -1,5 +1,6 @@
 package com.github.prgrms.social.api.model.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Post;
@@ -61,19 +62,24 @@ public class User {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createAt;
 
+    @ApiModelProperty(value = "친구 목록")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<ConnectedUser> connectedUser = new ArrayList<>();
 
     @ApiModelProperty(value = "사용자의 포스트")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Post> posts = new ArrayList<>();
 
     @ApiModelProperty(value = "사용자의 댓글")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Comment> commentList = new ArrayList<>();
 
     @ApiModelProperty(value = "사용자의 좋아요")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Likes> likeList = new ArrayList<>();
 
     @Builder

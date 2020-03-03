@@ -14,8 +14,6 @@ import {
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
-axios.defaults.baseURL = 'http://localhost:8080/api/';
-
 function emailCheckAPI(email) {
     return axios.post('user/exists', email)
 }
@@ -109,9 +107,9 @@ function loadUserAPI(token) {
 
 
 function* loadUser(action) {
+
     try {
         const result = yield call(loadUserAPI, action.data);
-        console.log(result.data.response);
         yield put({
             type: LOAD_USER_SUCCESS,
             data: result.data.response,

@@ -1,5 +1,6 @@
 package com.github.prgrms.social.api.model.user;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,10 +30,12 @@ public class ConnectedUser {
 
     @ManyToOne
     @Setter
+    @JsonManagedReference
     private User user;
 
     @OneToOne
     @Setter
+    @JsonManagedReference
     private User targetUser;
 
     public ConnectedUser(Long seq, LocalDateTime grantedAt) {

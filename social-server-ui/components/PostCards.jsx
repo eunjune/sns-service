@@ -30,7 +30,7 @@ const PostCards = ({post}) => {
           postId: post.id,
         }
       })
-    },[me && me.id]);
+    },[me && me.seq]);
 
     const onChangeCommentText = useCallback((e) => {
       setCommentText(e.target.value);
@@ -39,8 +39,8 @@ const PostCards = ({post}) => {
   return (
         <div>
           <Card
-              key={+post.createdAt}
-              cover={post.img && <img src="c.img" alt="example"/>}
+              key={+post.createAt}
+              cover={/*post.img && */<img src="c.img" alt="example"/>}
               actions={[
                   <Icon type="retweet" key="retweet"/>,
                   <Icon type="heart" key="heart"/>,
@@ -50,9 +50,9 @@ const PostCards = ({post}) => {
               extra = {<Button>팔로우</Button>}
           >
               <Card.Meta
-                  avatar={<Avatar>{post.User.name[0]}</Avatar>}
-                  title={post.User.name}
-                  description={post.content}
+                  avatar={<Avatar>{post.user.name[0]}</Avatar>}
+                  title={post.user.name}
+                  description={post.contents}
               >
 
               </Card.Meta>
@@ -66,15 +66,15 @@ const PostCards = ({post}) => {
                 <Button type="primary" htmlType="submit" loading={isAddingComment}>댓글작성</Button>
               </Form>
               <List
-                header={`${post.Comments ? post.Comments.length : 0} 댓글`}
+                header={` 댓글`}
                 itemLayout = "horizontal"
-                dataSource={post.Comments || []}
+                // dataSource={post.Comments || []}
                 renderItem={ item => (
                   <li>
                     <Comment
-                      author={item.User.name}
-                      avatar={<Avatar>{item.User.name[0]}</Avatar>}
-                      content={item.content}
+                      // author={}
+                      // avatar={<Avatar>{}</Avatar>}
+                      // content={}
                     />
                   </li>
                 )}
@@ -87,10 +87,10 @@ const PostCards = ({post}) => {
 
 PostCards.propTypes = {
     post: PropTypes.shape({
-        User: PropTypes.object,
-        content: PropTypes.string,
-        img: PropTypes.string,
-        createdAt: PropTypes.object,
+        user: PropTypes.object,
+        contents: PropTypes.string,
+        // img: PropTypes.string,
+        createAt: PropTypes.object,
     }),
 };
 

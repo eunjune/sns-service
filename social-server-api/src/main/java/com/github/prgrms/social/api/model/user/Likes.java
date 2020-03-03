@@ -1,12 +1,15 @@
 package com.github.prgrms.social.api.model.user;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.prgrms.social.api.model.post.Post;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
@@ -25,10 +28,12 @@ public class Likes {
 
     @ManyToOne
     @Setter
+    @JsonManagedReference
     private User user;
 
     @ManyToOne
     @Setter
+    @JsonManagedReference
     private Post post;
 
     public Likes(Long seq, LocalDateTime createAt) {

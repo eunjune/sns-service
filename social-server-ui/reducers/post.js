@@ -19,16 +19,7 @@ const dummyComment = {
 };
 
 export const initialState = {
-    mainPosts: [{
-        id : 1,
-        User: {
-            id: 1,
-            name: '이름'
-        },
-        content: '첫번째 게시글',
-        img: '',
-        Comments: [],
-    }],
+    mainPosts: [],
     imagePaths: [],
     isAddingPost: false,
     addedPost: false,
@@ -78,21 +69,6 @@ export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
 export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
 export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
 
-const addPost = {
-    type: ADD_POST_REQUEST,
-};
-
-const addDummy = {
-    type: '',
-    data: {
-        content: 'Hello',
-        UserId: 1,
-        User: {
-            name: '이름',
-        },
-
-    }
-};
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
@@ -100,19 +76,23 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 isAddingPost: true,
+                addedPost: false,
             }
         }
         case ADD_POST_SUCCESS: {
+            console.log('post success');
             return {
                 ...state,
                 isAddingPost: false,
-                mainPosts: [dummyPost, ...state.mainPosts],
+                addedPost: true,
+                mainPosts: [action.data, ...state.mainPosts],
             }
         }
         case ADD_POST_FAILURE: {
             return {
                 ...state,
                 isAddingPost: false,
+                addPostError: true,
                 addPostErrorReason: action.error,
             }
         }
@@ -128,7 +108,7 @@ const reducer = (state = initialState, action) => {
         case ADD_COMMENT_SUCCESS: {
             const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId);
             const post = state.mainPosts[postIndex];
-            const Comments = [...post.Comments, dummyComment];
+            const Comments = [...post.Comments, action.data];
             console.log('before');
             const mainPosts = [...state.mainPosts];
             mainPosts[postIndex] = {...post, Comments};
@@ -146,6 +126,25 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isAddingComment: false,
                 addCommentErrorReason: action.error,
+            }
+        }
+
+        case LOAD_MAIN_POSTS_REQUEST: {
+            console.log(action.data);
+            return {
+                ...state,
+                mainPosts: []
+            }
+        }
+        case LOAD_MAIN_POSTS_SUCCESS: {
+            return {
+                ...state,
+                mainPosts: action.data,
+            }
+        }
+        case LOAD_MAIN_POSTS_FAILURE: {
+            return {
+                ...state,
             }
         }
 

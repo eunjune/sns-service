@@ -1,5 +1,7 @@
 package com.github.prgrms.social.api.model.post;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.prgrms.social.api.model.user.Likes;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,7 +22,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Entity
 @Getter
 @NoArgsConstructor(force = true)
-@ToString(exclude = {"user","likeList","commentList", "imageList"})
+@ToString(exclude = {"user","likeList","commentList", "imageList", "hashTagList"})
 @EqualsAndHashCode(of = "seq")
 public class Post {
 
@@ -44,18 +46,22 @@ public class Post {
     @ApiModelProperty(value = "작성자")
     @ManyToOne
     @Setter
+    @JsonManagedReference
     private User user;
 
     @ApiModelProperty(value = "이미지 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Image> imageList = new ArrayList<>();
 
     @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Likes> likeList = new ArrayList<>();
 
     @ApiModelProperty(value = "댓글 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Comment> commentList = new ArrayList<>();
 
     @ApiModelProperty(value = "해쉬태그 리스트")
@@ -64,6 +70,7 @@ public class Post {
             name = "post_hashtag",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "hashtag_id"))
+    @JsonBackReference
     private List<HashTag> hashTagList = new ArrayList<>();
 
     @Builder
@@ -111,13 +118,16 @@ public class Post {
         this.likesOfMe = false;
     }
 
-    public void findHashTag() {
+    public List<HashTag> findHashTag() {
         Pattern pattern = Pattern.compile("#[^\\s!@#$%^&*()+-=`~.;'\"?<>,./]+");
         Matcher matcher = pattern.matcher(contents);
+        List<HashTag> hashTags = new ArrayList<>();
 
         while(matcher.find()) {
-            addHashTag(HashTag.builder().name(matcher.toString()).build());
+            hashTags.add(HashTag.builder().name(matcher.group()).build());
         }
+
+        return hashTags;
     }
 
     public void addHashTag(HashTag hashTag) {

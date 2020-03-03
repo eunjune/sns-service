@@ -1,5 +1,6 @@
 package com.github.prgrms.social.api.model.post;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -33,6 +34,7 @@ public class Image {
 
     @ApiModelProperty(value = "이미지를 갖고 있는 포스트")
     @ManyToOne
+    @JsonManagedReference
     private Post post;
 
     @Builder

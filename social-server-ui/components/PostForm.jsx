@@ -10,18 +10,27 @@ const PostForm = () => {
 
   useEffect(() => {
     setText('');
-  },[addedPost == true]);
+  },[addedPost === true]);
 
   const onSubmitForm = useCallback((e) => {
     e.preventDefault();
+    const apiToken = sessionStorage.getItem("apiToken");
+
+    if(!text || !text.trim()) {
+      alert('게시글을 작성하세욧.');
+      return;
+    }
 
     dispatch({
       type: ADD_POST_REQUEST,
       data: {
-        text,
+        post: {
+          contents: text,
+        },
+        token: apiToken,
       }
     });
-  },[]);
+  },[text]);
 
   const onChangeText = useCallback((e) => {
     setText(e.target.value)

@@ -1,9 +1,11 @@
 package com.github.prgrms.social.api.service.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
+import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Likes;
 import com.github.prgrms.social.api.model.user.User;
+import com.github.prgrms.social.api.repository.post.JpaHashTagRepository;
 import com.github.prgrms.social.api.repository.post.JpaPostLikeRepository;
 import com.github.prgrms.social.api.repository.post.JpaPostRepository;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
@@ -25,17 +27,28 @@ public class PostService {
 
     private final JpaPostLikeRepository postLikeRepository;
 
-    public PostService(JpaUserRepository userRepository, JpaPostRepository postRepository, JpaPostLikeRepository postLikeRepository) {
+    private final JpaHashTagRepository hashTagRepository;
+
+    public PostService(JpaUserRepository userRepository, JpaPostRepository postRepository, JpaPostLikeRepository postLikeRepository, JpaHashTagRepository hashTagRepository) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.postLikeRepository = postLikeRepository;
+        this.hashTagRepository = hashTagRepository;
     }
 
     @Transactional
     public Post write(Post post, Long userSeq) {
         return userRepository.findBySeq(userSeq)
                 .map(user -> {
-                    post.findHashTag();
+
+                    List<HashTag> hashTagList = post.findHashTag();
+                    for(HashTag item : hashTagList) {
+                        HashTag hashTag = hashTagRepository.findByName(item.getName()).orElse(null);
+                        if(hashTag == null) {
+                            hashTag = hashTagRepository.save(item);
+                        }
+                        post.addHashTag(hashTag);
+                    }
                     user.addPost(post);
                     return postRepository.save(post);
                 })

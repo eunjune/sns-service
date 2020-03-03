@@ -2,6 +2,7 @@ package com.github.prgrms.social.api.repository.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.post.Comment;
+import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
@@ -31,6 +32,9 @@ class JpaPostRepositoryTest {
 
     @Autowired
     JpaUserRepository jpaUserRepository;
+
+    @Autowired
+    JpaHashTagRepository jpaHashTagRepository;
 
     @BeforeEach
     void beforeEach() {
@@ -105,8 +109,12 @@ class JpaPostRepositoryTest {
                     Post post = Post.builder()
                             .contents("test01 fourth post #hashtag1 #()** #Hashtag2 #hash_tag")
                             .build();
+
+                    List<HashTag> hashTags = post.findHashTag();
+                    for(HashTag hashTag : hashTags) {
+                        post.addHashTag(jpaHashTagRepository.save(hashTag));
+                    }
                     user.addPost(post);
-                    post.findHashTag();
 
                     return jpaPostRepository.save(post);
                 })
