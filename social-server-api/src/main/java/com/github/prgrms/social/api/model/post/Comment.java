@@ -17,17 +17,17 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Getter
 @NoArgsConstructor(force = true)
 @ToString(exclude = {"post","user"})
-@EqualsAndHashCode(of = "seq")
+@EqualsAndHashCode(of = "id")
 public class Comment {
 
     @ApiModelProperty(value = "PK", required = true)
     @javax.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long seq;
+    private final Long id;
 
     @ApiModelProperty(value = "내용", required = true)
     @Column(nullable = false)
-    private String contents;
+    private String content;
 
     @ApiModelProperty(value = "작성일시", required = true)
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
@@ -46,15 +46,15 @@ public class Comment {
     private User user;
 
     @Builder
-    private Comment(Long seq, String contents, LocalDateTime createAt) {
-        checkArgument(isNotEmpty(contents), "contents must be provided.");
+    private Comment(Long id, String content, LocalDateTime createAt) {
+        checkArgument(isNotEmpty(content), "contents must be provided.");
         checkArgument(
-                contents.length() >= 4 && contents.length() <= 500,
+                content.length() >= 4 && content.length() <= 500,
                 "comment contents length must be between 4 and 500 characters."
         );
 
-        this.seq = seq;
-        this.contents = contents;
+        this.id = id;
+        this.content = content;
         this.createAt = defaultIfNull(createAt, now());
     }
 
@@ -65,6 +65,6 @@ public class Comment {
                 "post contents length must be between 4 and 500 characters."
         );
 
-        this.contents = contents;
+        this.content = contents;
     }
 }

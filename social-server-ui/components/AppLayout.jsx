@@ -5,7 +5,7 @@ import {Menu, Input, Button, Row, Col} from 'antd';
 import LoginForm from '../components/LoginForm'
 import UserProfile from "./UserProfile";
 import { useDispatch, useSelector } from 'react-redux';
-import { LOAD_USER_REQUEST } from '../reducers/user';
+import { LOAD_ME_REQUEST } from '../reducers/user';
 
 const AppLayout = ({children}) => {
 
@@ -13,13 +13,13 @@ const AppLayout = ({children}) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-      const apiToken = sessionStorage.getItem("apiToken");
+        const token = sessionStorage.getItem("token");
 
-        if(apiToken) {
-          dispatch({
-              type: LOAD_USER_REQUEST,
-              data: apiToken,
-          });
+        if(!me) {
+            dispatch({
+                type: LOAD_ME_REQUEST,
+                data: token,
+            });
         }
     }, []);
 

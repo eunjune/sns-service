@@ -22,18 +22,18 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Entity
 @Getter
 @NoArgsConstructor(force = true)
-@ToString(exclude = {"user","likeList","commentList", "imageList", "hashTagList"})
-@EqualsAndHashCode(of = "seq")
+@ToString(exclude = {"user","likes","comments", "images", "hashTags"})
+@EqualsAndHashCode(of = "id")
 public class Post {
 
     @ApiModelProperty(value = "PK", required = true)
     @javax.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long seq;
+    private final Long id;
 
     @ApiModelProperty(value = "내용", required = true)
     @Column(nullable = false)
-    private String contents;
+    private String content;
 
     @ApiModelProperty(value = "나의 좋아요 여부", required = true)
     @Transient
@@ -52,33 +52,33 @@ public class Post {
     @ApiModelProperty(value = "이미지 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<Image> imageList = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
 
     @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<Likes> likeList = new ArrayList<>();
+    private List<Likes> likes = new ArrayList<>();
 
     @ApiModelProperty(value = "댓글 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<Comment> commentList = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     @ApiModelProperty(value = "해쉬태그 리스트")
-    @ManyToMany(mappedBy = "postList", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "posts", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<HashTag> hashTagList = new ArrayList<>();
+    private List<HashTag> hashTags = new ArrayList<>();
 
     @Builder
-    private Post(Long seq, String contents, boolean likesOfMe, LocalDateTime createAt) {
-        checkArgument(isNotEmpty(contents), "contents must be provided.");
+    private Post(Long id, String content, boolean likesOfMe, LocalDateTime createAt) {
+        checkArgument(isNotEmpty(content), "contents must be provided.");
         checkArgument(
-                contents.length() >= 4 && contents.length() <= 500,
+                content.length() >= 4 && content.length() <= 500,
                 "post contents length must be between 4 and 500 characters."
         );
 
-        this.seq = seq;
-        this.contents = contents;
+        this.id = id;
+        this.content = content;
         this.likesOfMe = likesOfMe;
         this.createAt = defaultIfNull(createAt, now());
     }
@@ -90,23 +90,23 @@ public class Post {
                 "post contents length must be between 4 and 500 characters."
         );
 
-        this.contents = contents;
+        this.content = contents;
     }
 
     public void incrementAndGetLikes(Likes likes) {
         likesOfMe = true;
-        this.getLikeList().add(likes);
+        this.likes.add(likes);
         likes.setPost(this);
     }
 
     public void incrementAndGetComments(Comment comment) {
-        this.getCommentList().add(comment);
+        this.comments.add(comment);
         comment.setPost(this);
     }
 
     public void setLikesOfMe(Long userSeq) {
-        for(Likes likes : likeList) {
-            if(likes.getUser().getSeq().equals(userSeq)) {
+        for(Likes likes : likes) {
+            if(likes.getUser().getId().equals(userSeq)) {
                 this.likesOfMe = true;
                 return;
             }
@@ -116,7 +116,7 @@ public class Post {
 
     public List<HashTag> findHashTag() {
         Pattern pattern = Pattern.compile("#[^\\s!@#$%^&*()+-=`~.;'\"?<>,./]+");
-        Matcher matcher = pattern.matcher(contents);
+        Matcher matcher = pattern.matcher(content);
         List<HashTag> hashTags = new ArrayList<>();
 
         while(matcher.find()) {
@@ -127,7 +127,7 @@ public class Post {
     }
 
     public void addHashTag(HashTag hashTag) {
-        this.getHashTagList().add(hashTag);
-        hashTag.getPostList().add(this);
+        this.hashTags.add(hashTag);
+        hashTag.getPosts().add(this);
     }
 }

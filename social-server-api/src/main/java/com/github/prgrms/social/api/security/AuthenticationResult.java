@@ -11,16 +11,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AuthenticationResult {
 
     @ApiModelProperty(value = "API 토큰", required = true)
-    private final String apiToken;
+    private final String token;
 
     @ApiModelProperty(value = "사용자 정보", required = true)
     private final User user;
 
-    public AuthenticationResult(String apiToken, User user) {
-        checkNotNull(apiToken, "apiToken must be provided.");
+    public AuthenticationResult(String token, User user) {
+        checkNotNull(token, "apiToken must be provided.");
         checkNotNull(user, "user must be provided.");
 
-        this.apiToken = apiToken;
+        this.token = token;
         this.user = user;
     }
 }

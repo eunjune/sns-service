@@ -8,46 +8,44 @@ import { LOAD_USER_REQUEST } from '../reducers/user';
 
 const User = ({id}) => {
   const dispatch = useDispatch();
-  const {mainPosts} = useSelector(state => state.post);
-  const {userInfo} = useSelector(state => state.user);
+  const {posts} = useSelector(state => state.post);
+  const {user} = useSelector(state => state.user);
 
   useEffect(() => {
-    const apiToken = sessionStorage.getItem("apiToken");
+    const token = sessionStorage.getItem("token");
 
     dispatch({
       type: LOAD_USER_REQUEST,
-      data: {
-        userId : id,
-      },
+      data: id,
     });
 
     dispatch({
       type: LOAD_USER_POSTS_REQUEST,
       data: {
         userId : id,
-        token: apiToken,
+        token: token,
       },
     });
   },[]);
 
   return (
     <div>
-      {userInfo
+      {user
         ? <Card
           actions={[
-            <div key="twit">짹짹<br/></div>,/*{me.posts.length}*/
-            <div key="following">팔로윙<br/></div>,
-            <div key="twit">팔로워<br/></div>,
+            <div key="twit">게시글 수<br/>{posts.length}</div>,
+            <div key="following">팔로윙<br/>{}</div>,
+            <div key="twit">팔로워<br/>{}</div>,
           ]}
         >
           <Card.Meta
-            avatar={<Avatar>{userInfo.name[0]}</Avatar>}
-            title={userInfo.name}
+            avatar={<Avatar>{user.name[0]}</Avatar>}
+            title={user.name}
           />
 
         </Card>
         : null}
-      {mainPosts.map(p => (
+      {posts.map(p => (
         <PostCards key={+p.seq} post={p}/>
       ))}
     </div>

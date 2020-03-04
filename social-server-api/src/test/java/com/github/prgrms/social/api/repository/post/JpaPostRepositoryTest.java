@@ -41,29 +41,29 @@ class JpaPostRepositoryTest {
         Likes like = new Likes(null,null);
 
         Comment comment1 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Comment comment2 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Post post1 = Post.builder()
-                .contents("test01 first post")
+                .content("test01 first post")
                 .build();
         post1.incrementAndGetComments(comment1);
         post1.incrementAndGetLikes(like);
 
         Post post2 = Post.builder()
-                .contents("test01 second post")
+                .content("test01 second post")
                 .build();
 
         Post post3 = Post.builder()
-                .contents("test01 third post")
+                .content("test01 third post")
                 .build();
 
         Post post4 = Post.builder()
-                .contents("test02 third post")
+                .content("test02 third post")
                 .build();
         post4.incrementAndGetComments(comment2);
 
@@ -104,10 +104,10 @@ class JpaPostRepositoryTest {
 
     @Test
     void save() {
-        Post savedPost = jpaUserRepository.findBySeq(1L)
+        Post savedPost = jpaUserRepository.findById(1L)
                 .map(user -> {
                     Post post = Post.builder()
-                            .contents("test01 fourth post #hashtag1 #()** #Hashtag2 #hash_tag")
+                            .content("test01 fourth post #hashtag1 #()** #Hashtag2 #hash_tag")
                             .build();
 
                     List<HashTag> hashTags = post.findHashTag();
@@ -120,23 +120,23 @@ class JpaPostRepositoryTest {
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, 1L));
 
-        assertEquals(savedPost.getSeq(), 5L);
-        assertEquals(savedPost.getUser().getSeq(), 1L);
-        assertEquals(savedPost.getHashTagList().size(), 3);
+        assertEquals(savedPost.getId(), 5L);
+        assertEquals(savedPost.getUser().getId(), 1L);
+        assertEquals(savedPost.getHashTags().size(), 3);
     }
 
     @Test
     void findById() {
-        Post post = jpaPostRepository.findById(1L,1L,1L).orElseThrow(()->new NotFoundException(Post.class,1L));
+        Post post = jpaPostRepository.findByIdCustom(1L,1L,1L).orElseThrow(()->new NotFoundException(Post.class,1L));
 
-        assertEquals(post.getSeq(),1L);
-        assertEquals(post.getUser().getSeq(),1L);
+        assertEquals(post.getId(),1L);
+        assertEquals(post.getUser().getId(),1L);
         assertTrue(post.isLikesOfMe());
 
-        Post post2 = jpaPostRepository.findById(1L,2L,1L).orElseThrow(()->new NotFoundException(Post.class,1L));
+        Post post2 = jpaPostRepository.findByIdCustom(1L,2L,1L).orElseThrow(()->new NotFoundException(Post.class,1L));
 
-        assertEquals(post2.getSeq(),1L);
-        assertEquals(post2.getUser().getSeq(),1L);
+        assertEquals(post2.getId(),1L);
+        assertEquals(post2.getUser().getId(),1L);
         assertFalse(post2.isLikesOfMe());
     }
 

@@ -31,29 +31,29 @@ public class JpaUserRepositoryTests {
         Likes like = new Likes(null,null);
 
         Comment comment1 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Comment comment2 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Post post1 = Post.builder()
-                .contents("test01 first post")
+                .content("test01 first post")
                 .build();
         post1.incrementAndGetComments(comment1);
         post1.incrementAndGetLikes(like);
 
         Post post2 = Post.builder()
-                .contents("test01 second post")
+                .content("test01 second post")
                 .build();
 
         Post post3 = Post.builder()
-                .contents("test01 third post")
+                .content("test01 third post")
                 .build();
 
         Post post4 = Post.builder()
-                .contents("test02 third post")
+                .content("test02 third post")
                 .build();
         post4.incrementAndGetComments(comment2);
 
@@ -104,18 +104,18 @@ public class JpaUserRepositoryTests {
 
         System.out.println(savedUser);
 
-        assertNotNull(savedUser.getSeq());
+        assertNotNull(savedUser.getId());
     }
 
     @Test
     void findBySeq() {
-        User user1 = jpaUserRepository.findBySeq(1L).orElseThrow(()->new NotFoundException(User.class,1L));
-        User user2 = jpaUserRepository.findBySeq(2L).orElseThrow(()->new NotFoundException(User.class,2L));
-        User user3 = jpaUserRepository.findBySeq(3L).orElseThrow(()->new NotFoundException(User.class,3L));
+        User user1 = jpaUserRepository.findById(1L).orElseThrow(()->new NotFoundException(User.class,1L));
+        User user2 = jpaUserRepository.findById(2L).orElseThrow(()->new NotFoundException(User.class,2L));
+        User user3 = jpaUserRepository.findById(3L).orElseThrow(()->new NotFoundException(User.class,3L));
 
-        assertEquals(user1.getSeq(),1L);
-        assertEquals(user2.getSeq(),2L);
-        assertEquals(user3.getSeq(),3L);
+        assertEquals(user1.getId(),1L);
+        assertEquals(user2.getId(),2L);
+        assertEquals(user3.getId(),3L);
     }
 
     @Test
@@ -124,9 +124,9 @@ public class JpaUserRepositoryTests {
         User user2 = jpaUserRepository.findByEmail(new Email("test02@gmail.com")).orElseThrow(()->new NotFoundException(User.class,2L));
         User user3 = jpaUserRepository.findByEmail(new Email("test03@gmail.com")).orElseThrow(()->new NotFoundException(User.class,3L));
 
-        assertEquals(user1.getSeq(),1L);
-        assertEquals(user2.getSeq(),2L);
-        assertEquals(user3.getSeq(),3L);
+        assertEquals(user1.getId(),1L);
+        assertEquals(user2.getId(),2L);
+        assertEquals(user3.getId(),3L);
     }
 
 }

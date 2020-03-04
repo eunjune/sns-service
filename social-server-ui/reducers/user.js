@@ -8,9 +8,9 @@ export const initialState = {
     isSigningUp: false,
     signUpErrorReason: null,
     me: null,
-    followingList: [],
-    followerList: [],
-    useInfo: null,
+    followings: [],
+    followers: [],
+    user: null,
 };
 
 export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
@@ -29,6 +29,10 @@ export const LOG_OUT = 'LOG_OUT';
 export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST';
 export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS';
 export const LOAD_USER_FAILURE = 'LOAD_USER_FAILURE';
+
+export const LOAD_ME_REQUEST = 'LOAD_ME_REQUEST';
+export const LOAD_ME_SUCCESS = 'LOAD_ME_SUCCESS';
+export const LOAD_ME_FAILURE = 'LOAD_ME_FAILURE';
 
 export const LOAD_FOLLOW_REQUEST = 'LOAD_FOLLOW_REQUEST';
 export const LOAD_FOLLOW_SUCCESS = 'LOAD_FOLLOW_SUCCESS';
@@ -86,22 +90,22 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isSigningUp: true,
                 isSignedUp: false,
+                isEmailOk: false,
                 signUpErrorReason: null
             };
         }
 
         case SIGN_UP_SUCCESS: {
             const me = action.data.response.user;
-            const apiToken = action.data.response.apiToken;
+            const token = action.data.response.token;
 
-            sessionStorage.setItem("apiToken", apiToken);
+            sessionStorage.setItem('token',token);
 
             return {
                 ...state,
                 isSigningUp: false,
                 isSignedUp: true,
                 me: me,
-                apiToken: apiToken,
             };
         }
 
@@ -123,15 +127,14 @@ const reducer = (state = initialState, action) => {
 
         case LOG_IN_SUCCESS: {
             const me = action.data.response.user;
-            const apiToken = action.data.response.apiToken;
+            const token = action.data.response.token;
 
-            sessionStorage.setItem("apiToken", apiToken);
+            sessionStorage.setItem('token',token);
 
             return {
                 ...state,
                 isLoggingIn: false,
                 me: me,
-                apiToken: apiToken,
             };
         }
 
@@ -142,16 +145,35 @@ const reducer = (state = initialState, action) => {
 
                 loginErrorReason: action.error,
                 me: null,
-                apiToken: null,
             };
         }
 
         case LOG_OUT: {
-            sessionStorage.setItem("apiToken", null);
+            sessionStorage.setItem('token',null);
+
             return {
                 ...state,
                 me: null,
-                apiToken: null,
+            };
+        }
+
+        case LOAD_ME_REQUEST: {
+
+            return {
+                ...state,
+            };
+        }
+
+        case LOAD_ME_SUCCESS: {
+            return {
+                ...state,
+                me: action.data,
+            };
+        }
+
+        case LOAD_ME_FAILURE: {
+            return {
+                ...state,
             };
         }
 
@@ -163,16 +185,9 @@ const reducer = (state = initialState, action) => {
         }
 
         case LOAD_USER_SUCCESS: {
-            if(state.user.me) {
-                return {
-                    ...state,
-                    userInfo: action.data,
-                }
-            }
-
             return {
                 ...state,
-                me: action.data,
+                user: action.data,
             };
         }
 

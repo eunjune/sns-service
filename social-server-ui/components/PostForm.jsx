@@ -6,7 +6,8 @@ import { ADD_POST_REQUEST } from '../reducers/post';
 const PostForm = () => {
   const [text, setText] = useState('');
   const dispatch = useDispatch();
-  const { imagePaths, isAddingPost, addedPost} = useSelector(state => state.post);
+  const { images, isAddingPost, addedPost} = useSelector(state => state.post);
+  // const {token} = useSelector(state => state.user);
 
   useEffect(() => {
     setText('');
@@ -14,7 +15,7 @@ const PostForm = () => {
 
   const onSubmitForm = useCallback((e) => {
     e.preventDefault();
-    const apiToken = sessionStorage.getItem("apiToken");
+    const token = sessionStorage.getItem("token");
 
     if(!text || !text.trim()) {
       alert('게시글을 작성하세욧.');
@@ -25,9 +26,9 @@ const PostForm = () => {
       type: ADD_POST_REQUEST,
       data: {
         post: {
-          contents: text,
+          content: text,
         },
-        token: apiToken,
+        token: token,
       }
     });
   },[text]);
@@ -45,7 +46,7 @@ const PostForm = () => {
                 <Button type="primary" style={{float: 'right'}} htmlType="submit" loading={isAddingPost}>글 작성</Button>
             </div>
             <div>
-                {imagePaths.map((v,i) => {
+                {images.map((v,i) => {
                     return (
                         <div key={v} style={{display: 'inline-block'}}>
                             <img src={'http://localhost:3065/' + v}  style={{width: '200px'}} alt={v}/>

@@ -12,7 +12,7 @@ public interface JpaUserRepository extends JpaRepository<User,Long> {
     User save(User user);
 
     @Transactional(readOnly = true)
-    Optional<User> findBySeq(Long userSeq);
+    Optional<User> findById(Long id);
 
     @Transactional(readOnly = true)
     Optional<User> findByEmail(Email email);

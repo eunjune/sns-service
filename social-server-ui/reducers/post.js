@@ -1,26 +1,7 @@
-const dummyPost = {
-    id: 1,
-    User: {
-        id: 1,
-        name: '이름',
-    },
-    content : '나는 더미',
-    Comments: [],
-};
-
-const dummyComment = {
-    id: 2,
-    User: {
-        id: 1,
-        name: 2,
-    },
-    createdAt: new Date(),
-    content: '더미 입니다.',
-};
 
 export const initialState = {
-    mainPosts: [],
-    imagePaths: [],
+    posts: [],
+    images: [],
     isAddingPost: false,
     addedPost: false,
     addPostError: false,
@@ -85,7 +66,7 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 isAddingPost: false,
                 addedPost: true,
-                mainPosts: [action.data, ...state.mainPosts],
+                posts: [action.data, ...state.posts],
             }
         }
         case ADD_POST_FAILURE: {
@@ -97,49 +78,19 @@ const reducer = (state = initialState, action) => {
             }
         }
 
-        case ADD_COMMENT_REQUEST: {
-            return {
-                ...state,
-                isAddingComment: true,
-                addCommentErrorReason: '',
-                addedComment: false,
-            }
-        }
-        case ADD_COMMENT_SUCCESS: {
-            const postIndex = state.mainPosts.findIndex(v => v.id === action.data.postId);
-            const post = state.mainPosts[postIndex];
-            const Comments = [...post.Comments, action.data];
-            console.log('before');
-            const mainPosts = [...state.mainPosts];
-            mainPosts[postIndex] = {...post, Comments};
-            console.log('after');
 
-            return {
-                ...state,
-                isAddingComment: false,
-                addedComment: true,
-                mainPosts,
-            }
-        }
-        case ADD_COMMENT_FAILURE: {
-            return {
-                ...state,
-                isAddingComment: false,
-                addCommentErrorReason: action.error,
-            }
-        }
 
         case LOAD_MAIN_POSTS_REQUEST: {
             console.log(action.data);
             return {
                 ...state,
-                mainPosts: []
+                posts: []
             }
         }
         case LOAD_MAIN_POSTS_SUCCESS: {
             return {
                 ...state,
-                mainPosts: action.data,
+                posts: action.data,
             }
         }
         case LOAD_MAIN_POSTS_FAILURE: {
@@ -152,13 +103,13 @@ const reducer = (state = initialState, action) => {
             console.log(action.data);
             return {
                 ...state,
-                mainPosts: []
+                posts: []
             }
         }
         case LOAD_HASHTAG_POSTS_SUCCESS: {
             return {
                 ...state,
-                mainPosts: action.data,
+                posts: action.data,
             }
         }
         case LOAD_HASHTAG_POSTS_FAILURE: {
@@ -169,20 +120,74 @@ const reducer = (state = initialState, action) => {
         case LOAD_USER_POSTS_REQUEST: {
             return {
                 ...state,
-                mainPosts: []
+                posts: []
             }
         }
 
         case LOAD_USER_POSTS_SUCCESS: {
-            console.log(action.data);
             return {
                 ...state,
-                mainPosts: action.data,
+                posts: action.data,
             }
         }
         case LOAD_USER_POSTS_FAILURE: {
             return {
                 ...state,
+            }
+        }
+
+        case LOAD_COMMENTS_REQUEST: {
+            return {
+                ...state,
+            }
+        }
+
+        case LOAD_COMMENTS_SUCCESS: {
+            const postIndex = state.posts.findIndex(p => p.id === action.data.postId);
+            const post = state.posts[postIndex];
+            const comments = action.data.comments;
+            const posts = [...state.posts];
+            posts[postIndex] = {...post, comments: comments};
+
+            return {
+                ...state,
+                posts: posts,
+            }
+        }
+        case LOAD_COMMENTS_FAILURE: {
+            return {
+                ...state,
+            }
+        }
+
+        case ADD_COMMENT_REQUEST: {
+            return {
+                ...state,
+                isAddingComment: true,
+                addCommentErrorReason: '',
+                addedComment: false,
+            }
+        }
+        case ADD_COMMENT_SUCCESS: {
+            const postIndex = state.posts.findIndex(p => p.id === action.data.postId);
+
+            const post = state.posts[postIndex];
+            const comments = [...post.comments, action.data.comment];
+            const posts = [...state.posts];
+            posts[postIndex] = {...post, comments: comments};
+
+            return {
+                ...state,
+                isAddingComment: false,
+                addedComment: true,
+                posts: posts,
+            }
+        }
+        case ADD_COMMENT_FAILURE: {
+            return {
+                ...state,
+                isAddingComment: false,
+                addCommentErrorReason: action.error,
             }
         }
 

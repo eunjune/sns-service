@@ -1,22 +1,20 @@
 package com.github.prgrms.social.api.model.api.request.post;
 
 import com.github.prgrms.social.api.model.post.Comment;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 // 댓글작성 요청 데이터를 받는 DTO
-@Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @ToString
 public class CommentRequest {
 
-    private String contents;
+    private String content;
 
     public Comment newComment() {
         return Comment.builder()
-                .contents(contents)
+                .content(content)
                 .build();
 
     }

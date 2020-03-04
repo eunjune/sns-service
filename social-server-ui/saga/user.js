@@ -10,7 +10,7 @@ import {
     EMAIL_CHECK_REQUEST,
     EMAIL_CHECK_SUCCESS,
     EMAIL_CHECK_FAILURE,
-    LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOAD_USER_FAILURE,
+    LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOAD_USER_FAILURE, LOAD_ME_REQUEST, LOAD_ME_SUCCESS, LOAD_ME_FAILURE,
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
@@ -26,7 +26,7 @@ function* emailCheck(action) {
             data: !result.data.response,
         });
     } catch (e) { // 실패
-        console.error(e.message);
+        console.error(e);
         yield put({
             type: EMAIL_CHECK_FAILURE,
             error: '이메일 형식이 맞지 않습니다.',
@@ -39,11 +39,11 @@ function* watchEmailCheck() {
 }
 
 
-function signUpAPI(joinRequest) {
+function signUpAPI({name,address,password}) {
     const formData = new FormData();
-    formData.append('name', joinRequest.name);
-    formData.append('principal', joinRequest.principal);
-    formData.append('credentials', joinRequest.credentials);
+    formData.append('name', name);
+    formData.append('address', address);
+    formData.append('password', password);
 //data.append('file', new Blob(['test payload'], { type: 'text/csv' }));
 
     return axios.post('user/join', formData);
@@ -95,12 +95,8 @@ function* watchLogin() {
     yield takeLatest(LOG_IN_REQUEST, login);
 }
 
-function loadUserAPI({userId, token}) {
-    return axios.get(userId === null ? 'user/me' : `user/${userId}`, !userId && {
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
+function loadUserAPI(userId) {
+    return axios.get(`user/${userId}`);
 }
 
 
@@ -125,11 +121,41 @@ function* watchLoadUser() {
     yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
 
+function loadMeAPI(token) {
+    return axios.get('user/me',{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadMe(action) {
+
+    try {
+        const result = yield call(loadMeAPI, action.data);
+        yield put({
+            type: LOAD_ME_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: LOAD_ME_FAILURE,
+            error: e
+        });
+    }
+}
+
+function* watchLoadMe() {
+    yield takeLatest(LOAD_ME_REQUEST,loadMe);
+}
+
 export default function* userSaga() {
     yield all([
         fork(watchEmailCheck),
         fork(watchLogin),
         fork(watchSignUp),
         fork(watchLoadUser),
+        fork(watchLoadMe),
     ]);
 }

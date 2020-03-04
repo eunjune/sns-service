@@ -1,5 +1,4 @@
 {
-
   "watch": [
     "server.js",
     "nodemon.json"

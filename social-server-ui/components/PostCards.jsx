@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Icon, Avatar, Form, List,Comment,Input } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { ADD_COMMENT_REQUEST } from '../reducers/post';
+import {ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST} from '../reducers/post';
 import Link from 'next/link';
 
 const PostCards = ({post}) => {
@@ -17,21 +17,42 @@ const PostCards = ({post}) => {
     }, [addedComment === true]);
 
     const onToggleComment = useCallback(() => {
-      setCommentFormOpened(prev => !prev);
+        const token = sessionStorage.getItem("token");
+
+        setCommentFormOpened(prev => !prev);
+
+
+        if(!commentFormOpened) {
+          dispatch({
+              type: LOAD_COMMENTS_REQUEST,
+              data: {
+                  postId: post.id,
+                  userId: me.id,
+                  token: token,
+              },
+          })
+        }
+
     },[]);
 
     const onSubmitComment = useCallback((e) => {
-      e.preventDefault();
-      if(!me) {
+
+        const token = sessionStorage.getItem("token");
+
+        e.preventDefault();
+        if(!me) {
         alert('로그인이 필요합니다.');
-      }
-      dispatch({
-        type: ADD_COMMENT_REQUEST,
-        data: {
-          postId: post.id,
         }
-      })
-    },[me && me.seq]);
+        dispatch({
+            type: ADD_COMMENT_REQUEST,
+            data: {
+                userId: me.id,
+                postId: post.id,
+                comment: commentText,
+                token: token,
+            }
+            })
+    },[me && me.id, commentText]);
 
     const onChangeCommentText = useCallback((e) => {
       setCommentText(e.target.value);
@@ -51,15 +72,15 @@ const PostCards = ({post}) => {
               extra = {<Button>팔로우</Button>}
           >
               <Card.Meta
-                  avatar={<Avatar>{post.user.name[0]}</Avatar>}
+                  avatar={<Link href={{pathname: '/user', query: {id:post.user.id}}} as={`/user/${post.user.id}`}><a><Avatar>{post.user.name[0]}</Avatar></a></Link>  }
                   title={post.user.name}
                   description={(
 
                     <div>
-                      {post.contents.split(/(#[^\s!@#$%^&*()+-=`~.;'"?<>,./]+)/g).map(v => {
+                      {post.content.split(/(#[^\s!@#$%^&*()+-=`~.;'"?<>,./]+)/g).map(v => {
                           if(v.match(/#[^\s!@#$%^&*()+-=`~.;'"?<>,./]+/)) {
                             return (
-                              <Link href={`/hashtag/${v.slice(1)}`} key={v}><a>{v}</a></Link>
+                              <Link href={{pathname: '/hashtag', query: { tag : v.slice(1) }}} as={`/hashtag/${v.slice(1)}`} key={v}><a>{v}</a></Link>
                             )
                           }
                           return v;
@@ -80,13 +101,13 @@ const PostCards = ({post}) => {
               <List
                 header={` 댓글`}
                 itemLayout = "horizontal"
-                 dataSource={post.commentList || []}
+                dataSource={post.comments || []}
                 renderItem={ item => (
                   <li>
                     <Comment
                       author={item.user.name}
-                      avatar={<Avatar>{item.user.name[0]}</Avatar>}
-                      content={item.contents}
+                      avatar={<Link href={{pathname: '/user', query: {id : post.user.id}}} as={`/user/${post.user.id}`}><a><Avatar>{post.user.name[0]}</Avatar></a></Link> }
+                      content={item.content}
                     />
                   </li>
                 )}
@@ -100,7 +121,7 @@ const PostCards = ({post}) => {
 PostCards.propTypes = {
     post: PropTypes.shape({
         user: PropTypes.object,
-        contents: PropTypes.string,
+        content: PropTypes.string,
         // img: PropTypes.string,
         createAt: PropTypes.object,
     }),

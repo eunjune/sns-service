@@ -75,8 +75,8 @@ public class UserRestController {
     ) throws IOException {
         User user = userService.join(
                 joinRequest.getName(),
-                new Email(joinRequest.getPrincipal()),
-                joinRequest.getCredentials(),
+                new Email(joinRequest.getAddress()),
+                joinRequest.getPassword(),
                 toAttachedFile(file)
         );
 
@@ -123,7 +123,7 @@ public class UserRestController {
     }
 
     @GetMapping(path = "user/{id}")
-    @ApiOperation(value = "내 정보")
+    @ApiOperation(value = "다른 사람 정보")
     public ApiResult<User> findUser(@PathVariable Long id) {
 
         return OK(

@@ -15,8 +15,8 @@ const LoginForm = () => {
         dispatch({
           type: LOG_IN_REQUEST,
           data: {
-            principal: email,
-            credentials: password,
+            address: email,
+            password: password,
           }
         });
     }, [email, password]);

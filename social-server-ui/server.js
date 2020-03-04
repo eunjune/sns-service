@@ -29,8 +29,6 @@ app.prepare().then(() => {
     }
   }));
 
-
-  // 실제로 보여줄 페이지. url은 위지만 실제론 이 url의 페이지를 보여줌.
   server.get('/hashtag/:tag', (req,res) => {
     return app.render(req,res, '/hashtag', {tag : req.params.tag});
   });

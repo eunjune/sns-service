@@ -12,8 +12,8 @@ public interface JpaCommentRepository extends JpaRepository<Comment,Long> {
     Comment save(Comment comment);
 
     @Transactional(readOnly = true)
-    Optional<Comment> findBySeq(Long commentSeq);
+    Optional<Comment> findById(Long id);
 
     @Transactional(readOnly = true)
-    List<Comment> findByPost_SeqOrderBySeqDesc(Long seq);
+    List<Comment> findByPost_IdOrderByIdDesc(Long id);
 }

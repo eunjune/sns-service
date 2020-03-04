@@ -21,7 +21,7 @@ public class Likes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long seq;
+    private final Long id;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createAt;
@@ -36,8 +36,8 @@ public class Likes {
     @JsonManagedReference
     private Post post;
 
-    public Likes(Long seq, LocalDateTime createAt) {
-        this.seq = seq;
+    public Likes(Long id, LocalDateTime createAt) {
+        this.id = id;
         this.createAt = defaultIfNull(createAt, now());
     }
 }

@@ -37,8 +37,8 @@ public class PostService {
     }
 
     @Transactional
-    public Post write(Post post, Long userSeq) {
-        return userRepository.findBySeq(userSeq)
+    public Post write(Post post, Long userId) {
+        return userRepository.findById(userId)
                 .map(user -> {
 
                     List<HashTag> hashTagList = post.findHashTag();
@@ -52,18 +52,18 @@ public class PostService {
                     user.addPost(post);
                     return postRepository.save(post);
                 })
-                .orElseThrow(() -> new NotFoundException(User.class, userSeq));
+                .orElseThrow(() -> new NotFoundException(User.class, userId));
     }
 
     // 좋아요 기능 처리
     @Transactional
-    public Optional<Post> like(Long postSeq, Long userSeq, Long postWriterSeq) {
+    public Optional<Post> like(Long postId, Long userId, Long postWriterId) {
         // TODO PostLikeRepository를 구현하고, 포스트 좋아요 서비스를 구현하세요.
-        checkNotNull(postSeq, "postId must be provided.");
-        checkNotNull(userSeq, "userId must be provided.");
-        checkNotNull(postWriterSeq, "writerId must be provided.");
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postWriterId, "writerId must be provided.");
 
-        return postRepository.findById(postSeq, userSeq, postWriterSeq)
+        return postRepository.findByIdCustom(postId, userId, postWriterId)
             .map(post -> {
                 if (!post.isLikesOfMe()) {
                     //post.incrementAndGetLikes();
@@ -78,32 +78,32 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Post> findById(Long postSeq, Long postWriterSeq, Long userSeq) {
-        checkNotNull(postSeq, "postId must be provided.");
-        checkNotNull(userSeq, "userId must be provided.");
-        checkNotNull(postWriterSeq, "writerId must be provided.");
+    public Optional<Post> findById(Long postId, Long postWriterId, Long userId) {
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postWriterId, "writerId must be provided.");
 
-        return postRepository.findById(postSeq, userSeq, postWriterSeq);
+        return postRepository.findByIdCustom(postId, userId, postWriterId);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> findAll(Long userSeq, Long postWriterSeq, Pageable pageable) {
-        checkNotNull(userSeq, "userId must be provided.");
-        checkNotNull(postWriterSeq, "userId must be provided.");
+    public List<Post> findAll(Long userId, Long postWriterId, Pageable pageable) {
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postWriterId, "userId must be provided.");
 
-        userRepository.findBySeq(postWriterSeq)
-                .orElseThrow(() -> new NotFoundException(User.class, postWriterSeq));
+        userRepository.findById(postWriterId)
+                .orElseThrow(() -> new NotFoundException(User.class, postWriterId));
         // TODO likesOfMe를 효율적으로 구하기 위해 변경 필요
-        return postRepository.findAll(userSeq, postWriterSeq, pageable);
+        return postRepository.findAll(userId, postWriterId, pageable);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> findByHashTag(Long userSeq, String tag, Pageable pageable) {
-        checkNotNull(userSeq, "userId must be provided.");
+    public List<Post> findByHashTag(Long userId, String tag, Pageable pageable) {
+        checkNotNull(userId, "userId must be provided.");
         checkNotNull(tag, "tag must be provided.");
 
         return hashTagRepository.findByName(tag)
-                .map(HashTag::getPostList)
+                .map(HashTag::getPosts)
                 .orElseThrow(() -> new NotFoundException(HashTag.class, tag));
     }
 }

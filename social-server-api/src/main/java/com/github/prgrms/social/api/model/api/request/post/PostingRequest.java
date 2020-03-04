@@ -14,11 +14,11 @@ import lombok.ToString;
 public class PostingRequest {
 
     @ApiModelProperty(value = "포스트 내용", required = true)
-    private String contents;
+    private String content;
 
     public Post newPost() {
         return Post.builder()
-                .contents(contents)
+                .content(content)
                 .build();
     }
 }

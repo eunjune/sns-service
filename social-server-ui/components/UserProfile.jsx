@@ -5,6 +5,7 @@ import { LOG_OUT} from '../reducers/user';
 
 const UserProfile = () => {
     const {me} = useSelector(state => state.user);
+    const {posts} = useSelector(state => state.post);
     const dispatch = useDispatch();
     const onLogout = useCallback(() => {
         dispatch({
@@ -13,18 +14,20 @@ const UserProfile = () => {
     }, []);
 
     return (
-        <Card
-            action={[
-                <div key="twit">게시글 수<br/></div>,/*{me.posts.length}*/
-                <div key="following">팔로윙<br/></div>,
-                <div key="twit">팔로워<br/></div>,
-            ]}
-        >
-            <Card.Meta avatar={<Avatar>{me.name[0]}</Avatar>}
-                       title={me.name}
-            />
-            <Button onClick={onLogout}>로그아웃</Button>
-        </Card>
+        <div>
+            <Card
+                actions={[
+                    <div key="twit">게시글 수<br/>{posts.length}</div>,
+                    <div key="following">팔로윙<br/>{}</div>,
+                    <div key="twit">팔로워<br/>{}</div>,
+                ]}
+            >
+                <Card.Meta avatar={<Avatar>{me.name[0]}</Avatar>}
+                           title={me.name}
+                />
+                <Button onClick={onLogout}>로그아웃</Button>
+            </Card>
+        </div>
     );
 };
 

@@ -19,38 +19,38 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Post> findById(Long seq, Long userSeq, Long postWriterSeq) {
+    public Optional<Post> findByIdCustom(Long id, Long userId, Long postWriterId) {
 
-        Post post = (Post)entityManager.createNativeQuery("SELECT p.*, NVL2(l.user_seq,true,false) likes_of_me " +
-                "FROM post p JOIN users u ON p.user_seq=u.seq LEFT JOIN likes l ON l.user_seq=:userSeq AND l.post_seq = p.seq " +
-                "WHERE p.user_seq=:postWriterSeq AND p.seq=:seq", Post.class)
-                .setParameter("userSeq", userSeq)
-                .setParameter("postWriterSeq", postWriterSeq)
-                .setParameter("seq", seq).getSingleResult();
+        Post post = (Post)entityManager.createNativeQuery("SELECT p.*, " +
+                "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me " +
+                "FROM post p JOIN users u ON p.user_id=u.id LEFT JOIN likes l ON l.user_id=:userSeq AND l.post_id = p.id " +
+                "WHERE p.user_id=:postWriterSeq AND p.id=:id", Post.class)
+                .setParameter("userSeq", userId)
+                .setParameter("postWriterSeq", postWriterId)
+                .setParameter("id", id).getSingleResult();
 
-        post.setLikesOfMe(userSeq);
+        post.setLikesOfMe(userId);
 
         return Optional.of(post);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> findAll(Long userSeq, Long postWriterSeq, Pageable pageable) {
+    public List<Post> findAll(Long userId, Long postWriterId, Pageable pageable) {
 
         List resultList = entityManager.createNativeQuery("SELECT p.*, " +
-                /*"NVL2(l.user_seq,true,false) likes_of_me " +*/
-                "CASE WHEN l.user_seq = NULL THEN false ELSE true END AS likes_of_me " +
-                "FROM post p JOIN users u ON p.user_seq=u.seq LEFT JOIN likes l ON l.user_seq=:userSeq AND l.post_seq = p.seq " +
-                "WHERE p.user_seq=:postWriterSeq ORDER BY p.create_at DESC LIMIT :size OFFSET :offset", Post.class)
-                .setParameter("userSeq", userSeq)
-                .setParameter("postWriterSeq", postWriterSeq)
+                "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me " +
+                "FROM post p JOIN users u ON p.user_id=u.id LEFT JOIN likes l ON l.user_id=:userSeq AND l.post_id = p.id " +
+                "WHERE p.user_id=:postWriterSeq ORDER BY p.create_at DESC LIMIT :size OFFSET :offset", Post.class)
+                .setParameter("userSeq", userId)
+                .setParameter("postWriterSeq", postWriterId)
                 .setParameter("size", pageable.getPageSize())
                 .setParameter("offset", pageable.getOffset())
                 .getResultList();
 
         for(int i=0; i<resultList.size(); ++i) {
             Post post = (Post)resultList.get(i);
-            post.setLikesOfMe(userSeq);
+            post.setLikesOfMe(userId);
         }
 
         return resultList;

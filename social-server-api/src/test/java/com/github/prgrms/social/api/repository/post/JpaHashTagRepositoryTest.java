@@ -36,32 +36,32 @@ class JpaHashTagRepositoryTest {
         Likes like = new Likes(null,null);
 
         Comment comment1 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Comment comment2 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Post post1 = Post.builder()
-                .contents("test01 first post #first")
+                .content("test01 first post #first")
                 .build();
         post1.incrementAndGetComments(comment1);
         post1.incrementAndGetLikes(like);
         post1.addHashTag(hashTag1);
 
         Post post2 = Post.builder()
-                .contents("test01 second post #second")
+                .content("test01 second post #second")
                 .build();
 
         post2.addHashTag(hashTag2);
 
         Post post3 = Post.builder()
-                .contents("test01 third post")
+                .content("test01 third post")
                 .build();
 
         Post post4 = Post.builder()
-                .contents("test02 third post #first")
+                .content("test02 third post #first")
                 .build();
         post4.incrementAndGetComments(comment2);
         post4.addHashTag(hashTag1);
@@ -107,11 +107,11 @@ class JpaHashTagRepositoryTest {
     void findByName() {
         HashTag hashTag = hashTagRepository.findByName("first").orElseThrow(() -> new NotFoundException(HashTag.class, "first"));
 
-        assertEquals(hashTag.getPostList().size(),2);
+        assertEquals(hashTag.getPosts().size(),2);
 
         HashTag hashTag2 = hashTagRepository.findByName("second").orElseThrow(() -> new NotFoundException(HashTag.class, "second"));
 
-        assertEquals(hashTag2.getPostList().size(),1);
+        assertEquals(hashTag2.getPosts().size(),1);
 
     }
 }

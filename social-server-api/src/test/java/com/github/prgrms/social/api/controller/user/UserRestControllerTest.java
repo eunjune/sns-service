@@ -54,7 +54,7 @@ class UserRestControllerTest {
     @Test
     void checkEmail() throws Exception {
 
-        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).seq(1L).build();
+        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).id(1L).build();
 
         given(userService.findByEmail(new Email("test@gmail.com"))).willReturn(Optional.ofNullable(user));
 
@@ -100,7 +100,7 @@ class UserRestControllerTest {
 
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
 
-        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).seq(1L).build();
+        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).id(1L).build();
 
         given(userService.join("test",new Email("test@gmail.com"), "1234", null)).willReturn(user);
 
@@ -120,14 +120,14 @@ class UserRestControllerTest {
     void me() throws Exception {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
 
-        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).seq(1L).build();
+        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).id(1L).build();
         String apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
 
         given(userService.findById(1L)).willReturn(Optional.ofNullable(user));
 
         mockMvc.perform(get("/api/user/me").header(tokenHeader,apiToken))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.response.seq").value(1L))
+                        .andExpect(jsonPath("$.response.id()").value(1L))
                         .andDo(print());
 
         then(userService).should(times(1)).findById(any());
@@ -144,7 +144,7 @@ class UserRestControllerTest {
 
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
 
-        User user = User.builder().name("test1").password("1234").email(new Email("test1@gmail.com")).seq(1L).build();
+        User user = User.builder().name("test1").password("1234").email(new Email("test1@gmail.com")).id(1L).build();
         String apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
 
         given(userService.findAllConnectedUser(1L)).willReturn(givenConnected);

@@ -22,11 +22,11 @@ public class ConnectedUser {
     @ApiModelProperty(value = "PK", required = true)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long seq;
+    private final Long id;
 
     @ApiModelProperty(value = "승락일시", required = true)
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private final LocalDateTime grantedAt;
+    private final LocalDateTime createAt;
 
     @ManyToOne
     @Setter
@@ -38,8 +38,8 @@ public class ConnectedUser {
     @JsonManagedReference
     private User targetUser;
 
-    public ConnectedUser(Long seq, LocalDateTime grantedAt) {
-        this.seq = seq;
-        this.grantedAt = defaultIfNull(grantedAt, now());
+    public ConnectedUser(Long id, LocalDateTime createAt) {
+        this.id = id;
+        this.createAt = defaultIfNull(createAt, now());
     }
 }

@@ -7,19 +7,21 @@ import { LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 
 const Home = () => {
     const {me,loginErrorReason} = useSelector(state => state.user);
-    const {mainPosts} = useSelector(state => state.post);
+    const {posts} = useSelector(state => state.post);
     const dispatch = useDispatch();
 
     useEffect(() => {
 
-        const apiToken = sessionStorage.getItem("apiToken");
+        const token = sessionStorage.getItem("token");
 
         if(me) {
             console.log(me);
             dispatch({
                 type: LOAD_MAIN_POSTS_REQUEST,
-                userId: me.seq,
-                token: apiToken,
+                data : {
+                    userId: me.id,
+                    token: token,
+                }
             });
         }
 
@@ -28,8 +30,8 @@ const Home = () => {
     return (
         <div>
             {me && <PostForm />}
-            {mainPosts.map((post) => {
-                return <PostCards key={post.seq} post={post}/>;
+            {posts.map((post) => {
+                return <PostCards key={post.id} post={post}/>;
             })}
         </div>
     );

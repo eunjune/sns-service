@@ -15,14 +15,14 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Entity
 @NoArgsConstructor(force = true)
 @Getter
-@EqualsAndHashCode(of = "seq")
+@EqualsAndHashCode(of = "id")
 @ToString(exclude = {"post"})
 public class Image {
 
     @ApiModelProperty(value = "PK", required = true)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long seq;
+    private final Long id;
 
     @ApiModelProperty(value = "이미지 URL", required = true)
     @Column(nullable = false)
@@ -38,10 +38,10 @@ public class Image {
     private Post post;
 
     @Builder
-    private Image(Long seq, String path, LocalDateTime createAt) {
+    private Image(Long id, String path, LocalDateTime createAt) {
         checkArgument(isNotEmpty(path), "path must be provided.");
 
-        this.seq = seq;
+        this.id = id;
         this.path = path;
         this.createAt = defaultIfNull(createAt,now());
     }

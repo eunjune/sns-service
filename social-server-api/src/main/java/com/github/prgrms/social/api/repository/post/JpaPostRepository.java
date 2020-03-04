@@ -14,13 +14,15 @@ public interface JpaPostRepository extends JpaRepository<Post,Long>, JpaPostCust
     Post save(Post post);
 
     @Transactional(readOnly = true)
-    Optional<Post> findBySeq(Long seq);
+    Optional<Post> findById(Long id);
 
     @Transactional(readOnly = true)
     @Override
-    Optional<Post> findById(Long aLong);
+    Optional<Post> findByIdCustom(Long id, Long userId, Long postWriterId);
+
+
 
     @Transactional(readOnly = true)
     @Override
-    List<Post> findAll(Long userSeq, Long postWriterSeq, Pageable pageable);
+    List<Post> findAll(Long userId, Long postWriterId, Pageable pageable);
 }

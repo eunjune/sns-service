@@ -49,8 +49,8 @@ const Signup = () => {
             type: SIGN_UP_REQUEST,
             data : {
                 name,
-                principal: email,
-                credentials: password,
+                address: email,
+                password: password,
             }
         });
     },[password, passwordCheck, term]);

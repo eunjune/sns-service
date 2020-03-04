@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface JpaPostCustomRepository {
 
-    Optional<Post> findById(Long seq, Long userSeq, Long postWriterSeq);
+    Optional<Post> findByIdCustom(Long id, Long userId, Long postWriterId);
 
-    List<Post> findAll(Long userSeq, Long postWriterSeq, Pageable pageable);
+    List<Post> findAll(Long userId, Long postWriterId, Pageable pageable);
 }

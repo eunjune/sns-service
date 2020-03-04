@@ -62,7 +62,7 @@ class UserServiceTest {
     void join() {
 
         User givenUser = User.builder()
-                .seq(1L)
+                .id(1L)
                 .name(name)
                 .email(email)
                 .password(password)
@@ -80,7 +80,7 @@ class UserServiceTest {
     @Test
     void findByEmail() {
         User givenUser = User.builder()
-                .seq(1L)
+                .id(1L)
                 .name(name)
                 .email(email)
                 .password(password)
@@ -99,7 +99,7 @@ class UserServiceTest {
         int loginCount = 4;
 
         User givenUser = User.builder()
-                .seq(1L)
+                .id(1L)
                 .name(name)
                 .email(email)
                 .password(password)
@@ -123,7 +123,7 @@ class UserServiceTest {
     @Test
     void fail_password() {
         User givenUser = User.builder()
-                .seq(1L)
+                .id(1L)
                 .name(name)
                 .email(email)
                 .password(password)
@@ -137,9 +137,9 @@ class UserServiceTest {
     @DisplayName("친구 목록을 가져온다")
     @Test
     void find_connects() {
-        User user1 = User.builder().seq(1L).name(name).email(email).password(password).build();
-        User user2 = User.builder().seq(2L).name("test2").email(new Email("test2@gmail.com")).password(password).build();
-        User user3 = User.builder().seq(3L).name("test3").email(new Email("test2@gmail.com")).password(password).build();
+        User user1 = User.builder().id(1L).name(name).email(email).password(password).build();
+        User user2 = User.builder().id(2L).name("test2").email(new Email("test2@gmail.com")).password(password).build();
+        User user3 = User.builder().id(3L).name("test3").email(new Email("test2@gmail.com")).password(password).build();
 
         ConnectedUser connectedUser1 = new ConnectedUser(null, null);
         connectedUser1.setTargetUser(user2);
@@ -153,10 +153,10 @@ class UserServiceTest {
         givenConnected.add(connectedUser1);
         givenConnected.add(connectedUser2);
 
-        given(connectedUserRepository.findByUser_SeqAndGrantedAtIsNotNullOrderBySeqDesc(1L)).willReturn(givenConnected);
+        given(connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(1L)).willReturn(givenConnected);
 
-        connectedUserRepository.findByUser_SeqAndGrantedAtIsNotNullOrderBySeqDesc(1L);
+        connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(1L);
 
-        then(connectedUserRepository).should(times(1)).findByUser_SeqAndGrantedAtIsNotNullOrderBySeqDesc(any());
+        then(connectedUserRepository).should(times(1)).findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(any());
     }
 }

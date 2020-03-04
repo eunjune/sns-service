@@ -67,7 +67,7 @@ class PostRestControllerTest {
     @BeforeEach
     void setup() {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-        user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).seq(1L).build();
+        user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).id(1L).build();
         apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
     }
 
@@ -76,16 +76,16 @@ class PostRestControllerTest {
     void posting() throws Exception {
         String content = randomAlphabetic(40);
 
-        Post post = Post.builder().seq(1L).contents(content).build();
+        Post post = Post.builder().id(1L).content(content).build();
 
-        given(postService.write(Post.builder().contents(content).build(),1L)).willReturn(post);
+        given(postService.write(Post.builder().content(content).build(),1L)).willReturn(post);
 
         mockMvc.perform(post("/api/post")
                 .header(tokenHeader,apiToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"contents\" : \"" + content + "\"}"))
+                .content("{\"content()\" : \"" + content + "\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.seq").value(1L))
+                .andExpect(jsonPath("$.response.id()").value(1L))
                 .andDo(print());
 
         then(postService).should(times(1)).write(any(), any());
@@ -97,8 +97,8 @@ class PostRestControllerTest {
         String content1 = randomAlphabetic(40);
         String content2 = randomAlphabetic(40);
 
-        Post post1 = Post.builder().seq(1L).contents(content1).build();
-        Post post2 = Post.builder().seq(1L).contents(content2).build();
+        Post post1 = Post.builder().id(1L).content(content1).build();
+        Post post2 = Post.builder().id(1L).content(content2).build();
 
         List<Post> posts = new ArrayList<>();
         posts.add(post1);
@@ -131,10 +131,10 @@ class PostRestControllerTest {
         HashTag hashTag = HashTag.builder().name(tag.substring(1)).build();
 
         List<Post> givenPosts = new ArrayList<>();
-        Post post1 = Post.builder().seq(1L).contents(randomAlphabetic(40) + tag).build();
-        Post post2 = Post.builder().seq(2L).contents(randomAlphabetic(40) + tag).build();
-        Post post3 = Post.builder().seq(3L).contents(randomAlphabetic(40) + tag).build();
-        Post post4 = Post.builder().seq(4L).contents(randomAlphabetic(40) + tag).build();
+        Post post1 = Post.builder().id(1L).content(randomAlphabetic(40) + tag).build();
+        Post post2 = Post.builder().id(2L).content(randomAlphabetic(40) + tag).build();
+        Post post3 = Post.builder().id(3L).content(randomAlphabetic(40) + tag).build();
+        Post post4 = Post.builder().id(4L).content(randomAlphabetic(40) + tag).build();
 
         givenPosts.add(post1);
         givenPosts.add(post2);
@@ -162,7 +162,7 @@ class PostRestControllerTest {
     void like() throws Exception {
         String content = randomAlphabetic(40);
 
-        Post post = Post.builder().seq(1L).contents(content).build();
+        Post post = Post.builder().id(1L).content(content).build();
 
         given(postService.like(1L,1L,1L)).willReturn(Optional.ofNullable(post));
 
@@ -177,17 +177,17 @@ class PostRestControllerTest {
     @Test
     void comment() throws Exception {
         String content = randomAlphabetic(40);
-        Comment comment = Comment.builder().seq(1L).contents(content).build();
+        Comment comment = Comment.builder().id(1L).content(content).build();
 
-        given(commentService.write(1L, 1L, 1L, Comment.builder().contents(content).build()))
+        given(commentService.write(1L, 1L, 1L, Comment.builder().content(content).build()))
                 .willReturn(comment);
 
         mockMvc.perform(post("/api/user/1/post/1/comment")
                         .header(tokenHeader, apiToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"contents\" : \"" + content + "\"}"))
+                        .content("{\"content()\" : \"" + content + "\"}"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.response.seq").value(1L))
+                        .andExpect(jsonPath("$.response.id()").value(1L))
                         .andDo(print());
 
         then(commentService).should(times(1)).write(any(),any(),any(),any());
@@ -198,8 +198,8 @@ class PostRestControllerTest {
         String content1 = randomAlphabetic(40);
         String content2 = randomAlphabetic(40);
 
-        Comment comment1 = Comment.builder().seq(1L).contents(content1).build();
-        Comment comment2 = Comment.builder().seq(2L).contents(content2).build();
+        Comment comment1 = Comment.builder().id(1L).content(content1).build();
+        Comment comment2 = Comment.builder().id(2L).content(content2).build();
 
         List<Comment> comments = new ArrayList<>();
         comments.add(comment1);

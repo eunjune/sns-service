@@ -76,6 +76,8 @@ public class UserService {
         User user = User.builder()
                 .name(name)
                 .email(email)
+
+
                 .password(passwordEncoder.encode(password))
                 .profileImageUrl(profileImageUrl)
                 .build();
@@ -107,10 +109,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long userSeq) {
-        checkNotNull(userSeq, "userId must be provided.");
+    public Optional<User> findById(Long userId) {
+        checkNotNull(userId, "userId must be provided.");
 
-        return userRepository.findBySeq(userSeq);
+        return userRepository.findById(userId);
     }
 
     @Transactional(readOnly = true)
@@ -121,17 +123,17 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<ConnectedUser> findAllConnectedUser(Long userSeq) {
-        checkNotNull(userSeq, "userId must be provided.");
+    public List<ConnectedUser> findAllConnectedUser(Long userId) {
+        checkNotNull(userId, "userId must be provided.");
 
-        return connectedUserRepository.findByUser_SeqAndGrantedAtIsNotNullOrderBySeqDesc(userSeq);
+        return connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(userId);
     }
 
     @Transactional(readOnly = true)
-    public List<ConnectedId> findConnectedIds(Long userSeq) {
-        checkNotNull(userSeq, "userId must be provided.");
+    public List<ConnectedId> findConnectedIds(Long userId) {
+        checkNotNull(userId, "userId must be provided.");
 
-        return connectedUserRepository.findByUser_SeqAndGrantedAtIsNotNullOrderByTargetUser_Seq(userSeq);
+        return connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByTargetUser_Id(userId);
     }
 
 }

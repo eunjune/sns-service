@@ -29,10 +29,7 @@ Root.propTypes = {
     pageProps: PropTypes.object.isRequired,
 };
 
-// next에서 실행시키는 부분
-// context에 컴포넌트와 ctx가 들어있음. next에서 넣어줌.
-// 컴포넌트에 getInitialProps가 있으면 그걸 실행시켜준다.
-// ctx : 서버(url의 값 등)에서 넣어준 값이 존재
+
 Root.getInitialProps = async(context) => {
   const {ctx, Component} = context;
   let pageProps = {};

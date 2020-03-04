@@ -38,29 +38,29 @@ class JpaCommentRepositoryTest {
         Likes like = new Likes(null,null);
 
         Comment comment1 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Comment comment2 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Post post1 = Post.builder()
-                .contents("test01 first post")
+                .content("test01 first post")
                 .build();
         post1.incrementAndGetComments(comment1);
         post1.incrementAndGetLikes(like);
 
         Post post2 = Post.builder()
-                .contents("test01 second post")
+                .content("test01 second post")
                 .build();
 
         Post post3 = Post.builder()
-                .contents("test01 third post")
+                .content("test01 third post")
                 .build();
 
         Post post4 = Post.builder()
-                .contents("test02 third post")
+                .content("test02 third post")
                 .build();
         post4.incrementAndGetComments(comment2);
 
@@ -102,35 +102,35 @@ class JpaCommentRepositoryTest {
     @Test
     void save() {
         Comment comment = Comment.builder()
-                .contents("second comment")
+                .content("second comment")
                 .build();
 
-        User user = jpaUserRepository.findBySeq(1L).orElseThrow(()->new NotFoundException(User.class, 1L));
+        User user = jpaUserRepository.findById(1L).orElseThrow(()->new NotFoundException(User.class, 1L));
 
-        Post post = jpaPostRepository.findBySeq(1L).orElseThrow(()->new NotFoundException(Post.class, 1L));
+        Post post = jpaPostRepository.findById(1L).orElseThrow(()->new NotFoundException(Post.class, 1L));
 
         user.addComment(comment);
         post.incrementAndGetComments(comment);
 
         Comment savedComment = jpaCommentRepository.save(comment);
 
-        assertEquals(savedComment.getSeq(),3L);
-        assertEquals(savedComment.getUser().getSeq(),1L);
-        assertEquals(savedComment.getPost().getSeq(),1L);
+        assertEquals(savedComment.getId(),3L);
+        assertEquals(savedComment.getUser().getId(),1L);
+        assertEquals(savedComment.getPost().getId(),1L);
     }
 
     @Test
     void findBySeq() {
-        Comment comment = jpaCommentRepository.findBySeq(1L)
+        Comment comment = jpaCommentRepository.findById(1L)
                 .orElseThrow(() -> new NotFoundException(Comment.class, 1L));
 
-        assertEquals(comment.getSeq(), 1L);
+        assertEquals(comment.getId(), 1L);
     }
 
     @Test
     void findByPost_SeqOrderBySeqDesc() {
-        List<Comment> comments = jpaPostRepository.findBySeq(1L)
-                .map(post -> jpaCommentRepository.findByPost_SeqOrderBySeqDesc(post.getSeq()))
+        List<Comment> comments = jpaPostRepository.findById(1L)
+                .map(post -> jpaCommentRepository.findByPost_IdOrderByIdDesc(post.getId()))
                 .orElseThrow(() -> new NotFoundException(Post.class, 1L));
 
         assertEquals(comments.size(),1);

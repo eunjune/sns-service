@@ -2,7 +2,6 @@ package com.github.prgrms.social.api.event;
 
 import com.github.prgrms.social.api.model.commons.Id;
 import com.github.prgrms.social.api.model.user.User;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -16,7 +15,7 @@ public class JoinEvent {
     private final String name;
 
     public JoinEvent(User user) {
-        this.userId = Id.of(User.class, user.getSeq());
+        this.userId = Id.of(User.class, user.getId());
         this.name = user.getName();
     }
 }

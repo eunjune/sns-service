@@ -24,14 +24,14 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Entity(name = "users")
 @Getter
 @NoArgsConstructor(force = true)
-@EqualsAndHashCode(of = "seq")
+@EqualsAndHashCode(of = "id")
 @ToString(exclude = {"connectedUser","posts","commentList"})
 public class User {
 
     @ApiModelProperty(value = "PK", required = true)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long seq;
+    private final Long id;
 
     @ApiModelProperty(value = "사용자명", required = true)
     @Column(nullable = false)
@@ -65,7 +65,7 @@ public class User {
     @ApiModelProperty(value = "친구 목록")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<ConnectedUser> connectedUser = new ArrayList<>();
+    private List<ConnectedUser> connectedUsers = new ArrayList<>();
 
     @ApiModelProperty(value = "사용자의 포스트")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -75,15 +75,15 @@ public class User {
     @ApiModelProperty(value = "사용자의 댓글")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<Comment> commentList = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     @ApiModelProperty(value = "사용자의 좋아요")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<Likes> likeList = new ArrayList<>();
+    private List<Likes> likes = new ArrayList<>();
 
     @Builder
-    private User(Long seq, String name, Email email, String password, String profileImageUrl, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
+    private User(Long id, String name, Email email, String password, String profileImageUrl, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
         checkArgument(isNotEmpty(name), "name must be provided.");
         checkArgument(
                 name.length() >= 1 && name.length() <= 10,
@@ -92,7 +92,7 @@ public class User {
         checkNotNull(email, "email must be provided.");
         checkNotNull(password, "password must be provided.");
 
-        this.seq = seq;
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
@@ -108,7 +108,7 @@ public class User {
     }
 
     public String newApiToken(JWT jwt, String[] roles) {
-        JWT.Claims claims = JWT.Claims.of(seq, name, email, roles);
+        JWT.Claims claims = JWT.Claims.of(id, name, email, roles);
         return jwt.newToken(claims);
     }
 
@@ -121,7 +121,7 @@ public class User {
     }
 
     public void addConnectedUser(ConnectedUser connectedUser) {
-        this.getConnectedUser().add(connectedUser);
+        this.connectedUsers.add(connectedUser);
         connectedUser.setUser(this);
     }
 
@@ -131,12 +131,12 @@ public class User {
     }
 
     public void addComment(Comment comment) {
-        this.getCommentList().add(comment);
+        this.comments.add(comment);
         comment.setUser(this);
     }
 
     public void addLike(Likes likes) {
-        this.getLikeList().add(likes);
+        this.likes.add(likes);
         likes.setUser(this);
     }
 

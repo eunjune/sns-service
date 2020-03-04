@@ -16,14 +16,14 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @NoArgsConstructor(force = true)
 @Getter
 @Entity
-@ToString(exclude = {"postList"})
-@EqualsAndHashCode(of = "seq")
+@ToString(exclude = {"posts"})
+@EqualsAndHashCode(of = "id")
 public class HashTag {
 
     @ApiModelProperty(value = "PK", required = true)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long seq;
+    private final Long id;
 
     @ApiModelProperty(value = "태그이름", required = true)
     @Column(nullable = false)
@@ -31,7 +31,7 @@ public class HashTag {
 
     @ApiModelProperty(value = "생성일시", required = true)
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private final LocalDateTime createdAt;
+    private final LocalDateTime createAt;
 
     @ManyToMany
     @JoinTable(
@@ -40,14 +40,14 @@ public class HashTag {
             inverseJoinColumns = @JoinColumn(name = "post_id"))
     @Setter
     @JsonManagedReference
-    private List<Post> postList = new ArrayList<>();
+    private List<Post> posts = new ArrayList<>();
 
     @Builder
-    private HashTag(Long seq, String name, LocalDateTime createdAt) {
+    private HashTag(Long id, String name, LocalDateTime createAt) {
         checkArgument(isNotEmpty(name), "name must be provided. ");
 
-        this.seq = seq;
+        this.id = id;
         this.name = name;
-        this.createdAt = defaultIfNull(createdAt, LocalDateTime.now());
+        this.createAt = defaultIfNull(createAt, LocalDateTime.now());
     }
 }

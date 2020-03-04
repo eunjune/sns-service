@@ -19,7 +19,7 @@ public class SubscribeRequest {
 
     public Subscription newSubscription(Long userSeq, String endpoint, String publicKey, String auth) {
         return Subscription.builder()
-                .userSeq(userSeq)
+                .userId(userSeq)
                 .endpoint(endpoint)
                 .publicKey(publicKey)
                 .auth(auth)

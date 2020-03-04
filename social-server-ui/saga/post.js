@@ -5,7 +5,7 @@ import {
     ADD_COMMENT_SUCCESS,
     ADD_POST_FAILURE,
     ADD_POST_REQUEST,
-    ADD_POST_SUCCESS,
+    ADD_POST_SUCCESS, LOAD_COMMENTS_FAILURE, LOAD_COMMENTS_REQUEST, LOAD_COMMENTS_SUCCESS,
     LOAD_HASHTAG_POSTS_FAILURE,
     LOAD_HASHTAG_POSTS_REQUEST,
     LOAD_HASHTAG_POSTS_SUCCESS,
@@ -36,41 +36,15 @@ function* addPost(action) {
             data : result.data.response,
         });
     } catch (e) {
+        console.error(e);
         yield put({
             type: ADD_POST_FAILURE,
             error: e,
         })
     }
 }
-
-function* watchAddPost() {
-
-    yield takeLatest(ADD_POST_REQUEST, addPost);
-}
-
-function* addComment(action) {
-    try {
-        yield delay(2000);
-        yield put({
-            type: ADD_COMMENT_SUCCESS,
-            data : {
-                postId: action.data.postId,
-            }
-        });
-    } catch (e) {
-        yield put({
-            type: ADD_COMMENT_FAILURE,
-            error: e,
-        })
-    }
-}
-
-function* watchAddComment() {
-    yield takeLatest(ADD_COMMENT_REQUEST, addComment);
-}
-
 function loadPostAPI({userId,token}) {
-    return axios.get('user/' + userId + '/post/list?page=0&size=4', {
+    return axios.get(`user/${userId}/post/list?page=0&size=4`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -79,12 +53,13 @@ function loadPostAPI({userId,token}) {
 
 function* loadPost(action) {
     try {
-        const result = yield call(loadPostAPI, action);
+        const result = yield call(loadPostAPI, action.data);
         yield put({
             type: LOAD_MAIN_POSTS_SUCCESS,
             data : result.data.response,
         });
     } catch (e) {
+        console.error(e);
         yield put({
             type: LOAD_MAIN_POSTS_FAILURE,
             error: e,
@@ -113,6 +88,7 @@ function* loadHashtag(action) {
             data : result.data.response,
         });
     } catch (e) {
+        console.error(e);
         yield put({
             type: LOAD_HASHTAG_POSTS_FAILURE,
             error: e,
@@ -142,6 +118,7 @@ function* loadUserPost(action) {
             data : result.data.response,
         });
     } catch (e) {
+        console.error(e);
         yield put({
             type: LOAD_USER_POSTS_FAILURE,
             error: e,
@@ -153,6 +130,74 @@ function* watchLoadUserPosts() {
     yield takeLatest(LOAD_USER_POSTS_REQUEST,loadUserPost);
 }
 
+function loadCommentsAPI({userId,postId,token}) {
+    return axios.get(`user/${userId}/post/${postId}/comment/list`, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadComments(action) {
+    try {
+        const result = yield call(loadCommentsAPI, action.data);
+        yield put({
+            type: LOAD_COMMENTS_SUCCESS,
+            data : {
+                postId: action.data.postId,
+                comments: result.data.response,
+            },
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_COMMENTS_FAILURE,
+            error: e,
+        })
+    }
+}
+
+function* watchLoadComments() {
+    yield takeLatest(LOAD_COMMENTS_REQUEST, loadComments);
+}
+
+function* watchAddPost() {
+
+    yield takeLatest(ADD_POST_REQUEST, addPost);
+}
+
+function addCommentAPI({userId,postId,comment,token}) {
+    console.log(token);
+    return axios.post(`user/${userId}/post/${postId}/comment`, {content: comment}, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* addComment(action) {
+    try {
+        const result = yield call(addCommentAPI, action.data);
+        yield put({
+            type: ADD_COMMENT_SUCCESS,
+            data : {
+                postId: action.data.postId,  //??
+                comment: result.data.response,
+            }
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: ADD_COMMENT_FAILURE,
+            error: e,
+        })
+    }
+}
+
+function* watchAddComment() {
+    yield takeLatest(ADD_COMMENT_REQUEST, addComment);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchAddPost),
@@ -160,5 +205,6 @@ export default function* postSaga() {
         fork(watchAddComment),
         fork(watchLoadHashtagPosts),
         fork(watchLoadUserPosts),
+        fork(watchLoadComments),
     ]);
 }

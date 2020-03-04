@@ -6,24 +6,24 @@ import PostCards from '../components/PostCards';
 
 const Hashtag = ({tag}) => {
   const dispatch = useDispatch();
-  const {mainPosts} = useSelector(state => state.post);
+  const {posts} = useSelector(state => state.post);
 
   useEffect(() => {
-    const apiToken = sessionStorage.getItem("apiToken");
+    const token = sessionStorage.getItem("token");
 
     dispatch({
       type: LOAD_HASHTAG_POSTS_REQUEST,
       data: {
         tag: tag,
-        token: apiToken,
+        token: token,
       },
     });
   },[]);
 
   return (
     <div>
-      {mainPosts.map(p => (
-        <PostCards key={+p.seq} post={p}/>
+      {posts.map(p => (
+        <PostCards key={+p.id} post={p}/>
       ))}
     </div>
   );

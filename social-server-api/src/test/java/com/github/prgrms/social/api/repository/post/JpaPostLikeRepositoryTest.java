@@ -37,29 +37,29 @@ class JpaPostLikeRepositoryTest {
         Likes like = new Likes(null,null);
 
         Comment comment1 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Comment comment2 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Post post1 = Post.builder()
-                .contents("test01 first post")
+                .content("test01 first post")
                 .build();
         post1.incrementAndGetComments(comment1);
         post1.incrementAndGetLikes(like);
 
         Post post2 = Post.builder()
-                .contents("test01 second post")
+                .content("test01 second post")
                 .build();
 
         Post post3 = Post.builder()
-                .contents("test01 third post")
+                .content("test01 third post")
                 .build();
 
         Post post4 = Post.builder()
-                .contents("test02 third post")
+                .content("test02 third post")
                 .build();
         post4.incrementAndGetComments(comment2);
 
@@ -102,14 +102,14 @@ class JpaPostLikeRepositoryTest {
     void save() {
         Likes like = new Likes(null,null);
 
-        Post post = jpaPostRepository.findBySeq(1L).orElseThrow(()->new NotFoundException(Post.class, 1L));
+        Post post = jpaPostRepository.findById(1L).orElseThrow(()->new NotFoundException(Post.class, 1L));
         post.incrementAndGetLikes(like);
 
-        User user = jpaUserRepository.findBySeq(2L).orElseThrow(()->new NotFoundException(User.class, 1L));
+        User user = jpaUserRepository.findById(2L).orElseThrow(()->new NotFoundException(User.class, 1L));
         user.addLike(like);
 
         Likes savedLike = jpaPostLikeRepository.save(like);
 
-        assertEquals(savedLike.getSeq(),2L);
+        assertEquals(savedLike.getId(),2L);
     }
 }

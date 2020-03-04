@@ -34,29 +34,29 @@ class JpaConnectedUserRepositoryTest {
         Likes like = new Likes(null,null);
 
         Comment comment1 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Comment comment2 = Comment.builder()
-                .contents("first comment")
+                .content("first comment")
                 .build();
 
         Post post1 = Post.builder()
-                .contents("test01 first post")
+                .content("test01 first post")
                 .build();
         post1.incrementAndGetComments(comment1);
         post1.incrementAndGetLikes(like);
 
         Post post2 = Post.builder()
-                .contents("test01 second post")
+                .content("test01 second post")
                 .build();
 
         Post post3 = Post.builder()
-                .contents("test01 third post")
+                .content("test01 third post")
                 .build();
 
         Post post4 = Post.builder()
-                .contents("test02 third post")
+                .content("test02 third post")
                 .build();
         post4.incrementAndGetComments(comment2);
 
@@ -118,14 +118,14 @@ class JpaConnectedUserRepositoryTest {
 
     @Test
     void findAllConnectedUser() {
-        List<ConnectedUser> connects = jpaConnectedUserRepository.findByUser_SeqAndGrantedAtIsNotNullOrderBySeqDesc(1L);
+        List<ConnectedUser> connects = jpaConnectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(1L);
 
         assertEquals(connects.size(),3);
     }
 
     @Test
     void findConnectedId() {
-        List<ConnectedId> connectedIds = jpaConnectedUserRepository.findByUser_SeqAndGrantedAtIsNotNullOrderByTargetUser_Seq(1L);
+        List<ConnectedId> connectedIds = jpaConnectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByTargetUser_Id(1L);
 
         assertEquals(connectedIds.size(),3);
     }

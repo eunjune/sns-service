@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 public class AuthenticationRequest {
 
     @ApiModelProperty(value = "로그인 이메일", required = true)
-    private String principal;
+    private String address;
 
     @ApiModelProperty(value = "로그인 비밀번호", required = true)
-    private String credentials;
+    private String password;
 }

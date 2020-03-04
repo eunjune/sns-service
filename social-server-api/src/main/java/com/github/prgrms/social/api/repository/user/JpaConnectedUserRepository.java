@@ -10,8 +10,8 @@ import java.util.List;
 public interface JpaConnectedUserRepository extends JpaRepository<ConnectedUser, Long> {
 
     @Transactional(readOnly = true)
-    List<ConnectedUser> findByUser_SeqAndGrantedAtIsNotNullOrderBySeqDesc(Long seq);
+    List<ConnectedUser> findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(Long id);
 
     @Transactional(readOnly = true)
-    List<ConnectedId> findByUser_SeqAndGrantedAtIsNotNullOrderByTargetUser_Seq(Long seq);
+    List<ConnectedId> findByUser_IdAndCreateAtIsNotNullOrderByTargetUser_Id(Long id);
 }

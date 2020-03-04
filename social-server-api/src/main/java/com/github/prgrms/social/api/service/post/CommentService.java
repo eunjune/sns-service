@@ -31,24 +31,24 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment write(Long postSeq, Long userSeq, Long postWriterSeq, Comment comment) {
+    public Comment write(Long postId, Long userId, Long postWriterId, Comment comment) {
         checkNotNull(comment, "comment must be provided.");
 
-        return postRepository.findById(postSeq, userSeq, postWriterSeq).map(post -> {
+        return postRepository.findByIdCustom(postId, userId, postWriterId).map(post -> {
             post.getUser().addComment(comment);
             post.incrementAndGetComments(comment);
             postRepository.save(post);
 
             Comment saveComment = commentRepository.save(comment);
-            eventBus.post(new CommentCreatedEvent(saveComment, postWriterSeq));
+            eventBus.post(new CommentCreatedEvent(saveComment, postWriterId));
             return saveComment;
-        }).orElseThrow(() -> new NotFoundException(Post.class, postSeq, userSeq));
+        }).orElseThrow(() -> new NotFoundException(Post.class, postId, userId));
     }
 
     @Transactional(readOnly = true)
-    public List<Comment> findAll(Long postSeq, Long userSeq, Long postWriterSeq) {
-        return postRepository.findById(postSeq, userSeq, postWriterSeq)
-                .map(post -> commentRepository.findByPost_SeqOrderBySeqDesc(postSeq))
+    public List<Comment> findAll(Long postId, Long userId, Long postWriterId) {
+        return postRepository.findByIdCustom(postId, userId, postWriterId)
+                .map(post -> commentRepository.findByPost_IdOrderByIdDesc(postId))
                 .orElse(emptyList());
     }
 }
