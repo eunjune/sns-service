@@ -28,10 +28,11 @@ public class AttachedFile {
             String contentType = multipartFile.getContentType();
             // 이미지인 경우만 처리
             if (isNotEmpty(contentType) && contentType.toLowerCase().startsWith("image")) {
-                String fileSignature = byteToJpgSignature(multipartFile.getBytes());
+                /*String fileSignature = byteToJpgSignature(multipartFile.getBytes());
                 if(fileSignature.equals("ffd8ffe04a464946")) {
                     return true;
-                }
+                }*/
+                return true;
             }
         }
         return false;

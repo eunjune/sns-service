@@ -78,7 +78,7 @@ class PostRestControllerTest {
 
         Post post = Post.builder().id(1L).content(content).build();
 
-        given(postService.write(Post.builder().content(content).build(),1L)).willReturn(post);
+        given(postService.write(Post.builder().content(content).build(),1L, new ArrayList<>())).willReturn(post);
 
         mockMvc.perform(post("/api/post")
                 .header(tokenHeader,apiToken)
@@ -88,7 +88,7 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.id()").value(1L))
                 .andDo(print());
 
-        then(postService).should(times(1)).write(any(), any());
+        then(postService).should(times(1)).write(any(), any(),any());
 
     }
 

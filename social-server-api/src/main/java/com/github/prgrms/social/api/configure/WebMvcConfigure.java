@@ -27,6 +27,9 @@ public class WebMvcConfigure implements WebMvcConfigurer {
             .addResourceLocations("classpath:/static/");
 
         registry
+            .addResourceHandler("/image/**").addResourceLocations("file:/Users/iws16/AppData/Local/Temp/uploads/").setCachePeriod(0);
+
+        registry
             .addResourceHandler("/", "/**")
             .setCachePeriod(0)
             .addResourceLocations("classpath:/static/index.html")

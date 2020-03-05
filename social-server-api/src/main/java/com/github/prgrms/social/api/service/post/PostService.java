@@ -1,18 +1,25 @@
 package com.github.prgrms.social.api.service.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
+import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.post.HashTag;
+import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Likes;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.JpaHashTagRepository;
+import com.github.prgrms.social.api.repository.post.JpaImageRepository;
 import com.github.prgrms.social.api.repository.post.JpaPostLikeRepository;
 import com.github.prgrms.social.api.repository.post.JpaPostRepository;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,15 +36,19 @@ public class PostService {
 
     private final JpaHashTagRepository hashTagRepository;
 
-    public PostService(JpaUserRepository userRepository, JpaPostRepository postRepository, JpaPostLikeRepository postLikeRepository, JpaHashTagRepository hashTagRepository) {
+    private final JpaImageRepository imageRepository;
+
+    public PostService(JpaUserRepository userRepository, JpaPostRepository postRepository, JpaPostLikeRepository postLikeRepository
+            , JpaHashTagRepository hashTagRepository, JpaImageRepository imageRepository) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.postLikeRepository = postLikeRepository;
         this.hashTagRepository = hashTagRepository;
+        this.imageRepository = imageRepository;
     }
 
     @Transactional
-    public Post write(Post post, Long userId) {
+    public Post write(Post post, Long userId, List<String> imagePaths) {
         return userRepository.findById(userId)
                 .map(user -> {
 
@@ -49,6 +60,13 @@ public class PostService {
                         }
                         post.addHashTag(hashTag);
                     }
+
+                    for(String imagePath : imagePaths) {
+                        Image image = Image.builder().path(imagePath).build();
+                        image = imageRepository.save(image);
+                        post.addImage(image);
+                    }
+
                     user.addPost(post);
                     return postRepository.save(post);
                 })
@@ -105,5 +123,24 @@ public class PostService {
         return hashTagRepository.findByName(tag)
                 .map(HashTag::getPosts)
                 .orElseThrow(() -> new NotFoundException(HashTag.class, tag));
+    }
+
+    public List<String> uploadImage(MultipartFile[] files, String realPath) throws IOException {
+        // 20 * 1024 * 1024
+        checkNotNull(files, "files must be provided.");
+
+        realPath = realPath.substring(0,34) + "uploads";
+
+        List<String> result = new ArrayList<>();
+        for(MultipartFile file : files) {
+            AttachedFile attachedFile = AttachedFile.toAttachedFile(file);
+            assert attachedFile != null;
+            String extension = attachedFile.extension("png");
+            String randomName = attachedFile.randomName(realPath,extension);
+            file.transferTo(new File(randomName));
+            result.add(randomName.substring(realPath.length()+1));
+        }
+
+        return result;
     }
 }

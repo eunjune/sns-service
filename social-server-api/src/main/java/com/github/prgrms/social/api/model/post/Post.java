@@ -51,7 +51,7 @@ public class Post {
 
     @ApiModelProperty(value = "이미지 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonManagedReference
     private List<Image> images = new ArrayList<>();
 
     @ApiModelProperty(value = "좋아요 리스트")
@@ -129,5 +129,10 @@ public class Post {
     public void addHashTag(HashTag hashTag) {
         this.hashTags.add(hashTag);
         hashTag.getPosts().add(this);
+    }
+
+    public void addImage(Image image) {
+        this.images.add(image);
+        image.setPost(this);
     }
 }

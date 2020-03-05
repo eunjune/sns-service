@@ -66,7 +66,7 @@ class PostServiceTest {
         given(hashTagRepository.save(HashTag.builder().name("#Hashtag2").build())).willReturn(HashTag.builder().name("#Hashtag2").build());
         given(hashTagRepository.save(HashTag.builder().name("#hash_tag").build())).willReturn(HashTag.builder().name("#hash_tag").build());
 
-        postService.write(post, 1L);
+        postService.write(post, 1L, new ArrayList<>());
 
         then(userRepository).should(times(1)).findById(any());
         then(postRepository).should(times(1)).save(any());

@@ -14,7 +14,7 @@ import {
     LOAD_MAIN_POSTS_SUCCESS,
     LOAD_USER_POSTS_FAILURE,
     LOAD_USER_POSTS_REQUEST,
-    LOAD_USER_POSTS_SUCCESS
+    LOAD_USER_POSTS_SUCCESS, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS
 } from '../reducers/post';
 import axios from 'axios';
 
@@ -28,7 +28,6 @@ function addPostAPI({post, token}) {
 }
 
 function* addPost(action) {
-    console.log('add');
     try {
         const result = yield call(addPostAPI, action.data);
         yield put({
@@ -167,7 +166,6 @@ function* watchAddPost() {
 }
 
 function addCommentAPI({userId,postId,comment,token}) {
-    console.log(token);
     return axios.post(`user/${userId}/post/${postId}/comment`, {content: comment}, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -198,6 +196,34 @@ function* watchAddComment() {
     yield takeLatest(ADD_COMMENT_REQUEST, addComment);
 }
 
+function uploadImagesAPI({imageFormData,token}) {
+    return axios.post(`post/images`, imageFormData, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* uploadImages(action) {
+    try {
+        const result = yield call(uploadImagesAPI, action.data);
+        yield put({
+            type: UPLOAD_IMAGES_SUCCESS,
+            data : result.data.response
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: UPLOAD_IMAGES_FAILURE,
+            error: e,
+        })
+    }
+}
+
+function* watchUploadImages() {
+    yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchAddPost),
@@ -206,5 +232,6 @@ export default function* postSaga() {
         fork(watchLoadHashtagPosts),
         fork(watchLoadUserPosts),
         fork(watchLoadComments),
+        fork(watchUploadImages),
     ]);
 }

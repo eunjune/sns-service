@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 // 포스트 작성 요청 데이터를 받는 DTO
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,6 +17,9 @@ public class PostingRequest {
 
     @ApiModelProperty(value = "포스트 내용", required = true)
     private String content;
+
+    @ApiModelProperty(value = "포스트 이미지", required = true)
+    private List<String> imagePaths;
 
     public Post newPost() {
         return Post.builder()

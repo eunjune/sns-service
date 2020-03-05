@@ -11,9 +11,13 @@ import com.github.prgrms.social.api.service.post.CommentService;
 import com.github.prgrms.social.api.service.post.PostService;
 import io.swagger.annotations.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
@@ -39,7 +43,7 @@ public class PostRestController {
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestBody PostingRequest request
     ) {
-        return OK(postService.write(request.newPost(), authentication.id.getValue()));
+        return OK(postService.write(request.newPost(), authentication.id.getValue(), request.getImagePaths()));
     }
 
     @GetMapping(path = "user/{userId}/post/list")
@@ -120,6 +124,17 @@ public class PostRestController {
     ) {
         // TODO Comment 목록 조회 API를 구현하세요.
         return OK(commentService.findAll(postId, authentication.id.getValue(), userId));
+    }
+
+    @PostMapping(path = "post/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResult<List<String>> images(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @RequestPart(required = false)  MultipartFile[] images,
+            MultipartHttpServletRequest request
+            ) throws IOException {
+
+
+        return OK(postService.uploadImage(images,request.getServletContext().getRealPath("/")));
     }
 
 }
