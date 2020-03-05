@@ -25,7 +25,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Getter
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"connectedUser","posts","commentList"})
+@ToString(exclude = {"connectedUsers","posts","comments"})
 public class User {
 
     @ApiModelProperty(value = "PK", required = true)

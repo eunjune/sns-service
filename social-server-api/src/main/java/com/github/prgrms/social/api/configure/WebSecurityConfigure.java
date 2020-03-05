@@ -123,8 +123,6 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         http
             .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
-
-
     }
 
 
