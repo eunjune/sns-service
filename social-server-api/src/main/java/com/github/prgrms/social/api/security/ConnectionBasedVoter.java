@@ -58,7 +58,7 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
             return ACCESS_GRANTED;
         }
 
-        // 친구관계이면 승인
+        // 친구관계면 승인
         List<ConnectedId> connectedIds = userService.findConnectedIds(jwtAuthentication.id.getValue());
         for(int i=0; i<connectedIds.size(); ++i) {
             if(connectedIds.get(i).getId().equals(uriId.getValue())) {

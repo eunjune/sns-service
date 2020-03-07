@@ -14,7 +14,7 @@ import {
     LOAD_MAIN_POSTS_SUCCESS,
     LOAD_USER_POSTS_FAILURE,
     LOAD_USER_POSTS_REQUEST,
-    LOAD_USER_POSTS_SUCCESS, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS, LIKE_POST_SUCCESS, LIKE_POST_FAILURE, LIKE_POST_REQUEST, UNLIKE_POST_FAILURE, UNLIKE_POST_SUCCESS, UNLIKE_POST_REQUEST
+    LOAD_USER_POSTS_SUCCESS, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS, LIKE_POST_SUCCESS, LIKE_POST_FAILURE, LIKE_POST_REQUEST, UNLIKE_POST_FAILURE, UNLIKE_POST_SUCCESS, UNLIKE_POST_REQUEST, RETWEET_SUCCESS, RETWEET_FAILURE, RETWEET_REQUEST
 } from '../reducers/post';
 import axios from 'axios';
 import { UNFOLLOW_me_SUCCESS } from '../reducers/user';
@@ -227,7 +227,7 @@ function* watchUploadImages() {
 
 function likePostAPI({postId,userId,token}) {
     console.log(token);
-    return axios.patch(`user/${userId}/post/${postId}/like`, null, {
+    return axios.patch(`user/${userId}/post/${postId}/like`, {}, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -280,6 +280,35 @@ function* watchUnLikePost() {
     yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
 }
 
+function retweetAPI({postId,token}) {
+    return axios.post(`/post/${postId}/retweet`,{}, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* retweet(action) {
+    try {
+        const result = yield call(retweetAPI, action.data);
+        yield put({
+            type: RETWEET_SUCCESS,
+            data : result.data.response
+        });
+    } catch (e) {
+        alert(e.response.data.error.message);
+        yield put({
+            type: RETWEET_FAILURE,
+            error: e,
+        });
+        //console.log(e.response);
+    }
+}
+
+function* watchRetweet() {
+    yield takeLatest(RETWEET_REQUEST, retweet);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchAddPost),
@@ -291,5 +320,6 @@ export default function* postSaga() {
         fork(watchUploadImages),
         fork(watchLikePost),
         fork(watchUnLikePost),
+        fork(watchRetweet),
     ]);
 }

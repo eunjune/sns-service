@@ -154,4 +154,12 @@ public class PostRestController {
         return OK(postService.uploadImage(images,request.getServletContext().getRealPath("/")));
     }
 
+    @PostMapping(path = "post/{postId}/retweet")
+    public ApiResult<Post> retweet(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable
+            Long postId
+    ) {
+        return OK(postService.retweet(postId,authentication.id.getValue()));
+    }
 }

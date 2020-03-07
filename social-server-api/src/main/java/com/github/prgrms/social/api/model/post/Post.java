@@ -21,7 +21,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Entity
 @Getter
 @NoArgsConstructor(force = true)
-@ToString(exclude = {"user","likes","comments", "images", "hashTags"})
+@ToString(exclude = {"user","likes","comments", "images", "hashTags","retweet"})
 @EqualsAndHashCode(of = "id")
 public class Post {
 
@@ -37,6 +37,10 @@ public class Post {
     @ApiModelProperty(value = "좋아요 여부", required = true)
     @Transient
     private boolean likesOfMe;
+
+    @ApiModelProperty(value = "좋아요 여부", required = true)
+    @Transient
+    private boolean isRetweet;
 
     @ApiModelProperty(value = "작성일시", required = true)
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
@@ -69,8 +73,14 @@ public class Post {
     @JsonBackReference
     private List<HashTag> hashTags = new ArrayList<>();
 
+    @ApiModelProperty(value = "리트윗한 글의 목록")
+    @OneToOne(mappedBy = "post",cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Retweet retweet;
+
+
     @Builder
-    private Post(Long id, String content, boolean likesOfMe, LocalDateTime createAt) {
+    private Post(Long id, String content, boolean likesOfMe,boolean isRetweet, LocalDateTime createAt) {
         checkArgument(isNotEmpty(content), "contents must be provided.");
         checkArgument(
                 content.length() >= 4 && content.length() <= 500,
@@ -80,6 +90,7 @@ public class Post {
         this.id = id;
         this.content = content;
         this.likesOfMe = likesOfMe;
+        this.isRetweet = isRetweet;
         this.createAt = defaultIfNull(createAt, now());
     }
 
@@ -114,6 +125,10 @@ public class Post {
         this.likesOfMe = false;
     }
 
+    public void setIsRetweet() {
+        this.isRetweet = this.retweet != null;
+    }
+
     public List<HashTag> findHashTag() {
         Pattern pattern = Pattern.compile("#[^\\s!@#$%^&*()+-=`~.;'\"?<>,./]+");
         Matcher matcher = pattern.matcher(content);
@@ -134,5 +149,13 @@ public class Post {
     public void addImage(Image image) {
         this.images.add(image);
         image.setPost(this);
+    }
+
+    public void addRetweet(Retweet retweet, Post targetPost) {
+        this.isRetweet = true;
+        this.retweet = retweet;
+        retweet.setPost(this);
+        retweet.setTargetPost(targetPost);
+
     }
 }

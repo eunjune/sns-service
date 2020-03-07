@@ -178,7 +178,7 @@ class PostServiceTest {
     }
 
 
-    @DisplayName("포스트를 중복으로 좋아할수없다")
+    @DisplayName("포스트를 중복으로 좋아할 수 없다")
     @Test
     void like_overlap() {
 

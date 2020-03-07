@@ -60,7 +60,7 @@ const User = ({ id }) => {
         )
         : null}
       {posts.map((p) => (
-        <PostCards key={+p.seq} post={p} />
+        <PostCards key={+p.id} post={p} />
       ))}
     </div>
   );

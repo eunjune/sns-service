@@ -4,7 +4,6 @@ import com.amazonaws.AmazonServiceException;
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.error.ServiceRuntimeException;
 import com.github.prgrms.social.api.error.UnauthorizedException;
-import com.github.prgrms.social.api.model.api.response.ApiResult;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.springframework.beans.TypeMismatchException;
@@ -23,7 +22,7 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.ERROR;
 @ControllerAdvice
 public class GeneralExceptionHandler {
 
-    private ResponseEntity<ApiResult> newResponse(Throwable throwable, HttpStatus status) {
+    private ResponseEntity<?> newResponse(Throwable throwable, HttpStatus status) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
         return new ResponseEntity<>(ERROR(throwable, status), headers, status);
@@ -38,7 +37,7 @@ public class GeneralExceptionHandler {
             MissingServletRequestParameterException.class,
             JSONException.class
     })
-    public ResponseEntity<ApiResult> handleBadRequestException(Exception e){
+    public ResponseEntity<?> handleBadRequestException(Exception e){
         log.debug("Bad request exception occurred: {}", e.getMessage(), e);
         return newResponse(e,HttpStatus.BAD_REQUEST);
     }
@@ -59,7 +58,7 @@ public class GeneralExceptionHandler {
             UnauthorizedException.class,
             AmazonServiceException.class
     })
-    public ResponseEntity<ApiResult> handleServiceRuntimeException(Exception e){
+    public ResponseEntity<?> handleServiceRuntimeException(Exception e){
         if(e instanceof NotFoundException)
             return newResponse(e, HttpStatus.NOT_FOUND);
         if(e instanceof UnauthorizedException)

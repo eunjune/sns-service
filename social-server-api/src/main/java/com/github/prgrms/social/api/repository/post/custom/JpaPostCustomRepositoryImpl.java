@@ -22,9 +22,11 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
     public Optional<Post> findByIdCustom(Long id, Long userId, Long postWriterId) {
 
         Post post = (Post)entityManager.createNativeQuery("SELECT DISTINCT p.*, " +
-                "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me " +
+                "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me, " +
+                "CASE WHEN r.target_post_id = NULL THEN false ELSE true END AS is_retweet " +
                 "FROM post p JOIN users u ON p.user_id=u.id LEFT JOIN likes l ON l.user_id=:userId AND l.post_id = p.id " +
                 "LEFT JOIN image i ON p.id=i.post_id " +
+                "LEFT JOIN retweet r on p.id = r.post_id " +
                 "WHERE p.user_id=:postWriterId AND p.id=:id", Post.class)
                 .setParameter("userId", userId)
                 .setParameter("postWriterId", postWriterId)
@@ -40,9 +42,11 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
     public List<Post> findAll(Long userId, Long postWriterId, Pageable pageable) {
 
         List resultList = entityManager.createNativeQuery("SELECT DISTINCT p.*, " +
-                "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me " +
+                "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me, " +
+                "CASE WHEN r.post_id = NULL THEN false ELSE true END AS is_retweet " +
                 "FROM post p JOIN users u ON p.user_id=u.id LEFT JOIN likes l ON l.user_id=:userId AND l.post_id = p.id " +
                 "LEFT JOIN image i ON p.id=i.post_id " +
+                "LEFT JOIN retweet r on p.id = r.post_id " +
                 "WHERE p.user_id=:postWriterId ORDER BY p.create_at DESC LIMIT :size OFFSET :offset", Post.class)
                 .setParameter("userId", userId)
                 .setParameter("postWriterId", postWriterId)
@@ -53,6 +57,7 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
         for(int i=0; i<resultList.size(); ++i) {
             Post post = (Post)resultList.get(i);
             post.setLikesOfMe(userId);
+            post.setIsRetweet();
         }
 
         return resultList;

@@ -265,6 +265,26 @@ const reducer = (state = initialState, action) => {
             }
         }
 
+        case RETWEET_REQUEST: {
+
+            return {
+                ...state,
+
+            }
+        }
+        case RETWEET_SUCCESS: {
+            
+            return {
+                ...state,
+                posts : [action.data, ...state.posts],
+            }
+        }
+        case RETWEET_FAILURE: {
+            return {
+                ...state,
+            }
+        }
+
         default: {
             return {
                 ...state

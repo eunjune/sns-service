@@ -17,7 +17,7 @@ const UserProfile = () => {
         <div>
             <Card
                 actions={[
-                    <div key="twit">게시글 수<br/>{posts.length}</div>,
+                    <div key="twit">게시글<br/>{posts.length}</div>,
                     <div key="following">팔로윙<br/>{}</div>,
                     <div key="twit">팔로워<br/>{}</div>,
                 ]}
@@ -25,6 +25,7 @@ const UserProfile = () => {
                 <Card.Meta avatar={<Avatar>{me.name[0]}</Avatar>}
                            title={me.name}
                 />
+                
                 <Button onClick={onLogout}>로그아웃</Button>
             </Card>
         </div>

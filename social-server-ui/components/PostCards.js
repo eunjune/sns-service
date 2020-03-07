@@ -2,9 +2,10 @@ import React, { useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Icon, Avatar, Form, List,Comment,Input } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import {ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST, UNLIKE_POST_REQUEST, LIKE_POST_REQUEST} from '../reducers/post';
+import {ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST, UNLIKE_POST_REQUEST, LIKE_POST_REQUEST, RETWEET_REQUEST} from '../reducers/post';
 import Link from 'next/link';
 import PostImages from '../components/PostImages'
+import PostCardContent from '../components/PostCardContent'
 
 const PostCards = ({post}) => {
     const [commentFormOpened, setCommentFormOpened] = useState(false);
@@ -90,36 +91,61 @@ const PostCards = ({post}) => {
 
     },[me && me.id, post]);
 
+    const onRetweet = useCallback(() => {
+      const token = sessionStorage.getItem("token");
+
+      if(!me) {
+        return alert('로그인이 필요합니다.');
+      }
+
+      return dispatch({
+        type: RETWEET_REQUEST,
+        data: {
+          postId: post.id,
+          token: token,
+        }
+      });
+    }, [me && me.id, post.id] );
+
   return (
         <div>
           <Card
               key={+post.createAt}
               cover={post.images[0] && <PostImages images={post.images}/>}
               actions={[
-                  <Icon type="retweet" key="retweet"/>,
+                  <Icon type="retweet" key="retweet" onClick={onRetweet}/>,
                   <Icon type="heart" key="heart" theme={liked ? 'twoTone' : 'outlined'} twoToneColor="#eb2f96" onClick={onToggleLike}/>,
                   <Icon type="message" key="message" onClick={onToggleComment}/>,
                   <Icon type="ellipsis" key="ellipsis"/>,
               ]}
+              title={post.isRetweet ? `${post.user.name}님이 리트윗 하셨습니다.` : null}
               extra = {<Button>팔로우</Button>}
           >
-              <Card.Meta
+            {post.isRetweet ? 
+                <Card
+                  cover={post.retweet.targetPost.images[0] && <PostImages images={post.retweet.targetPost.images} />}
+                >
+                  <Card.Meta
+                  
+                    avatar={<Link href={{pathname: '/user', query: {id:post.retweet.targetPost.user.id}}} as={`/user/${post.retweet.targetPost.user.id}`}>
+                              <a><Avatar>{post.retweet.targetPost.user.name[0]}</Avatar></a></Link>  }
+                    title={post.retweet.targetPost.user.name}
+                    description={<PostCardContent postData={post.retweet.targetPost.content} />}
+                  />
+                </Card>
+              : 
+              (
+                <Card.Meta
                   avatar={<Link href={{pathname: '/user', query: {id:post.user.id}}} as={`/user/${post.user.id}`}><a><Avatar>{post.user.name[0]}</Avatar></a></Link>  }
                   title={post.user.name}
-                  description={(
+                  description={<PostCardContent postData={post.content} />}
+                />
+              )
+              
+            }
 
-                    <div>
-                      {post.content.split(/(#[^\s!@#$%^&*()+-=`~.;'"?<>,./]+)/g).map(v => {
-                          if(v.match(/#[^\s!@#$%^&*()+-=`~.;'"?<>,./]+/)) {
-                            return (
-                              <Link href={{pathname: '/hashtag', query: { tag : v.slice(1) }}} as={`/hashtag/${v.slice(1)}`} key={v}><a>{v}</a></Link>
-                            )
-                          }
-                          return v;
-                      })}
-                    </div>
-                  )}
-              />
+
+              
 
           </Card>
           {commentFormOpened && (
