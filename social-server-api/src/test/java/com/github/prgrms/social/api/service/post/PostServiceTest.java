@@ -6,7 +6,7 @@ import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
-import com.github.prgrms.social.api.model.user.Likes;
+import com.github.prgrms.social.api.model.post.Likes;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.JpaHashTagRepository;
 import com.github.prgrms.social.api.repository.post.JpaPostLikeRepository;

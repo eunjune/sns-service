@@ -14,9 +14,10 @@ import {
     LOAD_MAIN_POSTS_SUCCESS,
     LOAD_USER_POSTS_FAILURE,
     LOAD_USER_POSTS_REQUEST,
-    LOAD_USER_POSTS_SUCCESS, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS
+    LOAD_USER_POSTS_SUCCESS, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS, LIKE_POST_SUCCESS, LIKE_POST_FAILURE, LIKE_POST_REQUEST, UNLIKE_POST_FAILURE, UNLIKE_POST_SUCCESS, UNLIKE_POST_REQUEST
 } from '../reducers/post';
 import axios from 'axios';
+import { UNFOLLOW_me_SUCCESS } from '../reducers/user';
 
 function addPostAPI({post, token}) {
 
@@ -224,6 +225,61 @@ function* watchUploadImages() {
     yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
 }
 
+function likePostAPI({postId,userId,token}) {
+    console.log(token);
+    return axios.patch(`user/${userId}/post/${postId}/like`, null, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* likePost(action) {
+    try {
+        const result = yield call(likePostAPI, action.data);
+        yield put({
+            type: LIKE_POST_SUCCESS,
+            data : result.data.response
+        });
+    } catch (e) {
+        yield put({
+            type: LIKE_POST_FAILURE,
+            error: e,
+        })
+    }
+}
+
+function* watchLikePost() {
+    yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+function unlikePostAPI({postId,userId,token}) {
+    return axios.delete(`user/${userId}/post/${postId}/unlike`, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* unlikePost(action) {
+    try {
+        const result = yield call(unlikePostAPI, action.data);
+        yield put({
+            type: UNLIKE_POST_SUCCESS,
+            data : result.data.response
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: UNLIKE_POST_FAILURE,
+            error: e,
+        })
+    }
+}
+
+function* watchUnLikePost() {
+    yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchAddPost),
@@ -233,5 +289,7 @@ export default function* postSaga() {
         fork(watchLoadUserPosts),
         fork(watchLoadComments),
         fork(watchUploadImages),
+        fork(watchLikePost),
+        fork(watchUnLikePost),
     ]);
 }

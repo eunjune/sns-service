@@ -46,9 +46,13 @@ export const RETWEET_REQUEST = 'RETWEET_REQUEST';
 export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
 export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 
-export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
-export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
-export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
+export const LIKE_POST_REQUEST = 'LIKE_POST_REQUEST';
+export const LIKE_POST_SUCCESS = 'LIKE_POST_SUCCESS';
+export const LIKE_POST_FAILURE = 'LIKE_POST_FAILURE';
+
+export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST';
+export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS';
+export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
 
 
 const reducer = (state = initialState, action) => {
@@ -61,7 +65,6 @@ const reducer = (state = initialState, action) => {
             }
         }
         case ADD_POST_SUCCESS: {
-            console.log('post success');
             return {
                 ...state,
                 isAddingPost: false,
@@ -82,7 +85,6 @@ const reducer = (state = initialState, action) => {
 
 
         case LOAD_MAIN_POSTS_REQUEST: {
-            console.log(action.data);
             return {
                 ...state,
                 posts: []
@@ -101,7 +103,6 @@ const reducer = (state = initialState, action) => {
         }
 
         case LOAD_HASHTAG_POSTS_REQUEST: {
-            console.log(action.data);
             return {
                 ...state,
                 posts: []
@@ -215,6 +216,52 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 imagePaths: state.imagePaths.filter((v,i) => i !== action.index),
+            }
+        }
+
+        case LIKE_POST_REQUEST: {
+
+            return {
+                ...state,
+
+            }
+        }
+        case LIKE_POST_SUCCESS: {
+            const postIndex = state.posts.findIndex(v => v.id === action.data.id);
+            const newPosts = [...state.posts];
+            newPosts[postIndex] = action.data;
+            
+            return {
+                ...state,
+                posts : newPosts,
+            }
+        }
+        case LIKE_POST_FAILURE: {
+            return {
+                ...state,
+            }
+        }
+
+        case UNLIKE_POST_REQUEST: {
+
+            return {
+                ...state,
+
+            }
+        }
+        case UNLIKE_POST_SUCCESS: {
+            const postIndex = state.posts.findIndex(v => v.id === action.data.id);
+            const newPosts = [...state.posts];
+            newPosts[postIndex] = action.data;
+            
+            return {
+                ...state,
+                posts : newPosts,
+            }
+        }
+        case UNLIKE_POST_FAILURE: {
+            return {
+                ...state,
             }
         }
 

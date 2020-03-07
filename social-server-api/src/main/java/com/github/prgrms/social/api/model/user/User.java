@@ -3,6 +3,7 @@ package com.github.prgrms.social.api.model.user;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.prgrms.social.api.model.post.Comment;
+import com.github.prgrms.social.api.model.post.Likes;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.security.JWT;
 import io.swagger.annotations.ApiModelProperty;

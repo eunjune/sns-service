@@ -6,7 +6,7 @@ import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
-import com.github.prgrms.social.api.model.user.Likes;
+import com.github.prgrms.social.api.model.post.Likes;
 import com.github.prgrms.social.api.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

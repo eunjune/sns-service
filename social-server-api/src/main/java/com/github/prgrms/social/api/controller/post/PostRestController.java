@@ -95,6 +95,23 @@ public class PostRestController {
                 .orElseThrow(() -> new NotFoundException(Post.class, postId)));
     }
 
+    @DeleteMapping(path = "user/{userId}/post/{postId}/unlike")
+    @ApiOperation(value = "포스트 좋아요 취소")
+    public ApiResult<Post> unlike(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable
+            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
+                    Long userId,
+            @PathVariable
+            @ApiParam(value = "대상 포스트 PK", example = "1")
+                    Long postId
+    ) {
+        // TODO query parameter에 offset, limit 파라미터를 추가하고 페이징 처리한다.
+
+        return OK(postService.unlike(postId, authentication.id.getValue(),userId)
+                .orElseThrow(() -> new NotFoundException(Post.class, postId)));
+    }
+
     @PostMapping(path = "user/{userId}/post/{postId}/comment")
     public ApiResult<Comment> comment(
             @AuthenticationPrincipal JwtAuthentication authentication,

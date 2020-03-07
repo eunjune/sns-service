@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Icon, Avatar, Form, List,Comment,Input } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import {ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST} from '../reducers/post';
+import {ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST, UNLIKE_POST_REQUEST, LIKE_POST_REQUEST} from '../reducers/post';
 import Link from 'next/link';
 import PostImages from '../components/PostImages'
 
@@ -12,6 +12,8 @@ const PostCards = ({post}) => {
     const { me } = useSelector(state => state.user);
     const { addedComment,isAddingComment } = useSelector(state => state.post);
     const dispatch = useDispatch();
+
+    const liked = post.likes && post.likes.find(v =>v.user.id === me.id);
 
     useEffect(() => {
       setCommentText('');
@@ -59,6 +61,35 @@ const PostCards = ({post}) => {
       setCommentText(e.target.value);
     },[]);
 
+    const onToggleLike = useCallback(() => {
+      const token = sessionStorage.getItem("token");
+
+      if(!me) {
+        return alert('로그인이 필요합니다.');
+      }
+
+      if(liked) {
+        return dispatch({
+          type: UNLIKE_POST_REQUEST,
+          data: {
+            userId: post.user.id,
+            postId: post.id,
+            token: token
+          }
+        });
+      } else {
+        return dispatch({
+          type: LIKE_POST_REQUEST,
+          data: {
+            userId: post.user.id,
+            postId: post.id,
+            token: token
+          }
+        });
+      }
+
+    },[me && me.id, post]);
+
   return (
         <div>
           <Card
@@ -66,7 +97,7 @@ const PostCards = ({post}) => {
               cover={post.images[0] && <PostImages images={post.images}/>}
               actions={[
                   <Icon type="retweet" key="retweet"/>,
-                  <Icon type="heart" key="heart"/>,
+                  <Icon type="heart" key="heart" theme={liked ? 'twoTone' : 'outlined'} twoToneColor="#eb2f96" onClick={onToggleLike}/>,
                   <Icon type="message" key="message" onClick={onToggleComment}/>,
                   <Icon type="ellipsis" key="ellipsis"/>,
               ]}

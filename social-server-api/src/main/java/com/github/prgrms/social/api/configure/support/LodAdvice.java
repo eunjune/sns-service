@@ -51,4 +51,5 @@ public class LodAdvice {
     public void modelSuccessPrintLog(JoinPoint jointPoint) {
         log.info("[{}] Model Method Success", jointPoint.getSignature().getName());
     }
+
 }

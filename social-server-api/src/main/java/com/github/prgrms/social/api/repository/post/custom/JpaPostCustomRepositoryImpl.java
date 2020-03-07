@@ -21,13 +21,13 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
     @Transactional(readOnly = true)
     public Optional<Post> findByIdCustom(Long id, Long userId, Long postWriterId) {
 
-        Post post = (Post)entityManager.createNativeQuery("SELECT p.*, " +
+        Post post = (Post)entityManager.createNativeQuery("SELECT DISTINCT p.*, " +
                 "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me " +
-                "FROM post p JOIN users u ON p.user_id=u.id LEFT JOIN likes l ON l.user_id=:userSeq AND l.post_id = p.id " +
+                "FROM post p JOIN users u ON p.user_id=u.id LEFT JOIN likes l ON l.user_id=:userId AND l.post_id = p.id " +
                 "LEFT JOIN image i ON p.id=i.post_id " +
-                "WHERE p.user_id=:postWriterSeq AND p.id=:id", Post.class)
-                .setParameter("userSeq", userId)
-                .setParameter("postWriterSeq", postWriterId)
+                "WHERE p.user_id=:postWriterId AND p.id=:id", Post.class)
+                .setParameter("userId", userId)
+                .setParameter("postWriterId", postWriterId)
                 .setParameter("id", id).getSingleResult();
 
         post.setLikesOfMe(userId);
@@ -39,13 +39,13 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
     @Transactional(readOnly = true)
     public List<Post> findAll(Long userId, Long postWriterId, Pageable pageable) {
 
-        List resultList = entityManager.createNativeQuery("SELECT p.*, " +
+        List resultList = entityManager.createNativeQuery("SELECT DISTINCT p.*, " +
                 "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me " +
-                "FROM post p JOIN users u ON p.user_id=u.id LEFT JOIN likes l ON l.user_id=:userSeq AND l.post_id = p.id " +
+                "FROM post p JOIN users u ON p.user_id=u.id LEFT JOIN likes l ON l.user_id=:userId AND l.post_id = p.id " +
                 "LEFT JOIN image i ON p.id=i.post_id " +
-                "WHERE p.user_id=:postWriterSeq ORDER BY p.create_at DESC LIMIT :size OFFSET :offset", Post.class)
-                .setParameter("userSeq", userId)
-                .setParameter("postWriterSeq", postWriterId)
+                "WHERE p.user_id=:postWriterId ORDER BY p.create_at DESC LIMIT :size OFFSET :offset", Post.class)
+                .setParameter("userId", userId)
+                .setParameter("postWriterId", postWriterId)
                 .setParameter("size", pageable.getPageSize())
                 .setParameter("offset", pageable.getOffset())
                 .getResultList();

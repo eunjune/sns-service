@@ -2,7 +2,6 @@ package com.github.prgrms.social.api.model.post;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.github.prgrms.social.api.model.user.Likes;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -35,9 +34,9 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
-    @ApiModelProperty(value = "나의 좋아요 여부", required = true)
+    @ApiModelProperty(value = "좋아요 여부", required = true)
     @Transient
-    private boolean likesOfMe; // like의 user_seq = login의 user_seq
+    private boolean likesOfMe;
 
     @ApiModelProperty(value = "작성일시", required = true)
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
@@ -56,7 +55,8 @@ public class Post {
 
     @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonManagedReference
+    @Setter
     private List<Likes> likes = new ArrayList<>();
 
     @ApiModelProperty(value = "댓글 리스트")

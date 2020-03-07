@@ -5,7 +5,7 @@ import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.Post;
-import com.github.prgrms.social.api.model.user.Likes;
+import com.github.prgrms.social.api.model.post.Likes;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.JpaHashTagRepository;
 import com.github.prgrms.social.api.repository.post.JpaImageRepository;
@@ -86,13 +86,41 @@ public class PostService {
                 if (!post.isLikesOfMe()) {
                     //post.incrementAndGetLikes();
 
-                    Likes likes = new Likes(null,null);
-                    post.getUser().addLike(likes);
-                    post.incrementAndGetLikes(likes);
-                    postLikeRepository.save(likes);
+                    Likes like = new Likes(null,null);
+                    post.getUser().addLike(like);
+                    post.incrementAndGetLikes(like);
+                    postLikeRepository.save(like);
                 }
             return post;
         });
+    }
+
+    public Optional<Post> unlike(Long postId, Long userId, Long postWriterId) {
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postWriterId, "writerId must be provided.");
+
+        return postRepository.findByIdCustom(postId, userId, postWriterId)
+                .map(post -> {
+                    if (post.isLikesOfMe()) {
+                        List<Likes> likes = post.getLikes();
+                        post.setLikes(new ArrayList<>());
+
+                        Likes deleteLike = null;
+                        for(Likes like : likes) {
+                            if(like.getUser().getId().equals(userId)) {
+                                deleteLike = like;
+                                continue;
+                            }
+                            post.getUser().addLike(like);
+                            post.incrementAndGetLikes(like);
+                        }
+
+                        postLikeRepository.deleteById(deleteLike.getId());
+                    }
+                    return post;
+                });
+
     }
 
     @Transactional(readOnly = true)
@@ -143,4 +171,6 @@ public class PostService {
 
         return result;
     }
+
+
 }

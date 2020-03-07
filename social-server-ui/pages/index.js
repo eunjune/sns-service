@@ -15,7 +15,6 @@ const Home = () => {
         const token = sessionStorage.getItem("token");
 
         if(me) {
-            console.log(me);
             dispatch({
                 type: LOAD_MAIN_POSTS_REQUEST,
                 data : {

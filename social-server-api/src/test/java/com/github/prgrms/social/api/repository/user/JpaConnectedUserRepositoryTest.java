@@ -4,7 +4,7 @@ import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
-import com.github.prgrms.social.api.model.user.Likes;
+import com.github.prgrms.social.api.model.post.Likes;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.projection.ConnectedId;
 import org.junit.jupiter.api.BeforeEach;

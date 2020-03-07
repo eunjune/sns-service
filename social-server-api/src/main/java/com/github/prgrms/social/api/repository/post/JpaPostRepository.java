@@ -20,8 +20,6 @@ public interface JpaPostRepository extends JpaRepository<Post,Long>, JpaPostCust
     @Override
     Optional<Post> findByIdCustom(Long id, Long userId, Long postWriterId);
 
-
-
     @Transactional(readOnly = true)
     @Override
     List<Post> findAll(Long userId, Long postWriterId, Pageable pageable);
