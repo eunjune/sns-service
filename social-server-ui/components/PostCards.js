@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Card, Icon, Avatar, Form, List,Comment,Input } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import {ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST, UNLIKE_POST_REQUEST, LIKE_POST_REQUEST, RETWEET_REQUEST} from '../reducers/post';
+import {FOLLOW_USER_REQUEST,UNFOLLOW_USER_REQUEST} from '../reducers/user'
 import Link from 'next/link';
 import PostImages from '../components/PostImages'
 import PostCardContent from '../components/PostCardContent'
@@ -107,6 +108,31 @@ const PostCards = ({post}) => {
       });
     }, [me && me.id, post.id] );
 
+    const onFollow = useCallback(userId => () => {
+      const token = sessionStorage.getItem("token");
+
+      dispatch({
+        type: FOLLOW_USER_REQUEST,
+        data: {
+          userId,
+          token
+        }
+      });
+    },[]);
+
+    const onUnfollow = useCallback(userId => () => {
+      console.log(me.followings && me.followings.find(v => v.id === post.user.id));
+      const token = sessionStorage.getItem("token");
+
+      dispatch({
+        type: UNFOLLOW_USER_REQUEST,
+        data: {
+          userId,
+          token
+        }
+      });
+    },[]);
+
   return (
         <div>
           <Card
@@ -119,7 +145,12 @@ const PostCards = ({post}) => {
                   <Icon type="ellipsis" key="ellipsis"/>,
               ]}
               title={post.isRetweet ? `${post.user.name}님이 리트윗 하셨습니다.` : null}
-              extra = {<Button>팔로우</Button>}
+              extra = { !me || post.user.id === me.id
+              ? null
+              : me.followings && me.followings.find(id => id === post.user.id)
+              ? <Button onClick={onUnfollow(post.user.id)}>언팔로우</Button>
+              : <Button onClick={onFollow(post.user.id)}>팔로우</Button>
+              }
           >
             {post.isRetweet ? 
                 <Card

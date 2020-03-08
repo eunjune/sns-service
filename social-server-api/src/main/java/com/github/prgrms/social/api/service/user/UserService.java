@@ -8,7 +8,7 @@ import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.post.projection.ConnectedId;
+import com.github.prgrms.social.api.repository.user.projection.ConnectedId;
 import com.github.prgrms.social.api.repository.user.JpaConnectedUserRepository;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
 import com.google.common.eventbus.EventBus;
@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,7 +113,7 @@ public class UserService {
     public Optional<User> findById(Long userId) {
         checkNotNull(userId, "userId must be provided.");
 
-        return userRepository.findById(userId);
+        return userRepository.findByIdCustom(userId);
     }
 
     @Transactional(readOnly = true)
@@ -136,4 +137,50 @@ public class UserService {
         return connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByTargetUser_Id(userId);
     }
 
+    @Transactional
+    public User addFollowing(Long meId, Long userId) {
+        checkNotNull(meId, "meId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+
+        User targetUser = userRepository.findByIdCustom(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
+
+        return userRepository.findByIdCustom(meId)
+                .map(user -> {
+                    if(!user.getFollowers().contains(userId)) {
+                        ConnectedUser connectedUser = new ConnectedUser(null,null);
+                        connectedUser.setTargetUser(targetUser);
+                        user.addConnectedUser(connectedUser);
+
+                        user.addFollowing(connectedUserRepository.save(connectedUser).getTargetUser().getId());
+                    }
+                    return user;
+                })
+                .orElseThrow(() -> new NotFoundException(User.class, meId));
+    }
+
+    @Transactional
+    public User removeFollowing(Long meId, Long userId) {
+        checkNotNull(meId, "meId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+
+
+        return userRepository.findByIdCustom(meId)
+                .map(user -> {
+                    List<ConnectedUser> connectedUsers = user.getConnectedUsers();
+                    user.setConnectedUsers(new ArrayList<>());
+                    user.setFollowings(new ArrayList<>());
+
+                    for(ConnectedUser connectedUser : connectedUsers) {
+                        if(!connectedUser.getTargetUser().getId().equals(userId)) {
+                            user.addConnectedUser(connectedUser);
+                            user.addFollowing(connectedUser.getId());
+                        }
+                    }
+
+                    connectedUserRepository.deleteByUserIdAndTargetUserId(meId, userId);
+
+                    return user;
+                })
+                .orElseThrow(() -> new NotFoundException(User.class, meId));
+    }
 }

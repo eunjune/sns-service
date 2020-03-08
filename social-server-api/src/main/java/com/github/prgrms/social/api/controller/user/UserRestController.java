@@ -137,4 +137,22 @@ public class UserRestController {
     public ApiResult<List<ConnectedUser>> connections(@AuthenticationPrincipal JwtAuthentication authentication) {
         return OK(userService.findAllConnectedUser(authentication.id.getValue()));
     }
+
+    @PostMapping(path = "user/{userId}/follow")
+    @ApiOperation(value = "팔로우")
+    public ApiResult<User> follow(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable Long userId
+    ) {
+        return OK(userService.addFollowing(authentication.id.getValue(), userId));
+    }
+
+    @DeleteMapping(path = "user/{userId}/follow")
+    @ApiOperation(value = "팔로우")
+    public ApiResult<User> unfollow(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable Long userId
+    ) {
+        return OK(userService.removeFollowing(authentication.id.getValue(), userId));
+    }
 }

@@ -11,6 +11,8 @@ import {
     EMAIL_CHECK_SUCCESS,
     EMAIL_CHECK_FAILURE,
     LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOAD_USER_FAILURE, LOAD_ME_REQUEST, LOAD_ME_SUCCESS, LOAD_ME_FAILURE,
+    FOLLOW_USER_REQUEST,FOLLOW_USER_SUCCESS,FOLLOW_USER_FAILURE,
+    UNFOLLOW_USER_REQUEST,UNFOLLOW_USER_SUCCESS,UNFOLLOW_USER_FAILURE
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
@@ -150,6 +152,64 @@ function* watchLoadMe() {
     yield takeLatest(LOAD_ME_REQUEST,loadMe);
 }
 
+function followAPI({userId,token}) {
+    return axios.post(`user/${userId}/follow`,{},{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* follow(action) {
+
+    try {
+        const result = yield call(followAPI, action.data);
+        yield put({
+            type: FOLLOW_USER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: FOLLOW_USER_FAILURE,
+            error: e
+        });
+    }
+}
+
+function* watchFollow() {
+    yield takeLatest(FOLLOW_USER_REQUEST,follow);
+}
+
+function unfollowAPI({userId,token}) {
+    return axios.delete(`user/${userId}/follow`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* unfollow(action) {
+
+    try {
+        const result = yield call(unfollowAPI, action.data);
+        yield put({
+            type: UNFOLLOW_USER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: UNFOLLOW_USER_FAILURE,
+            error: e
+        });
+    }
+}
+
+function* watchUnfollow() {
+    yield takeLatest(UNFOLLOW_USER_REQUEST,unfollow);
+}
+
 export default function* userSaga() {
     yield all([
         fork(watchEmailCheck),
@@ -157,5 +217,7 @@ export default function* userSaga() {
         fork(watchSignUp),
         fork(watchLoadUser),
         fork(watchLoadMe),
+        fork(watchFollow),
+        fork(watchUnfollow),
     ]);
 }

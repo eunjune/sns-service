@@ -63,9 +63,19 @@ public class User {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createAt;
 
-    @ApiModelProperty(value = "친구 목록")
+    @ApiModelProperty(value = "팔로잉 Id 목록")
+    @Transient
+    @Setter
+    private List<Long> followings = new ArrayList<>();
+
+    @ApiModelProperty(value = "팔로워 Id 목록")
+    @Transient
+    private List<Long> followers = new ArrayList<>();
+
+    @ApiModelProperty(value = "팔로잉 목록")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
+    @Setter
     private List<ConnectedUser> connectedUsers = new ArrayList<>();
 
     @ApiModelProperty(value = "사용자의 포스트")
@@ -142,4 +152,11 @@ public class User {
     }
 
 
+    public void addFollowing(Long id) {
+        this.followings.add(id);
+
+
+
+
+    }
 }
