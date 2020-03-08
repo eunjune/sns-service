@@ -2,6 +2,8 @@ package com.github.prgrms.social.api.model.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.github.prgrms.social.api.model.api.response.user.UserSerializer;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Likes;
 import com.github.prgrms.social.api.model.post.Post;
@@ -27,6 +29,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(of = "id")
 @ToString(exclude = {"connectedUsers","posts","comments"})
+@JsonSerialize(using = UserSerializer.class)
 public class User {
 
     @ApiModelProperty(value = "PK", required = true)
@@ -40,7 +43,7 @@ public class User {
 
     @ApiModelProperty(value = "이메일", required = true)
     @AttributeOverrides({
-            @AttributeOverride(name="address", column=@Column(name="email", nullable = false))
+            @AttributeOverride(name = "address", column = @Column(name = "email", nullable = false))
     })
     private final Email email;
 
@@ -62,15 +65,6 @@ public class User {
     @ApiModelProperty(value = "생성일시", required = true)
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createAt;
-
-    @ApiModelProperty(value = "팔로잉 Id 목록")
-    @Transient
-    @Setter
-    private List<Long> followings = new ArrayList<>();
-
-    @ApiModelProperty(value = "팔로워 Id 목록")
-    @Transient
-    private List<Long> followers = new ArrayList<>();
 
     @ApiModelProperty(value = "팔로잉 목록")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -149,14 +143,5 @@ public class User {
     public void addLike(Likes likes) {
         this.likes.add(likes);
         likes.setUser(this);
-    }
-
-
-    public void addFollowing(Long id) {
-        this.followings.add(id);
-
-
-
-
     }
 }

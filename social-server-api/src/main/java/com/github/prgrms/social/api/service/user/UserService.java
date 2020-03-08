@@ -113,7 +113,7 @@ public class UserService {
     public Optional<User> findById(Long userId) {
         checkNotNull(userId, "userId must be provided.");
 
-        return userRepository.findByIdCustom(userId);
+        return userRepository.findById(userId);
     }
 
     @Transactional(readOnly = true)
@@ -142,18 +142,15 @@ public class UserService {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
-        User targetUser = userRepository.findByIdCustom(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
+        User targetUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
 
-        return userRepository.findByIdCustom(meId)
+        return userRepository.findById(meId)
                 .map(user -> {
-                    if(!user.getFollowers().contains(userId)) {
-                        ConnectedUser connectedUser = new ConnectedUser(null,null);
-                        connectedUser.setTargetUser(targetUser);
-                        user.addConnectedUser(connectedUser);
+                    ConnectedUser connectedUser = new ConnectedUser(null,null);
+                    connectedUser.setTargetUser(targetUser);
+                    user.addConnectedUser(connectedUser);
 
-                        user.addFollowing(connectedUserRepository.save(connectedUser).getTargetUser().getId());
-                    }
-                    return user;
+                    return connectedUserRepository.save(connectedUser).getUser();
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, meId));
     }
@@ -164,16 +161,14 @@ public class UserService {
         checkNotNull(userId, "userId must be provided.");
 
 
-        return userRepository.findByIdCustom(meId)
+        return userRepository.findById(meId)
                 .map(user -> {
                     List<ConnectedUser> connectedUsers = user.getConnectedUsers();
                     user.setConnectedUsers(new ArrayList<>());
-                    user.setFollowings(new ArrayList<>());
 
                     for(ConnectedUser connectedUser : connectedUsers) {
                         if(!connectedUser.getTargetUser().getId().equals(userId)) {
                             user.addConnectedUser(connectedUser);
-                            user.addFollowing(connectedUser.getId());
                         }
                     }
 
