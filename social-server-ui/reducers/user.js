@@ -22,9 +22,6 @@ export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
 export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
 
 export const LOG_OUT = 'LOG_OUT';
-// export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
-// export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
-// export const LOG_OUT_FAILURE = 'LOG_OUT_FAILURE';
 
 export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST';
 export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS';
@@ -34,9 +31,13 @@ export const LOAD_ME_REQUEST = 'LOAD_ME_REQUEST';
 export const LOAD_ME_SUCCESS = 'LOAD_ME_SUCCESS';
 export const LOAD_ME_FAILURE = 'LOAD_ME_FAILURE';
 
-export const LOAD_FOLLOW_REQUEST = 'LOAD_FOLLOW_REQUEST';
-export const LOAD_FOLLOW_SUCCESS = 'LOAD_FOLLOW_SUCCESS';
-export const LOAD_FOLLOW_FAILURE = 'LOAD_FOLLOW_FAILURE';
+export const LOAD_FOLLOWER_REQUEST = 'LOAD_FOLLOWER_REQUEST';
+export const LOAD_FOLLOWER_SUCCESS = 'LOAD_FOLLOWER_SUCCESS';
+export const LOAD_FOLLOWER_FAILURE = 'LOAD_FOLLOWER_FAILURE';
+
+export const LOAD_FOLLOWING_REQUEST = 'LOAD_FOLLOWING_REQUEST';
+export const LOAD_FOLLOWING_SUCCESS = 'LOAD_FOLLOWING_SUCCESS';
+export const LOAD_FOLLOWING_FAILURE = 'LOAD_FOLLOWING_FAILURE';
 
 export const FOLLOW_USER_REQUEST = 'FOLLOW_USER_REQUEST';
 export const FOLLOW_USER_SUCCESS = 'FOLLOW_USER_SUCCESS';
@@ -227,7 +228,11 @@ const reducer = (state = initialState, action) => {
         case UNFOLLOW_USER_SUCCESS: {
             return {
                 ...state,
-                me: action.data,
+                me: {
+                    ...state.me,
+                    followings: state.me.followings.filter(v=>v.id !== action.data),
+                },
+                followings: state.followings.filter(v => v.id !== action.data),
             };
         }
 
@@ -236,6 +241,73 @@ const reducer = (state = initialState, action) => {
                 ...state,
             };
         }
+
+        case LOAD_FOLLOWING_REQUEST: {
+
+            return {
+                ...state,
+            };
+        }
+
+        case LOAD_FOLLOWING_SUCCESS: {
+            return {
+                ...state,
+                followings: action.data,
+            
+            };
+        }
+
+        case LOAD_FOLLOWING_FAILURE: {
+            return {
+                ...state,
+            };
+        }
+
+        case LOAD_FOLLOWER_REQUEST: {
+
+            return {
+                ...state,
+            };
+        }
+
+        case LOAD_FOLLOWER_SUCCESS: {
+            return {
+                ...state,
+                followers: action.data,
+            };
+        }
+
+        case LOAD_FOLLOWER_FAILURE: {
+            return {
+                ...state,
+            };
+        }
+
+        case REMOVE_FOLLOWER_REQUEST: {
+
+            return {
+                ...state,
+            };
+        }
+
+        case REMOVE_FOLLOWER_SUCCESS: {
+            return {
+                ...state,
+                me: {
+                    ...state.me,
+                    followers: state.me.followers.filter(v=>v.id !== action.data),
+                },
+                followers: state.followers.filter(v => v.id !== action.data),
+            };
+        }
+
+        case REMOVE_FOLLOWER_FAILURE: {
+            return {
+                ...state,
+            };
+        }
+
+        
 
         default: {
             return {

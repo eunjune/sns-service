@@ -138,6 +138,22 @@ public class UserRestController {
         return OK(userService.findAllConnectedUser(authentication.id.getValue()));
     }
 
+    @GetMapping(path = "user/followings")
+    @ApiOperation(value = "팔로우 목록")
+    public ApiResult<List<User>> followings(
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        return OK(userService.getFollowings(authentication.id.getValue()));
+    }
+
+    @GetMapping(path = "user/followers")
+    @ApiOperation(value = "팔로우 목록")
+    public ApiResult<List<User>> followers(
+            @AuthenticationPrincipal JwtAuthentication authentication
+    ) {
+        return OK(userService.getFollowers(authentication.id.getValue()));
+    }
+
     @PostMapping(path = "user/{userId}/follow")
     @ApiOperation(value = "팔로우")
     public ApiResult<User> follow(
@@ -149,10 +165,19 @@ public class UserRestController {
 
     @DeleteMapping(path = "user/{userId}/follow")
     @ApiOperation(value = "팔로우")
-    public ApiResult<User> unfollow(
+    public ApiResult<Long> unfollow(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable Long userId
     ) {
-        return OK(userService.removeFollowing(authentication.id.getValue(), userId));
+        return OK(userService.removeFollowing(authentication.id.getValue(),userId));
+    }
+
+    @DeleteMapping(path = "user/{userId}/follower")
+    @ApiOperation(value = "팔로우")
+    public ApiResult<Long> removeFollower(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable Long userId
+    ) {
+        return OK(userService.removeFollower(authentication.id.getValue(), userId));
     }
 }

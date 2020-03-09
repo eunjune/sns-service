@@ -10,9 +10,13 @@ import {
     EMAIL_CHECK_REQUEST,
     EMAIL_CHECK_SUCCESS,
     EMAIL_CHECK_FAILURE,
-    LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOAD_USER_FAILURE, LOAD_ME_REQUEST, LOAD_ME_SUCCESS, LOAD_ME_FAILURE,
+    LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOAD_USER_FAILURE, 
+    LOAD_ME_REQUEST, LOAD_ME_SUCCESS, LOAD_ME_FAILURE,
     FOLLOW_USER_REQUEST,FOLLOW_USER_SUCCESS,FOLLOW_USER_FAILURE,
-    UNFOLLOW_USER_REQUEST,UNFOLLOW_USER_SUCCESS,UNFOLLOW_USER_FAILURE
+    UNFOLLOW_USER_REQUEST,UNFOLLOW_USER_SUCCESS,UNFOLLOW_USER_FAILURE, 
+    LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWER_SUCCESS, LOAD_FOLLOWER_FAILURE, 
+    REMOVE_FOLLOWER_FAILURE, REMOVE_FOLLOWER_REQUEST, REMOVE_FOLLOWER_SUCCESS,
+    LOAD_FOLLOWING_REQUEST, LOAD_FOLLOWING_FAILURE, LOAD_FOLLOWING_SUCCESS
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
@@ -210,6 +214,93 @@ function* watchUnfollow() {
     yield takeLatest(UNFOLLOW_USER_REQUEST,unfollow);
 }
 
+function loadFollowerAPI(token) {
+    return axios.get(`user/followers`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadFollower(action) {
+
+    try {
+        const result = yield call(loadFollowerAPI, action.data);
+        yield put({
+            type: LOAD_FOLLOWER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: LOAD_FOLLOWER_FAILURE,
+            error: e
+        });
+    }
+}
+
+function* watchLoadfollower() {
+    yield takeLatest(LOAD_FOLLOWER_REQUEST,loadFollower);
+}
+
+function loadFollowingAPI(token) {
+    return axios.get(`user/followings`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadFollowing(action) {
+
+    try {
+        const result = yield call(loadFollowingAPI, action.data);
+        yield put({
+            type: LOAD_FOLLOWING_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: LOAD_FOLLOWING_FAILURE,
+            error: e
+        });
+    }
+}
+
+function* watchLoadfollowing() {
+    yield takeLatest(LOAD_FOLLOWING_REQUEST,loadFollowing);
+}
+
+function removeFollowerAPI({userId,token}) {
+    return axios.delete(`user/${userId}/follower`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* removeFollower(action) {
+
+    try {
+        const result = yield call(removeFollowerAPI, action.data);
+        yield put({
+            type: REMOVE_FOLLOWER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: REMOVE_FOLLOWER_FAILURE,
+            error: e
+        });
+    }
+}
+
+function* watchRemovefollower() {
+    yield takeLatest(REMOVE_FOLLOWER_REQUEST,removeFollower);
+}
+
 export default function* userSaga() {
     yield all([
         fork(watchEmailCheck),
@@ -219,5 +310,8 @@ export default function* userSaga() {
         fork(watchLoadMe),
         fork(watchFollow),
         fork(watchUnfollow),
+        fork(watchLoadfollower),
+        fork(watchLoadfollowing),
+        fork(watchRemovefollower),
     ]);
 }

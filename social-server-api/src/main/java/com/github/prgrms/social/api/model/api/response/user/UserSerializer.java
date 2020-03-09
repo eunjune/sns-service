@@ -21,7 +21,7 @@ public class UserSerializer extends StdSerializer<User> {
     public void serialize(User value, JsonGenerator gen, SerializerProvider provider) throws IOException {
 
         gen.writeStartObject();
-        gen.writeNumberField("id",value.getId());
+        gen.writeNumberField("id", value.getId());
         gen.writeStringField("name",value.getName());
         gen.writeStringField("email",value.getEmail().getAddress());
         gen.writeNumberField("loginCount", value.getLoginCount());
@@ -41,6 +41,11 @@ public class UserSerializer extends StdSerializer<User> {
         }
         gen.writeFieldName("followings");
         gen.writeArray(followings, 0, followings.length);
+
+        long[] followers = new long[0];
+        gen.writeFieldName("follower");
+        gen.writeArray(followers,0,followers.length);
+
         gen.writeEndObject();
 
     }

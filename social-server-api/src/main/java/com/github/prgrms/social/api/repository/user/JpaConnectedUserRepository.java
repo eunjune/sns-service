@@ -15,7 +15,10 @@ public interface JpaConnectedUserRepository extends JpaRepository<ConnectedUser,
     List<ConnectedUser> findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(Long id);
 
     @Transactional(readOnly = true)
+    List<ConnectedUser> findByTargetUser_IdAndCreateAtIsNotNullOrderByIdDesc(Long id);
+
+    @Transactional(readOnly = true)
     List<ConnectedId> findByUser_IdAndCreateAtIsNotNullOrderByTargetUser_Id(Long id);
 
-    void deleteByUserIdAndTargetUserId(Long userId,Long targetUserId);
+    void deleteByUser_IdAndTargetUser_Id(Long userId, Long targetUserId);
 }

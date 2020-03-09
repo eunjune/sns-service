@@ -121,7 +121,6 @@ const PostCards = ({post}) => {
     },[]);
 
     const onUnfollow = useCallback(userId => () => {
-      console.log(me.followings && me.followings.find(v => v.id === post.user.id));
       const token = sessionStorage.getItem("token");
 
       dispatch({
