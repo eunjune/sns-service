@@ -11,6 +11,9 @@ export const initialState = {
     followings: [],
     followers: [],
     user: null,
+    isEditingName: false,
+    editNameErrorReason: '',
+
 };
 
 export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
@@ -54,6 +57,10 @@ export const REMOVE_FOLLOWER_FAILURE = 'REMOVE_FOLLOWER_FAILURE';
 export const SIGN_UP_REQUEST = 'SIGN_UP_REQUEST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
+
+export const EDIT_NAME_REQUEST = 'EDIT_NAME_REQUEST';
+export const EDIT_NAME_SUCCESS = 'EDIT_NAME_SUCCESS';
+export const EDIT_NAME_FAILURE = 'EDIT_NAME_FAILURE';
 
 export const INCREMENT_NUMBER = 'INCREMENT_NUMBER';
 
@@ -307,11 +314,34 @@ const reducer = (state = initialState, action) => {
             };
         }
 
-        
+        case EDIT_NAME_REQUEST: {
 
+            return {
+                ...state,
+                isEditingName: true,
+                editNameErrorReason: ''
+            };
+        }
+
+        case EDIT_NAME_SUCCESS: {
+            return {
+                ...state,
+                me: action.data,
+                isEditingName: false,
+            };
+        }
+
+        case EDIT_NAME_FAILURE: {
+            return {
+                ...state,
+                isEditingName: false,
+            };
+        }
+        
         default: {
             return {
-                ...state
+                ...state,
+                editNameErrorReason: action.error,
             };
         }
     }

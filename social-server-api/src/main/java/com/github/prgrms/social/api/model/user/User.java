@@ -39,6 +39,7 @@ public class User {
 
     @ApiModelProperty(value = "사용자명", required = true)
     @Column(nullable = false)
+    @Setter
     private final String name;
 
     @ApiModelProperty(value = "이메일", required = true)
@@ -87,7 +88,7 @@ public class User {
     @JsonBackReference
     private List<Likes> likes = new ArrayList<>();
 
-    @Builder
+    @Builder(toBuilder = true)
     private User(Long id, String name, Email email, String password, String profileImageUrl, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
         checkArgument(isNotEmpty(name), "name must be provided.");
         checkArgument(
@@ -106,6 +107,20 @@ public class User {
         this.lastLoginAt = lastLoginAt;
         this.createAt = defaultIfNull(createAt, now());
     }
+/*
+    @Builder
+    private User(User user) {
+        checkNotNull(user, "user must be provided.");
+
+        this.id = user.getId();
+        this.name = user.getName();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+        this.profileImageUrl = user.getProfileImageUrl().orElse(null);
+        this.loginCount = user.getLoginCount();
+        this.lastLoginAt = user.getLastLoginAt().orElse(null);
+        this.createAt = user.getCreateAt();
+    }*/
 
     public void afterLoginSuccess() {
         loginCount++;

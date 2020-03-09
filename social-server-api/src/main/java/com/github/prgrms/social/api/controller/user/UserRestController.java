@@ -115,11 +115,20 @@ public class UserRestController {
     @GetMapping(path = "user/me")
     @ApiOperation(value = "내 정보")
     public ApiResult<User> me(@AuthenticationPrincipal JwtAuthentication authentication) {
-        System.out.println(authentication);
         return OK(
                 userService.findById(authentication.id.getValue())
                         .orElseThrow(() -> new NotFoundException(User.class, authentication.id))
         );
+    }
+
+    @PatchMapping(path = "user/{name}")
+    @ApiOperation(value = "이름 수정")
+    public ApiResult<User> name(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable String name
+    ) {
+        return OK(userService.updateName(authentication.id.getValue(), name));
+
     }
 
     @GetMapping(path = "user/{id}")

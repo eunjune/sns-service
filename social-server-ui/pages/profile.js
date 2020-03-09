@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import {Button, List, Card, Icon} from 'antd';
-import NameForm from "../components/NameForm";
+import NameEditForm from "../components/NameEditForm";
 import { useDispatch, useSelector } from 'react-redux';
 import { LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWING_REQUEST, UNFOLLOW_USER_REQUEST, REMOVE_FOLLOWER_REQUEST } from '../reducers/user';
 import { LOAD_USER_POSTS_REQUEST } from '../reducers/post';
@@ -64,7 +64,7 @@ const Profile = () => {
 
     return <>
             <div>
-                <NameForm/>
+                <NameEditForm/>
                 <List
                     style={{marginBottom: '20px'}}
                     grid={{gutter: 4, xs: 2, md: 3}}

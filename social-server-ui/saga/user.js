@@ -16,7 +16,7 @@ import {
     UNFOLLOW_USER_REQUEST,UNFOLLOW_USER_SUCCESS,UNFOLLOW_USER_FAILURE, 
     LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWER_SUCCESS, LOAD_FOLLOWER_FAILURE, 
     REMOVE_FOLLOWER_FAILURE, REMOVE_FOLLOWER_REQUEST, REMOVE_FOLLOWER_SUCCESS,
-    LOAD_FOLLOWING_REQUEST, LOAD_FOLLOWING_FAILURE, LOAD_FOLLOWING_SUCCESS
+    LOAD_FOLLOWING_REQUEST, LOAD_FOLLOWING_FAILURE, LOAD_FOLLOWING_SUCCESS, EDIT_NAME_REQUEST, EDIT_NAME_FAILURE, EDIT_NAME_SUCCESS
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
@@ -301,6 +301,35 @@ function* watchRemovefollower() {
     yield takeLatest(REMOVE_FOLLOWER_REQUEST,removeFollower);
 }
 
+function editNameAPI({name, token}) {
+    return axios.patch(`user/${name}`, null, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* editName(action) {
+
+    try {
+        const result = yield call(editNameAPI, action.data);
+        yield put({
+            type: EDIT_NAME_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: EDIT_NAME_FAILURE,
+            error: e
+        });
+    }
+}
+
+function* watchEditName() {
+    yield takeLatest(EDIT_NAME_REQUEST,editName);
+}
+
 export default function* userSaga() {
     yield all([
         fork(watchEmailCheck),
@@ -313,5 +342,6 @@ export default function* userSaga() {
         fork(watchLoadfollower),
         fork(watchLoadfollowing),
         fork(watchRemovefollower),
+        fork(watchEditName),
     ]);
 }

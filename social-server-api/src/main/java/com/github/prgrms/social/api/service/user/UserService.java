@@ -215,4 +215,14 @@ public class UserService {
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, userId));
     }
+
+    public User updateName(Long id, String name) {
+
+        return userRepository.findById(id)
+                .map(user -> {
+                    User newUser =user.toBuilder().name(name).build();
+                    return userRepository.save(newUser);
+                })
+                .orElseThrow(() -> new NotFoundException(User.class, id));
+    }
 }
