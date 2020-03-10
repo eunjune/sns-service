@@ -7,7 +7,7 @@
 
 ### 사용 스텍
 - 백엔드 : Spring Boot, Spring Security, Spring Data JPA, JWT, JUnit, Mockito, Lombok, Swagger, Apache Maven, MySql, Apache Kafka, MSA 
-- 프론트 : React, React-Hooks, Redux, Redux-Saga, ESLint, Next.js, Webpack 
+- 프론트 : React, React-Hooks, Redux, Redux-Saga, ESLint, Next.js, Webpack, Axios, SSR
 - 기타 : Git, AWS S3
 
 
@@ -18,6 +18,7 @@
 - 이미지 처리
 - 해시태그 
 - 리트윗
+- 팔로우, 언팔로우
 - 인가(본인 또는 친구 관계시만 친구의 포스트를 볼 수 있도록)
 - 인증(JSON WEB TOKEN을 활용한 인증처리)
 - 기존의 모놀리틱 구조를 간단한 마이크로 서비스 아키텍처로 확장
@@ -25,12 +26,11 @@
 - JDBC => JPA
 - 테스트 코드 작성
 - 예외처리
+- 서버 사이드 랜더링
 
 
 ### 개발 예정
-- 팔로우, 언팔로우
 - 검색엔진 최적화
-- 서버 사이드 랜더링
 - 배포
 - oAuth
 - Notification
