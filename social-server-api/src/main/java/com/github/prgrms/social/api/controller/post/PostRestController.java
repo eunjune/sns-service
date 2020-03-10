@@ -87,6 +87,17 @@ public class PostRestController {
         return OK(postService.findByHashTag(tag, pageable));
     }
 
+    @DeleteMapping(path = "/post/{postId}")
+    @ApiOperation(value = "특정 포스트 삭제")
+    public ApiResult<Long> removePost(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable
+            @ApiParam(value = "대상 포스트 PK", example = "1")
+            Long postId
+    ) {
+        return OK(postService.removePost(authentication.id.getValue(), postId));
+    }
+
     @PatchMapping(path = "user/{userId}/post/{postId}/like")
     @ApiOperation(value = "포스트 좋아요")
     public ApiResult<Post> like(
@@ -110,10 +121,10 @@ public class PostRestController {
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
             @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
-                    Long userId,
+            Long userId,
             @PathVariable
             @ApiParam(value = "대상 포스트 PK", example = "1")
-                    Long postId
+            Long postId
     ) {
         // TODO query parameter에 offset, limit 파라미터를 추가하고 페이징 처리한다.
 

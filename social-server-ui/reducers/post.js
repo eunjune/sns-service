@@ -27,6 +27,10 @@ export const LOAD_USER_POSTS_REQUEST = 'LOAD_USER_POSTS_REQUEST';
 export const LOAD_USER_POSTS_SUCCESS = 'LOAD_USER_POSTS_SUCCESS';
 export const LOAD_USER_POSTS_FAILURE = 'LOAD_USER_POSTS_FAILURE';
 
+export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
+export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
+export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
+
 export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';
 export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
 export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE';
@@ -132,6 +136,25 @@ const reducer = (state = initialState, action) => {
             }
         }
         case LOAD_USER_POSTS_FAILURE: {
+            return {
+                ...state,
+            }
+        }
+
+        case REMOVE_POST_REQUEST: {
+            return {
+                ...state,
+            }
+        }
+
+        case REMOVE_POST_SUCCESS: {
+            console.log(action.data);
+            return {
+                ...state,
+                posts: state.posts.filter(v => v.id !== action.data),
+            }
+        }
+        case REMOVE_POST_FAILURE: {
             return {
                 ...state,
             }

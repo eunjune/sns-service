@@ -215,4 +215,30 @@ public class PostService {
         return retweetRepository.findByTargetPostId(postId);
 
     }
+
+    public Long removePost(Long userId, Long postId) {
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postId, "postId must be provided.");
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(User.class, userId));
+
+        return postRepository.findById(postId)
+                .map(post -> {
+                    /*List<Post> posts = user.getPosts();
+                    List<Post> newPosts = new ArrayList<>();
+                    for(Post postItem : posts) {
+                        if(postItem.getId().equals(postId)) {
+                            continue;
+                        }
+                        newPosts.add(postItem);
+                    }
+                    Post newPosts*/
+
+                    postRepository.deleteById(postId);
+
+                    return post.getId();
+                })
+                .orElseThrow(() -> new NotFoundException(Post.class, postId));
+    }
 }
