@@ -24,6 +24,6 @@
     "linebreak-style": "off",
     "no-trailing-spaces": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "eslint-disable-next-line no-console": ".js",
+    "eslint-disable-next-line no-console": ".js"
   }
 }

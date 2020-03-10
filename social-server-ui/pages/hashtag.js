@@ -8,18 +8,6 @@ const Hashtag = ({ tag }) => {
   const dispatch = useDispatch();
   const { posts } = useSelector((state) => state.post);
 
-  useEffect(() => {
-    const token = sessionStorage.getItem('token');
-
-    dispatch({
-      type: LOAD_HASHTAG_POSTS_REQUEST,
-      data: {
-        tag,
-        token,
-      },
-    });
-  }, []);
-
   return (
     <div>
       {posts.map((p) => (
@@ -34,6 +22,14 @@ Hashtag.propTypes = {
 };
 
 Hashtag.getInitialProps = async (context) => {
+  const tag = context.query.tag;
+  console.log('tag');
+  console.log(tag);
+  context.store.dispatch({
+    type: LOAD_HASHTAG_POSTS_REQUEST,
+    data: tag,
+  });
+
   return { tag: context.query.tag };
 };
 

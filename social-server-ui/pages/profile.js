@@ -1,10 +1,12 @@
 import React, { useEffect, useCallback, useState } from 'react';
+import cookie from 'react-cookies';
 import {Button, List, Card, Icon} from 'antd';
 import NameEditForm from "../components/NameEditForm";
 import { useDispatch, useSelector } from 'react-redux';
 import { LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWING_REQUEST, UNFOLLOW_USER_REQUEST, REMOVE_FOLLOWER_REQUEST } from '../reducers/user';
-import { LOAD_USER_POSTS_REQUEST } from '../reducers/post';
+import { LOAD_USER_POSTS_REQUEST, LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 import PostCards from '../components/PostCards';
+import axios from 'axios';
 
 const Profile = () => {
 
@@ -12,33 +14,7 @@ const Profile = () => {
     const {me, followers, followings} = useSelector(state => state.user);
     const {posts} = useSelector(state => state.post);
 
-    useEffect(() => {
-        if(me) {
-            const token = sessionStorage.getItem("token");
-
-            dispatch({
-                type: LOAD_FOLLOWER_REQUEST,
-                data: token,
-            });
-    
-            dispatch({
-                type: LOAD_FOLLOWING_REQUEST,
-                data: token,
-            });
-    
-            dispatch({
-                type: LOAD_USER_POSTS_REQUEST,
-                data: {
-                    userId: me.id,
-                    token: token,
-                }
-            });
-        }
-        
-    }, [me && me.id]);
-
     const onUnfollow = useCallback(userId => () => {
-        const token = sessionStorage.getItem("token");
 
         dispatch({
             type: UNFOLLOW_USER_REQUEST,
@@ -50,7 +26,6 @@ const Profile = () => {
     },[]);
 
     const onRemoveFollower = useCallback(userId => () => {
-        const token = sessionStorage.getItem("token");
 
         dispatch({
             type: REMOVE_FOLLOWER_REQUEST,
@@ -105,5 +80,27 @@ const Profile = () => {
             </div>
         </>
 };
+
+Profile.getInitialProps = async(context) => {
+    const token = cookie.load('token') || (context.isServer ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
+
+    context.store.dispatch({
+        type: LOAD_FOLLOWER_REQUEST,
+        data: token
+    });
+
+    context.store.dispatch({
+        type: LOAD_FOLLOWING_REQUEST,
+        data: token
+    });
+
+    context.store.dispatch({
+        type: LOAD_USER_POSTS_REQUEST,
+        data: {
+            userId: 0,
+            token: token,
+        }
+    });
+}
 
 export default Profile;

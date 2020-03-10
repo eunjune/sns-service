@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import cookie from 'react-cookies';
 import PropTypes from 'prop-types';
 import { Button, Card, Icon, Avatar, Form, List,Comment,Input } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,6 +15,7 @@ const PostCards = ({post}) => {
     const { me } = useSelector(state => state.user);
     const { addedComment,isAddingComment } = useSelector(state => state.post);
     const dispatch = useDispatch();
+    const token = cookie.load('token');
 
     const liked = post.likes && post.likes.find(v =>v.user.id === me.id);
 
@@ -22,8 +24,6 @@ const PostCards = ({post}) => {
     }, [addedComment === true]);
 
     const onToggleComment = useCallback(() => {
-        const token = sessionStorage.getItem("token");
-
         setCommentFormOpened(prev => !prev);
 
 
@@ -33,7 +33,7 @@ const PostCards = ({post}) => {
               data: {
                   postId: post.id,
                   userId: me.id,
-                  token: token,
+                  token,
               },
           })
         }
@@ -41,9 +41,6 @@ const PostCards = ({post}) => {
     },[]);
 
     const onSubmitComment = useCallback((e) => {
-
-        const token = sessionStorage.getItem("token");
-
         e.preventDefault();
         if(!me) {
         alert('로그인이 필요합니다.');
@@ -54,7 +51,7 @@ const PostCards = ({post}) => {
                 userId: me.id,
                 postId: post.id,
                 comment: commentText,
-                token: token,
+                token,
             }
             })
     },[me && me.id, commentText]);
@@ -64,7 +61,6 @@ const PostCards = ({post}) => {
     },[]);
 
     const onToggleLike = useCallback(() => {
-      const token = sessionStorage.getItem("token");
 
       if(!me) {
         return alert('로그인이 필요합니다.');
@@ -76,7 +72,7 @@ const PostCards = ({post}) => {
           data: {
             userId: post.user.id,
             postId: post.id,
-            token: token
+            token
           }
         });
       } else {
@@ -85,7 +81,7 @@ const PostCards = ({post}) => {
           data: {
             userId: post.user.id,
             postId: post.id,
-            token: token
+            token
           }
         });
       }
@@ -93,7 +89,7 @@ const PostCards = ({post}) => {
     },[me && me.id, post]);
 
     const onRetweet = useCallback(() => {
-      const token = sessionStorage.getItem("token");
+
 
       if(!me) {
         return alert('로그인이 필요합니다.');
@@ -103,13 +99,12 @@ const PostCards = ({post}) => {
         type: RETWEET_REQUEST,
         data: {
           postId: post.id,
-          token: token,
+          token,
         }
       });
     }, [me && me.id, post.id] );
 
     const onFollow = useCallback(userId => () => {
-      const token = sessionStorage.getItem("token");
 
       dispatch({
         type: FOLLOW_USER_REQUEST,
@@ -121,7 +116,6 @@ const PostCards = ({post}) => {
     },[]);
 
     const onUnfollow = useCallback(userId => () => {
-      const token = sessionStorage.getItem("token");
 
       dispatch({
         type: UNFOLLOW_USER_REQUEST,

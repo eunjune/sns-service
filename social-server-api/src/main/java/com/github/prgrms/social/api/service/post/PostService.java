@@ -131,19 +131,27 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<Post> findAll(Long userId, Long postWriterId, Pageable pageable) {
+    public List<Post> findAllById(Long userId, Long postWriterId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
         checkNotNull(postWriterId, "userId must be provided.");
 
+        if(postWriterId == 0L) {
+            return postRepository.findAllById(userId, userId, pageable);
+        }
+
         userRepository.findById(postWriterId)
                 .orElseThrow(() -> new NotFoundException(User.class, postWriterId));
-        // TODO likesOfMe를 효율적으로 구하기 위해 변경 필요
-        return postRepository.findAll(userId, postWriterId, pageable);
+        return postRepository.findAllById(userId, postWriterId, pageable);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> findByHashTag(Long userId, String tag, Pageable pageable) {
-        checkNotNull(userId, "userId must be provided.");
+    public List<Post> findAll(Pageable pageable) {
+        return postRepository.findAllByOrderByCreateAtDesc(pageable);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<Post> findByHashTag(String tag, Pageable pageable) {
         checkNotNull(tag, "tag must be provided.");
 
         return hashTagRepository.findByName(tag)

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import cookie from 'react-cookies';
 import {Input, Button, Form} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { ADD_POST_REQUEST, REMOVE_IMAGE, UPLOAD_IMAGES_REQUEST } from '../reducers/post';
@@ -8,6 +9,7 @@ const PostForm = () => {
   const dispatch = useDispatch();
   const { imagePaths, isAddingPost, addedPost} = useSelector(state => state.post);
   const imageInput = useRef();
+  const token = cookie.load('token');
 
   useEffect(() => {
     setText('');
@@ -15,7 +17,6 @@ const PostForm = () => {
 
   const onSubmitForm = useCallback((e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem("token");
 
     if(!text || !text.trim()) {
       alert('게시글을 작성하세욧.');
@@ -27,11 +28,10 @@ const PostForm = () => {
       formData.append('images',i);
     });
     formData.append('content',text);*/
-
     dispatch({
       type: ADD_POST_REQUEST,
       data: {
-        token: token,
+        token,
         post: {
           content : text,
           imagePaths: imagePaths,
@@ -46,7 +46,6 @@ const PostForm = () => {
 
   const onChangeImages = useCallback((e) => {
     const imageFormData = new FormData();
-    const token = sessionStorage.getItem("token");
 
     [].forEach.call(e.target.files, (f) => {
         imageFormData.append('images', f);

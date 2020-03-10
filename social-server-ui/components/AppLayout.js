@@ -13,17 +13,6 @@ const AppLayout = ({ children }) => {
   const { me } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const token = sessionStorage.getItem('token');
-
-    if (!me) {
-      dispatch({
-        type: LOAD_ME_REQUEST,
-        data: token,
-      });
-    }
-  }, []);
-
   return (
     <div>
       <Menu mode="horizontal">
@@ -51,5 +40,7 @@ const AppLayout = ({ children }) => {
 AppLayout.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+
 
 export default AppLayout;

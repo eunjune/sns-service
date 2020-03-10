@@ -20,7 +20,6 @@ import axios from 'axios';
 import { UNFOLLOW_me_SUCCESS } from '../reducers/user';
 
 function addPostAPI({post, token}) {
-
     return axios.post('post', post, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -43,17 +42,21 @@ function* addPost(action) {
         })
     }
 }
-function loadPostAPI({userId,token}) {
-    return axios.get(`user/${userId}/post/list?page=0&size=4`, {
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
+
+function* watchAddPost() {
+    
+    yield takeLatest(ADD_POST_REQUEST, addPost);
+}
+
+
+function loadPostAPI() {
+
+    return axios.get(`user/post/list?page=0&size=4`);
 }
 
 function* loadPost(action) {
     try {
-        const result = yield call(loadPostAPI, action.data);
+        const result = yield call(loadPostAPI);
         yield put({
             type: LOAD_MAIN_POSTS_SUCCESS,
             data : result.data.response,
@@ -71,12 +74,8 @@ function* watchLoadPost() {
     yield takeLatest(LOAD_MAIN_POSTS_REQUEST, loadPost);
 }
 
-function loadHashtagAPI({tag,token}) {
-    return axios.get(`/post/${tag}/list?page=0&size=4`, {
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
+function loadHashtagAPI(tag) {
+    return axios.get(`/post/${encodeURIComponent(tag)}/list?page=0&size=4`);
 }
 
 
@@ -103,7 +102,7 @@ function* watchLoadHashtagPosts() {
 
 
 function loadUserPostAPI({userId,token}) {
-    return axios.get(`user/${userId}/post/list?page=0&size=4`, {
+    return axios.get(`user/${userId || 0}/post/list?page=0&size=4`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -161,10 +160,7 @@ function* watchLoadComments() {
     yield takeLatest(LOAD_COMMENTS_REQUEST, loadComments);
 }
 
-function* watchAddPost() {
 
-    yield takeLatest(ADD_POST_REQUEST, addPost);
-}
 
 function addCommentAPI({userId,postId,comment,token}) {
     return axios.post(`user/${userId}/post/${postId}/comment`, {content: comment}, {

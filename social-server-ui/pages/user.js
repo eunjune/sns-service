@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import cookie from 'react-cookies';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { Avatar, Card } from 'antd';
@@ -11,22 +12,7 @@ const User = ({ id }) => {
   const { posts } = useSelector((state) => state.post);
   const { user } = useSelector((state) => state.user);
 
-  useEffect(() => {
-    const token = sessionStorage.getItem('token');
-
-    dispatch({
-      type: LOAD_USER_REQUEST,
-      data: id,
-    });
-
-    dispatch({
-      type: LOAD_USER_POSTS_REQUEST,
-      data: {
-        userId: id,
-        token,
-      },
-    });
-  }, []);
+ 
 
   return (
     <div>
@@ -71,6 +57,25 @@ User.propTypes = {
 };
 
 User.getInitialProps = async (context) => {
+  const id = context.query.id;
+  const token = cookie.load('token') || (context.isServer ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
+
+  context.store.dispatch({
+    type: LOAD_USER_REQUEST,
+    data: {
+      userId: id,
+      token : token
+    },
+  });
+
+  context.store.dispatch({
+    type: LOAD_USER_POSTS_REQUEST,
+    data: {
+      userId: id,
+      token : token
+    },
+  });
+
   return { id: parseInt(context.query.id) }; // 프론트의 props에 전달 가능.
 };
 

@@ -1,3 +1,6 @@
+import cookie from 'react-cookies';
+import axios from 'axios';
+
 export const initialState = {
     isEmailOk: null,
     isEmailChecking: false,
@@ -107,7 +110,7 @@ const reducer = (state = initialState, action) => {
             const me = action.data.response.user;
             const token = action.data.response.token;
 
-            sessionStorage.setItem('token',token);
+            cookie.save('token',token, { path: '/' });
 
             return {
                 ...state,
@@ -126,6 +129,8 @@ const reducer = (state = initialState, action) => {
         }
 
         case LOG_IN_REQUEST: {
+            cookie.remove('token', { path: '/' });
+
             return {
                 ...state,
                 isLoggingIn: true,
@@ -137,7 +142,7 @@ const reducer = (state = initialState, action) => {
             const me = action.data.response.user;
             const token = action.data.response.token;
 
-            sessionStorage.setItem('token',token);
+            cookie.save('token',token, { path: '/' });
 
             return {
                 ...state,
@@ -157,7 +162,7 @@ const reducer = (state = initialState, action) => {
         }
 
         case LOG_OUT: {
-            sessionStorage.setItem('token',null);
+            cookie.remove('token', { path: '/' });
 
             return {
                 ...state,

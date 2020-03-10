@@ -22,61 +22,61 @@ const Signup = () => {
     const { isSigningUp, signUpErrorReason } = useSelector((state) => state.user);
     const { me } = useSelector((state) => state.user);
 
-  useEffect(() => {
+    useEffect(() => {
         if (me) {
             alert('회원가입 성공');
             Router.push('/');
         }
     }, [me && me.id]);
 
-  const onSubmit = useCallback((e) => {
+    const onSubmit = useCallback((e) => {
         e.preventDefault();
 
-    if (!isEmailOk) {
-            return;
-        }
+        if (!isEmailOk) {
+                return;
+            }
 
-    if (password !== passwordCheck) {
-            return setPasswordError(true);
-        }
+        if (password !== passwordCheck) {
+                return setPasswordError(true);
+            }
 
-    if (!term) {
-            return setTermError(true);
-        }
+        if (!term) {
+                return setTermError(true);
+            }
 
-    dispatch({
-            type: SIGN_UP_REQUEST,
-            data: {
-                name,
-                address: email,
-                password,
-            },
+        dispatch({
+                type: SIGN_UP_REQUEST,
+                data: {
+                    name,
+                    address: email,
+                    password,
+                },
     });
     }, [password, passwordCheck, term]);
 
-  const onChangeEmail = useCallback((e) => {
+    const onChangeEmail = useCallback((e) => {
         setEmail(e.target.value);
     }, []);
 
-  const onChangeName = useCallback((e) => {
+    const onChangeName = useCallback((e) => {
         setName(e.target.value);
     }, []);
 
-  const onChangePassword = useCallback((e) => {
+    const onChangePassword = useCallback((e) => {
         setPassword(e.target.value);
     }, []);
 
-  const onChangePasswordCheck = useCallback((e) => {
+    const onChangePasswordCheck = useCallback((e) => {
         setPasswordError(e.target.value !== password);
         setPasswordCheck(e.target.value);
     }, [password]);
 
-  const onChangeTerm = useCallback((e) => {
+    const onChangeTerm = useCallback((e) => {
         setTermError(false);
         setTerm(e.target.value);
     }, []);
 
-  const onClickChecking = useCallback((e) => {
+    const onClickChecking = useCallback((e) => {
         if (email == null) {
             return;
         }
@@ -88,8 +88,12 @@ const Signup = () => {
     });
     }, [email]);
 
-  return (
-<>
+    if(me) {
+        return null;
+    }
+
+    return (
+    <>
         <Form onSubmit={onSubmit} style={{padding: 10}}>
             <div>
                 <label htmlFor="user-email">아이디</label>
@@ -97,7 +101,7 @@ const Signup = () => {
                 <Input name="user-email" value={email} required onChange={onChangeEmail}/>
                 <Button onClick={onClickChecking} loading={isEmailChecking}>중복확인</Button>
                 {isEmailOk === true ? <div style={{color: 'green'}}>사용 가능한 이메일입니다.</div> :
-                  (isEmailOk === false ? <div style={{color: 'red'}}>이메일이 중복입니다.</div> : null)}
+                (isEmailOk === false ? <div style={{color: 'red'}}>이메일이 중복입니다.</div> : null)}
                 {emailCheckingErrorReason !== '' ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : null}
             </div>
             <div>
@@ -125,7 +129,7 @@ const Signup = () => {
             </div>
         </Form>
     </>
-)
+    )
 };
 
 export default Signup;

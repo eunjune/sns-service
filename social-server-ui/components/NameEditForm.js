@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import cookie from 'react-cookies';
 import {Button, Form, Input} from "antd";
 import { useDispatch, useSelector } from 'react-redux';
 import { EDIT_NAME_REQUEST } from '../reducers/user';
@@ -16,13 +17,11 @@ const NameEditForm = () => {
     const onEditName = useCallback((e) => {
         e.preventDefault();
 
-        const token = sessionStorage.getItem("token");
-
         dispatch({
             type: EDIT_NAME_REQUEST,
             data: {
                 name: editedName,
-                token: token,
+                token: cookie.load('token'),
             }
         });
 

@@ -47,19 +47,29 @@ public class PostRestController {
     }
 
     @GetMapping(path = "user/{userId}/post/list")
-    @ApiOperation(value = "포스트 목록 조회")
+    @ApiOperation(value = "특정 유저 포스트 목록 조회")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", defaultValue = "0", value = "페이징 offset"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
     })
     public ApiResult<List<Post>> posts(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable
+            @PathVariable(required = false)
             @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
             Long userId,
             Pageable pageable
     ) {
-        return OK(postService.findAll(authentication.id.getValue(), userId, pageable));
+        return OK(postService.findAllById(authentication.id.getValue(), userId, pageable));
+    }
+
+    @GetMapping(path = "user/post/list")
+    @ApiOperation(value = "전체 포스트 목록 조회")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query", defaultValue = "0", value = "페이징 offset"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
+    })
+    public ApiResult<List<Post>> postAll(Pageable pageable) {
+        return OK(postService.findAll(pageable));
     }
 
     @GetMapping(path = "/post/{tag}/list")
@@ -69,13 +79,12 @@ public class PostRestController {
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
     })
     public ApiResult<List<Post>> postsOfHashTag(
-            @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
             @ApiParam(value = "해시태그", example = "1")
             String tag,
             Pageable pageable
     ) {
-        return OK(postService.findByHashTag(authentication.id.getValue(), tag, pageable));
+        return OK(postService.findByHashTag(tag, pageable));
     }
 
     @PatchMapping(path = "user/{userId}/post/{postId}/like")

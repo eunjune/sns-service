@@ -43,7 +43,7 @@ public class UserSerializer extends StdSerializer<User> {
         gen.writeArray(followings, 0, followings.length);
 
         long[] followers = new long[0];
-        gen.writeFieldName("follower");
+        gen.writeFieldName("followers");
         gen.writeArray(followers,0,followers.length);
 
         gen.writeEndObject();

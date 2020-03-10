@@ -39,7 +39,7 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Post> findAll(Long userId, Long postWriterId, Pageable pageable) {
+    public List<Post> findAllById(Long userId, Long postWriterId, Pageable pageable) {
         List resultList = entityManager.createNativeQuery("SELECT DISTINCT p.*, " +
                 "CASE WHEN l.user_id = NULL THEN false ELSE true END AS likes_of_me, " +
                 "CASE WHEN r.post_id = NULL THEN false ELSE true END AS is_retweet " +

@@ -54,7 +54,7 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
         JwtAuthentication jwtAuthentication = (JwtAuthentication) authentication.getPrincipal();
 
         // 본인인 경우 승인
-        if (jwtAuthentication.id.equals(uriId)) {
+        if (jwtAuthentication.id.equals(uriId) || uriId.getValue() == 0L) {
             return ACCESS_GRANTED;
         }
 

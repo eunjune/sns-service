@@ -101,8 +101,12 @@ function* watchLogin() {
     yield takeLatest(LOG_IN_REQUEST, login);
 }
 
-function loadUserAPI(userId) {
-    return axios.get(`user/${userId}`);
+function loadUserAPI({userId,token}) {
+    return axios.get(`user/${userId}`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
 }
 
 
@@ -138,7 +142,7 @@ function loadMeAPI(token) {
 function* loadMe(action) {
 
     try {
-        const result = yield call(loadMeAPI, action.data);
+        const result = yield call(loadMeAPI,action.data);
         yield put({
             type: LOAD_ME_SUCCESS,
             data: result.data.response,
@@ -225,7 +229,7 @@ function loadFollowerAPI(token) {
 function* loadFollower(action) {
 
     try {
-        const result = yield call(loadFollowerAPI, action.data);
+        const result = yield call(loadFollowerAPI,action.data);
         yield put({
             type: LOAD_FOLLOWER_SUCCESS,
             data: result.data.response,
@@ -240,7 +244,7 @@ function* loadFollower(action) {
 }
 
 function* watchLoadfollower() {
-    yield takeLatest(LOAD_FOLLOWER_REQUEST,loadFollower);
+    yield takeLatest(LOAD_FOLLOWER_REQUEST,loadFollower,);
 }
 
 function loadFollowingAPI(token) {
@@ -254,7 +258,7 @@ function loadFollowingAPI(token) {
 function* loadFollowing(action) {
 
     try {
-        const result = yield call(loadFollowingAPI, action.data);
+        const result = yield call(loadFollowingAPI,action.data);
         yield put({
             type: LOAD_FOLLOWING_SUCCESS,
             data: result.data.response,

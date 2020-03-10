@@ -145,7 +145,7 @@ class JpaPostRepositoryTest {
         int size = 4;
         Pageable pageable = PageRequest.of(0,size);
 
-        List<Post> posts = jpaPostRepository.findAll(1L,1L,pageable);
+        List<Post> posts = jpaPostRepository.findAllById(1L,1L,pageable);
 
         assertEquals(posts.size(),size);
     }

@@ -8,23 +8,6 @@ import { LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 const Home = () => {
     const {me,loginErrorReason} = useSelector(state => state.user);
     const {posts} = useSelector(state => state.post);
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-
-        const token = sessionStorage.getItem("token");
-
-        if(me) {
-            dispatch({
-                type: LOAD_MAIN_POSTS_REQUEST,
-                data : {
-                    userId: me.id,
-                    token: token,
-                }
-            });
-        }
-
-    },[me]);
 
     return (
         <div>
@@ -34,6 +17,14 @@ const Home = () => {
             })}
         </div>
     );
+};
+
+Home.getInitialProps = async (context) => {
+
+    context.store.dispatch({
+        type: LOAD_MAIN_POSTS_REQUEST,
+    });
+
 };
 
 export default Home;
