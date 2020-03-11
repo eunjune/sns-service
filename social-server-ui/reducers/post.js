@@ -9,6 +9,7 @@ export const initialState = {
     addedComment: false,
     addCommentError: false,
     addCommentErrorReason: '',
+    hasMorePost: false,
 };
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
@@ -59,6 +60,7 @@ export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
 
 
 const reducer = (state = initialState, action) => {
+    
     switch (action.type) {
         case ADD_POST_REQUEST: {
             return {
@@ -85,36 +87,40 @@ const reducer = (state = initialState, action) => {
             }
         }
 
-
-
         case LOAD_MAIN_POSTS_REQUEST: {
             return {
                 ...state,
-                posts: []
+                posts: action.lastId === 0 ? [] : state.posts,
+                hasMorePost: action.lastId ? state.hasMorePost : true,
+            
             }
         }
         case LOAD_MAIN_POSTS_SUCCESS: {
             return {
                 ...state,
-                posts: action.data,
+                posts: state.posts.concat(action.data),
+                hasMorePost: action.data.length === 8,
             }
         }
         case LOAD_MAIN_POSTS_FAILURE: {
             return {
                 ...state,
+                
             }
         }
 
         case LOAD_HASHTAG_POSTS_REQUEST: {
             return {
                 ...state,
-                posts: []
+                posts: action.lastId === 0 ? [] : state.posts,
+                hasMorePost: action.lastId ? state.hasMorePost : true,
             }
         }
         case LOAD_HASHTAG_POSTS_SUCCESS: {
             return {
                 ...state,
-                posts: action.data,
+                posts: state.posts.concat(action.data),
+                hasMorePost: action.data.length === 8,
             }
         }
         case LOAD_HASHTAG_POSTS_FAILURE: {
@@ -125,14 +131,16 @@ const reducer = (state = initialState, action) => {
         case LOAD_USER_POSTS_REQUEST: {
             return {
                 ...state,
-                posts: []
+                posts: action.lastId === 0 ? [] : state.posts,
+                hasMorePost: action.lastId ? state.hasMorePost : true,
             }
         }
 
         case LOAD_USER_POSTS_SUCCESS: {
             return {
                 ...state,
-                posts: action.data,
+                posts: state.posts.concat(action.data),
+                hasMorePost: action.data.length === 8,
             }
         }
         case LOAD_USER_POSTS_FAILURE: {

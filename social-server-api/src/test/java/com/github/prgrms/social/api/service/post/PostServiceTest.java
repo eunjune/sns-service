@@ -97,12 +97,12 @@ class PostServiceTest {
         givenPosts.add(post4);
 
         given(userRepository.findById(1L)).willReturn(Optional.ofNullable(User.builder().id(1L).name("test").password("1234").email(new Email("test00@gmail.com")).build()));
-        given(postRepository.findAllById(2L, 1L, pageable)).willReturn(givenPosts.subList(page,page + size));
+        given(postRepository.findAllById(2L, 1L, 0L, pageable)).willReturn(givenPosts.subList(page,page + size));
 
-        List<Post> returnPosts = postService.findAllById(2L, 1L, pageable);
+        List<Post> returnPosts = postService.findAllById(2L, 1L,0L , pageable);
 
         then(userRepository).should(times(1)).findById(any());
-        then(postRepository).should(times(1)).findAllById(any(), any(), any());
+        then(postRepository).should(times(1)).findAllById(any(), any(), any(), any());
 
         assertNotNull(returnPosts);
         assertEquals(returnPosts.size(), size);

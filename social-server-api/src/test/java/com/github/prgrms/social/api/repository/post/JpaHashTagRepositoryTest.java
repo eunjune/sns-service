@@ -105,7 +105,7 @@ class JpaHashTagRepositoryTest {
 
     @Test
     void findByName() {
-        HashTag hashTag = hashTagRepository.findByName("first").orElseThrow(() -> new NotFoundException(HashTag.class, "first"));
+        HashTag hashTag = hashTagRepository.findByName("first" ).orElseThrow(() -> new NotFoundException(HashTag.class, "first"));
 
         assertEquals(hashTag.getPosts().size(),2);
 

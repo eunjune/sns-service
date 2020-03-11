@@ -10,5 +10,5 @@ public interface JpaPostCustomRepository {
 
     Optional<Post> findByIdCustom(Long id, Long userId, Long postWriterId);
 
-    List<Post> findAllById(Long userId, Long postWriterId, Pageable pageable);
+    List<Post> findAllById(Long userId, Long postWriterId, Long lastId, Pageable pageable);
 }

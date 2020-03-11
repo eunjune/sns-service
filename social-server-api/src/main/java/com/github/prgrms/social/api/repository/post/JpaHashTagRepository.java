@@ -12,4 +12,5 @@ public interface JpaHashTagRepository extends JpaRepository<HashTag, Long> {
 
     @Transactional(readOnly = true)
     Optional<HashTag> findByName(String name);
+
 }

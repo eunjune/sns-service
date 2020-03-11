@@ -131,31 +131,60 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<Post> findAllById(Long userId, Long postWriterId, Pageable pageable) {
+    public List<Post> findAllById(Long userId, Long postWriterId, Long lastId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
-        checkNotNull(postWriterId, "userId must be provided.");
+        checkNotNull(postWriterId, "postWriterId must be provided.");
+        checkNotNull(lastId, "lastId must be provided.");
 
         if(postWriterId == 0L) {
-            return postRepository.findAllById(userId, userId, pageable);
+            return postRepository.findAllById(userId, userId, lastId , pageable);
         }
 
         userRepository.findById(postWriterId)
                 .orElseThrow(() -> new NotFoundException(User.class, postWriterId));
-        return postRepository.findAllById(userId, postWriterId, pageable);
+        return postRepository.findAllById(userId, postWriterId, lastId, pageable);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> findAll(Pageable pageable) {
-        return postRepository.findAllByOrderByCreateAtDesc(pageable);
+    public List<Post> findAll(Long lastId, Pageable pageable) {
+
+        if(lastId == 0L) {
+            return postRepository.findAllByOrderByCreateAtDesc(pageable);
+        }
+
+        return postRepository.findAllByIdLessThanOrderByCreateAtDesc(lastId, pageable);
     }
 
 
     @Transactional(readOnly = true)
-    public List<Post> findByHashTag(String tag, Pageable pageable) {
+    public List<Post> findByHashTag(String tag, Long lastId, Pageable pageable) {
         checkNotNull(tag, "tag must be provided.");
+        checkNotNull(lastId, "lastId must be provided.");
+
+        if(lastId == 0L) {
+            return hashTagRepository.findByName(tag)
+                    .map(hashTag -> {
+                        List<Post> posts = hashTag.getPosts();
+                        posts.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
+                        return posts.subList(0, Math.min(pageable.getPageSize(), posts.size()));
+                    })
+                    .orElseThrow(() -> new NotFoundException(HashTag.class, tag));
+        }
 
         return hashTagRepository.findByName(tag)
-                .map(HashTag::getPosts)
+                .map(hashTag -> {
+                    List<Post> posts = hashTag.getPosts();
+                    posts.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
+
+                    int startIndex = 0;
+                    for(int i=0; i<posts.size(); ++i) {
+                        if(posts.get(i).getId().equals(lastId)) {
+                            startIndex = i + 1;
+                            break;
+                        }
+                    }
+                    return posts.subList(startIndex, Math.min(pageable.getPageSize(), posts.size() - startIndex));
+                })
                 .orElseThrow(() -> new NotFoundException(HashTag.class, tag));
     }
 

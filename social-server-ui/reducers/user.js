@@ -259,6 +259,7 @@ const reducer = (state = initialState, action) => {
 
             return {
                 ...state,
+                followings : state.followings.length === 0 ? [] : state.followings,
                 hasMoreFollowing: action.data.offset ? state.hasMoreFollowing : true, 
             };
         }
@@ -284,6 +285,7 @@ const reducer = (state = initialState, action) => {
 
             return {
                 ...state,
+                followers : state.followers.length === 0 ? [] : state.followers,
                 hasMoreFollower: action.data.offset ? state.hasMoreFollower : true, 
             };
         }

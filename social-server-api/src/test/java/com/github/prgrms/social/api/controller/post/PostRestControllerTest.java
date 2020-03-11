@@ -107,7 +107,7 @@ class PostRestControllerTest {
         int page = 0;
         int size = 2;
 
-        given(postService.findAllById(1L, 1L, PageRequest.of(page,size))).willReturn(posts.subList(page,page + size));
+        given(postService.findAllById(1L, 1L, 0L, PageRequest.of(page,size))).willReturn(posts.subList(page,page + size));
 
 
         mockMvc.perform(get("/api/user/1/post/list")
@@ -117,7 +117,7 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.*", hasSize(size)))
                 .andDo(print());
 
-        then(postService).should(times(1)).findAllById(any(),any(),any());
+        then(postService).should(times(1)).findAllById(any(),any(), any(), any());
     }
 
     @Test
@@ -146,7 +146,7 @@ class PostRestControllerTest {
         post3.addHashTag(hashTag);
         post4.addHashTag(hashTag);
 
-        given(postService.findByHashTag(tag.substring(1), PageRequest.of(page,size))).willReturn(givenPosts.subList(page,page + size));
+        given(postService.findByHashTag(tag.substring(1),0L, PageRequest.of(page,size))).willReturn(givenPosts.subList(page,page + size));
 
         mockMvc.perform(get("/api/post/hashtag/list")
                 .header(tokenHeader, apiToken)
@@ -155,7 +155,7 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.*", hasSize(size)))
                 .andDo(print());
 
-        then(postService).should(times(1)).findByHashTag(any(),any());
+        then(postService).should(times(1)).findByHashTag(any(), any(), any());
     }
 
     @Test
