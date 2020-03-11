@@ -1,3 +1,5 @@
+import produce from 'immer'
+
 export const initialState = {
     posts: [],
     imagePaths: [],
@@ -60,267 +62,198 @@ export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
 
 
 const reducer = (state = initialState, action) => {
+    return produce(state, (draft) => {
+        switch (action.type) {
+            case ADD_POST_REQUEST: {
+                draft.isAddingPost =  true;
+                draft.addedPost = false,
+                draft.addPostErrorReason = '';
+                break;
+            }
+
+            case ADD_POST_SUCCESS: {
+                draft.isAddingPost = false;
+                draft.addedPost = true;
+                draft.posts.unshift(action.data);
+                draft.addedPost = true;
+                draft.imagePaths = [];
+                break;
+            }
+
+            case ADD_POST_FAILURE: {
+                draft.isAddingPost = false;
+                draft.addPostError = true;
+                draft.addPostErrorReason = action.error;
+                break;
+            }
     
-    switch (action.type) {
-        case ADD_POST_REQUEST: {
-            return {
-                ...state,
-                isAddingPost: true,
-                addedPost: false,
+            case LOAD_MAIN_POSTS_REQUEST: {
+                draft.posts = action.lastId === 0 ? [] : draft.posts;
+                draft.hasMorePost = action.lastId ? draft.hasMorePost : true
+                break;
             }
-        }
-        case ADD_POST_SUCCESS: {
-            return {
-                ...state,
-                isAddingPost: false,
-                addedPost: true,
-                posts: [action.data, ...state.posts],
-                imagePaths: [],
-            }
-        }
-        case ADD_POST_FAILURE: {
-            return {
-                ...state,
-                isAddingPost: false,
-                addPostError: true,
-                addPostErrorReason: action.error,
-            }
-        }
 
-        case LOAD_MAIN_POSTS_REQUEST: {
-            return {
-                ...state,
-                posts: action.lastId === 0 ? [] : state.posts,
-                hasMorePost: action.lastId ? state.hasMorePost : true,
-            
+            case LOAD_MAIN_POSTS_SUCCESS: {
+                draft.posts = draft.posts.concat(action.data);
+                draft.hasMorePost = action.data.length === 8;
+                break;
             }
-        }
-        case LOAD_MAIN_POSTS_SUCCESS: {
-            return {
-                ...state,
-                posts: state.posts.concat(action.data),
-                hasMorePost: action.data.length === 8,
+
+            case LOAD_MAIN_POSTS_FAILURE: {
+                break;
             }
-        }
-        case LOAD_MAIN_POSTS_FAILURE: {
-            return {
-                ...state,
+    
+            case LOAD_HASHTAG_POSTS_REQUEST: {
+                draft.posts = action.lastId === 0 ? [] : draft.posts;
+                draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
+                break;
+            }
+
+            case LOAD_HASHTAG_POSTS_SUCCESS: {
+                draft.posts = draft.posts.concat(action.data);
+                draft.hasMorePost = action.data.length === 8;
+                break;
+            }
+
+            case LOAD_HASHTAG_POSTS_FAILURE: {
+                break;
+            }
+
+            case LOAD_USER_POSTS_REQUEST: {
+                draft.posts = action.lastId === 0 ? [] : draft.posts;
+                draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
+                break;
+            }
+    
+            case LOAD_USER_POSTS_SUCCESS: {
+                draft.posts = draft.posts.concat(action.data);
+                draft.hasMorePost = action.data.length === 8;
+                break;
+            }
+
+            case LOAD_USER_POSTS_FAILURE: {
+                break;
+            }
+    
+            case REMOVE_POST_REQUEST: {
+                break;
+            }
+    
+            case REMOVE_POST_SUCCESS: {
+                draft.posts = draft.posts.filter(v => v.id !== action.data);
+                break;
+            }
+
+            case REMOVE_POST_FAILURE: {
+                break;
+            }
+    
+            case LOAD_COMMENTS_REQUEST: {
+                break;
+            }
+    
+            case LOAD_COMMENTS_SUCCESS: {
+                const postIndex = state.posts.findIndex(p => p.id === action.data.postId);
+                draft.posts[postIndex].comments = action.data.comments;
+                break;
+            }
+
+            case LOAD_COMMENTS_FAILURE: {
+                break;
+            }
+    
+            case ADD_COMMENT_REQUEST: {
+                draft.isAddingComment = true;
+                draft.addCommentErrorReason = '';
+                draft.addedComment = false;
+                break;
+            }
+
+            case ADD_COMMENT_SUCCESS: {
+                const postIndex = state.posts.findIndex(p => p.id === action.data.postId);
+                draft.posts[postIndex].comments.push(action.data.comment);
+                draft.isAddingComment = false;
+                draft.addedComment = true;
+                break;
+            }
+
+            case ADD_COMMENT_FAILURE: {
+                draft.isAddingComment = false;
+                draft.addCommentErrorReason = action.error;
+                break;
+            }
+    
+            case UPLOAD_IMAGES_REQUEST: {
+                break;
+            }
+
+            case UPLOAD_IMAGES_SUCCESS: {
+                action.data.forEach(v => {
+                    draft.imagePaths.push(v)
+                });
+                break;
+            }
+
+            case UPLOAD_IMAGES_FAILURE: {
+                break;
+            }
+    
+            case REMOVE_IMAGE: {
+                const index = draft.imagePaths.findIndex((v,i) => i === action.index);
+                draft.imagePaths.splice(index,1);
+                break;
+            }
+    
+            case LIKE_POST_REQUEST: {
+                break;
+            }
+
+            case LIKE_POST_SUCCESS: {
+                const postIndex = state.posts.findIndex(v => v.id === action.data.id);
+                draft.posts[postIndex] = action.data;
                 
+                break;
             }
-        }
 
-        case LOAD_HASHTAG_POSTS_REQUEST: {
-            return {
-                ...state,
-                posts: action.lastId === 0 ? [] : state.posts,
-                hasMorePost: action.lastId ? state.hasMorePost : true,
+            case LIKE_POST_FAILURE: {
+                break;
             }
-        }
-        case LOAD_HASHTAG_POSTS_SUCCESS: {
-            return {
-                ...state,
-                posts: state.posts.concat(action.data),
-                hasMorePost: action.data.length === 8,
+    
+            case UNLIKE_POST_REQUEST: {
+    
+                break;
             }
-        }
-        case LOAD_HASHTAG_POSTS_FAILURE: {
-            return {
-                ...state,
+            case UNLIKE_POST_SUCCESS: {
+                const postIndex = state.posts.findIndex(v => v.id === action.data.id);
+                draft.posts[postIndex] = action.data;
+                
+                break;
             }
-        }
-        case LOAD_USER_POSTS_REQUEST: {
-            return {
-                ...state,
-                posts: action.lastId === 0 ? [] : state.posts,
-                hasMorePost: action.lastId ? state.hasMorePost : true,
-            }
-        }
 
-        case LOAD_USER_POSTS_SUCCESS: {
-            return {
-                ...state,
-                posts: state.posts.concat(action.data),
-                hasMorePost: action.data.length === 8,
+            case UNLIKE_POST_FAILURE: {
+                break;
             }
-        }
-        case LOAD_USER_POSTS_FAILURE: {
-            return {
-                ...state,
+    
+            case RETWEET_REQUEST: {
+                break;
             }
-        }
 
-        case REMOVE_POST_REQUEST: {
-            return {
-                ...state,
+            case RETWEET_SUCCESS: {
+                draft.posts.unshift(action.data);
+                
+                break;
+            }
+            case RETWEET_FAILURE: {
+                break;
+            }
+    
+            default: {
+                break;
             }
         }
+    });
 
-        case REMOVE_POST_SUCCESS: {
-            console.log(action.data);
-            return {
-                ...state,
-                posts: state.posts.filter(v => v.id !== action.data),
-            }
-        }
-        case REMOVE_POST_FAILURE: {
-            return {
-                ...state,
-            }
-        }
-
-        case LOAD_COMMENTS_REQUEST: {
-            return {
-                ...state,
-            }
-        }
-
-        case LOAD_COMMENTS_SUCCESS: {
-            const postIndex = state.posts.findIndex(p => p.id === action.data.postId);
-            const post = state.posts[postIndex];
-            const comments = action.data.comments;
-            const posts = [...state.posts];
-            posts[postIndex] = {...post, comments: comments};
-
-            return {
-                ...state,
-                posts: posts,
-            }
-        }
-        case LOAD_COMMENTS_FAILURE: {
-            return {
-                ...state,
-            }
-        }
-
-        case ADD_COMMENT_REQUEST: {
-            return {
-                ...state,
-                isAddingComment: true,
-                addCommentErrorReason: '',
-                addedComment: false,
-            }
-        }
-        case ADD_COMMENT_SUCCESS: {
-            const postIndex = state.posts.findIndex(p => p.id === action.data.postId);
-
-            const post = state.posts[postIndex];
-            const comments = [...post.comments, action.data.comment];
-            const posts = [...state.posts];
-            posts[postIndex] = {...post, comments: comments};
-
-            return {
-                ...state,
-                isAddingComment: false,
-                addedComment: true,
-                posts: posts,
-            }
-        }
-        case ADD_COMMENT_FAILURE: {
-            return {
-                ...state,
-                isAddingComment: false,
-                addCommentErrorReason: action.error,
-            }
-        }
-
-        case UPLOAD_IMAGES_REQUEST: {
-
-            return {
-                ...state,
-
-            }
-        }
-        case UPLOAD_IMAGES_SUCCESS: {
-            return {
-                ...state,
-                imagePaths: [...state.imagePaths, ...action.data],
-            }
-        }
-        case UPLOAD_IMAGES_FAILURE: {
-            return {
-                ...state,
-            }
-        }
-
-        case REMOVE_IMAGE: {
-            return {
-                ...state,
-                imagePaths: state.imagePaths.filter((v,i) => i !== action.index),
-            }
-        }
-
-        case LIKE_POST_REQUEST: {
-
-            return {
-                ...state,
-
-            }
-        }
-        case LIKE_POST_SUCCESS: {
-            const postIndex = state.posts.findIndex(v => v.id === action.data.id);
-            const newPosts = [...state.posts];
-            newPosts[postIndex] = action.data;
-            
-            return {
-                ...state,
-                posts : newPosts,
-            }
-        }
-        case LIKE_POST_FAILURE: {
-            return {
-                ...state,
-            }
-        }
-
-        case UNLIKE_POST_REQUEST: {
-
-            return {
-                ...state,
-
-            }
-        }
-        case UNLIKE_POST_SUCCESS: {
-            const postIndex = state.posts.findIndex(v => v.id === action.data.id);
-            const newPosts = [...state.posts];
-            newPosts[postIndex] = action.data;
-            
-            return {
-                ...state,
-                posts : newPosts,
-            }
-        }
-        case UNLIKE_POST_FAILURE: {
-            return {
-                ...state,
-            }
-        }
-
-        case RETWEET_REQUEST: {
-
-            return {
-                ...state,
-
-            }
-        }
-        case RETWEET_SUCCESS: {
-            
-            return {
-                ...state,
-                posts : [action.data, ...state.posts],
-            }
-        }
-        case RETWEET_FAILURE: {
-            return {
-                ...state,
-            }
-        }
-
-        default: {
-            return {
-                ...state
-            }
-        }
-    }
+    
 };
 
 export default reducer;

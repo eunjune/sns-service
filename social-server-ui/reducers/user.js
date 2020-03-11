@@ -1,5 +1,5 @@
 import cookie from 'react-cookies';
-import axios from 'axios';
+import produce from 'immer';
 
 export const initialState = {
     isEmailOk: null,
@@ -71,294 +71,206 @@ export const INCREMENT_NUMBER = 'INCREMENT_NUMBER';
 export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
 
 const reducer = (state = initialState, action) => {
-    switch (action.type) {
-        case EMAIL_CHECK_REQUEST: {
-            return {
-                ...state,
-                isEmailOk: null,
-                isEmailChecking: true,
-                emailCheckingErrorReason: null
-            };
-        }
+    return produce(state, (draft) => {
+        switch (action.type) {
+            case EMAIL_CHECK_REQUEST: {
+                draft.isEmailOk = null;
+                draft.isEmailChecking = true;
+                draft.emailCheckingErrorReason = null;
+                break;
+            }
+    
+            case EMAIL_CHECK_SUCCESS: {
+                draft.isEmailOk = action.data;
+                draft.isEmailChecking = false;
+                break;
+            }
+    
+            case EMAIL_CHECK_FAILURE: {
+                draft.emailCheckingErrorReason = action.error;
+                draft.isEmailChecking = false;
+                break;
+            }
+    
+            case SIGN_UP_REQUEST: {
+                draft.isSignedUp = true;
+                draft.isSignedUp = false;
+                draft.isEmailOk = false;
+                draft.signUpErrorReason = null;
+                break;
+            }
+    
+            case SIGN_UP_SUCCESS: {
+                const me = action.data.response.user;
+                const token = action.data.response.token;
+    
+                cookie.save('token',token, { path: '/' });
 
-        case EMAIL_CHECK_SUCCESS: {
-            return {
-                ...state,
-                isEmailOk: action.data,
-                isEmailChecking: false,
-            };
-        }
+                draft.isSigningUp = false;
+                draft.isSignedUp = true;
+                draft.me = me;
+                break;
+            }
+    
+            case SIGN_UP_FAILURE: {
+                draft.isSignedUp = false;
+                draft.signUpErrorReason = action.error;
+                break;
+            }
+    
+            case LOG_IN_REQUEST: {
+                cookie.remove('token', { path: '/' });
+                draft.isLoggingIn = true;
+                draft.loginErrorReason = null;
+                break;
+            }
+    
+            case LOG_IN_SUCCESS: {
+                const me = action.data.response.user;
+                const token = action.data.response.token;
+    
+                cookie.save('token',token, { path: '/' });
 
-        case EMAIL_CHECK_FAILURE: {
-            return {
-                ...state,
-                emailCheckingErrorReason: action.error,
-                isEmailChecking: false,
-            };
-        }
-
-        case SIGN_UP_REQUEST: {
-            return {
-                ...state,
-                isSigningUp: true,
-                isSignedUp: false,
-                isEmailOk: false,
-                signUpErrorReason: null
-            };
-        }
-
-        case SIGN_UP_SUCCESS: {
-            const me = action.data.response.user;
-            const token = action.data.response.token;
-
-            cookie.save('token',token, { path: '/' });
-
-            return {
-                ...state,
-                isSigningUp: false,
-                isSignedUp: true,
-                me: me,
-            };
-        }
-
-        case SIGN_UP_FAILURE: {
-            return {
-                ...state,
-                isSigningUp: false,
-                signUpErrorReason: action.error,
-            };
-        }
-
-        case LOG_IN_REQUEST: {
-            cookie.remove('token', { path: '/' });
-
-            return {
-                ...state,
-                isLoggingIn: true,
-                loginErrorReason: null,
-            };
-        }
-
-        case LOG_IN_SUCCESS: {
-            const me = action.data.response.user;
-            const token = action.data.response.token;
-
-            cookie.save('token',token, { path: '/' });
-
-            return {
-                ...state,
-                isLoggingIn: false,
-                me: me,
-            };
-        }
-
-        case LOG_IN_FAILURE: {
-            return {
-                ...state,
-                isLoggingIn: false,
-
-                loginErrorReason: action.error,
-                me: null,
-            };
-        }
-
-        case LOG_OUT: {
-            cookie.remove('token', { path: '/' });
-
-            return {
-                ...state,
-                me: null,
-            };
-        }
-
-        case LOAD_ME_REQUEST: {
-
-            return {
-                ...state,
-            };
-        }
-
-        case LOAD_ME_SUCCESS: {
-            return {
-                ...state,
-                me: action.data,
-            };
-        }
-
-        case LOAD_ME_FAILURE: {
-            return {
-                ...state,
-            };
-        }
-
-        case LOAD_USER_REQUEST: {
-
-            return {
-                ...state,
-            };
-        }
-
-        case LOAD_USER_SUCCESS: {
-            return {
-                ...state,
-                user: action.data,
-            };
-        }
-
-        case LOAD_USER_FAILURE: {
-            return {
-                ...state,
-            };
-        }
-
-        case FOLLOW_USER_REQUEST: {
-
-            return {
-                ...state,
-            };
-        }
-
-        case FOLLOW_USER_SUCCESS: {
-            return {
-                ...state,
-                me: action.data,
-            };
-        }
-
-        case FOLLOW_USER_FAILURE: {
-            return {
-                ...state,
-            };
-        }
-
-        case UNFOLLOW_USER_REQUEST: {
-
-            return {
-                ...state,
-            };
-        }
-
-        case UNFOLLOW_USER_SUCCESS: {
-            return {
-                ...state,
-                me: {
-                    ...state.me,
-                    followings: state.me.followings.filter(v=>v.id !== action.data),
-                },
-                followings: state.followings.filter(v => v.id !== action.data),
-            };
-        }
-
-        case UNFOLLOW_USER_FAILURE: {
-            return {
-                ...state,
-            };
-        }
-
-        case LOAD_FOLLOWING_REQUEST: {
-
-            return {
-                ...state,
-                followings : state.followings.length === 0 ? [] : state.followings,
-                hasMoreFollowing: action.data.offset ? state.hasMoreFollowing : true, 
-            };
-        }
-
-        case LOAD_FOLLOWING_SUCCESS: {
-            console.log(state.followings.concat(action.data));
-
-            return {
-                ...state,
-                followings: state.followings.concat(action.data),
-                hasMoreFollowing : action.data.length === 3,
+                draft.isLoggingIn = false;
+                draft.me = me;
+                break;
+            }
+    
+            case LOG_IN_FAILURE: {
+                draft.isLoggingIn = false;
+                draft.loginErrorReason = action.error;
+                draft.me = null;
+                break;
+            }
+    
+            case LOG_OUT: {
+                cookie.remove('token', { path: '/' });
+                draft.me = null;
+                break;
+            }
+    
+            case LOAD_ME_REQUEST: {
+                break;
+            }
+    
+            case LOAD_ME_SUCCESS: {
+                draft.me = action.data;
+                break;
+            }
+    
+            case LOAD_ME_FAILURE: {
+                break;
+            }
+    
+            case LOAD_USER_REQUEST: {
+                break;
+            }
+    
+            case LOAD_USER_SUCCESS: {
+                draft.user = action.data;
+                break;
+            }
+    
+            case LOAD_USER_FAILURE: {
+                break;
+            }
+    
+            case FOLLOW_USER_REQUEST: {
+                break;
+            }
+    
+            case FOLLOW_USER_SUCCESS: {
+                draft.me = action.data;
+                break;
+            }
+    
+            case FOLLOW_USER_FAILURE: {
+                break;
+            }
+    
+            case UNFOLLOW_USER_REQUEST: {
+                break;
+            }
+    
+            case UNFOLLOW_USER_SUCCESS: {
+                draft.me.followings = draft.me.followings.filter(v=>v.id !== action.data);
+                draft.followings = draft.followings.filter(v => v.id !== action.data);
+                break;
+            }
+    
+            case UNFOLLOW_USER_FAILURE: {
+                break;
+            }
+    
+            case LOAD_FOLLOWING_REQUEST: {
+                draft.followings = draft.followings.length === 0 ? [] : draft.followings;
+                draft.hasMoreFollower = action.data.offset ? draft.hasMoreFollowing : true;
+                break;1
+            }
+    
+            case LOAD_FOLLOWING_SUCCESS: {
+                draft.followings = draft.followings.concat(action.data);
+                draft.hasMoreFollowing = action.data.length === 3;
+                break;
+            }
+    
+            case LOAD_FOLLOWING_FAILURE: {
+                break;
+            }
+    
+            case LOAD_FOLLOWER_REQUEST: {
+                draft.followings = draft.followers.length === 0 ? [] : draft.followers;
+                draft.hasMoreFollower = action.data.offset ? draft.hasMoreFollower : true;
+                break;
+            }
+    
+            case LOAD_FOLLOWER_SUCCESS: {
+                draft.followers = draft.followers.concat(action.data)
+                draft.hasMoreFollower = action.data.length === 3;
+                break;
+            }
+    
+            case LOAD_FOLLOWER_FAILURE: {
+                break;
+            }
+    
+            case REMOVE_FOLLOWER_REQUEST: {
+                break;
+            }
+    
+            case REMOVE_FOLLOWER_SUCCESS: {
+                draft.me.followers = draft.me.followers.filter(v=>v.id !== action.data);
+                draft.followers = draft.followers.filter(v => v.id !== action.data);
+                break;
+            }
+    
+            case REMOVE_FOLLOWER_FAILURE: {
+                break;
+            }
+    
+            case EDIT_NAME_REQUEST: {
+                draft.isEditingName = true;
+                draft.editNameErrorReason = '';
+                break;
+            }
+    
+            case EDIT_NAME_SUCCESS: {
+                draft.me = action.data;
+                draft.isEditingName = false;
+                break;
+            }
+    
+            case EDIT_NAME_FAILURE: {
+                draft.isEditingName = false;
+                break;
+            }
             
-            };
+            default: {
+                break;
+            }
         }
+    });
 
-        case LOAD_FOLLOWING_FAILURE: {
-            return {
-                ...state,
-            };
-        }
-
-        case LOAD_FOLLOWER_REQUEST: {
-
-            return {
-                ...state,
-                followers : state.followers.length === 0 ? [] : state.followers,
-                hasMoreFollower: action.data.offset ? state.hasMoreFollower : true, 
-            };
-        }
-
-        case LOAD_FOLLOWER_SUCCESS: {
-            return {
-                ...state,
-                followers: state.followers.concat(action.data),
-                hasMoreFollower : action.data.length === 3,
-            };
-        }
-
-        case LOAD_FOLLOWER_FAILURE: {
-            return {
-                ...state,
-            };
-        }
-
-        case REMOVE_FOLLOWER_REQUEST: {
-
-            return {
-                ...state,
-            };
-        }
-
-        case REMOVE_FOLLOWER_SUCCESS: {
-            return {
-                ...state,
-                me: {
-                    ...state.me,
-                    followers: state.me.followers.filter(v=>v.id !== action.data),
-                },
-                followers: state.followers.filter(v => v.id !== action.data),
-            };
-        }
-
-        case REMOVE_FOLLOWER_FAILURE: {
-            return {
-                ...state,
-            };
-        }
-
-        case EDIT_NAME_REQUEST: {
-
-            return {
-                ...state,
-                isEditingName: true,
-                editNameErrorReason: ''
-            };
-        }
-
-        case EDIT_NAME_SUCCESS: {
-            return {
-                ...state,
-                me: action.data,
-                isEditingName: false,
-            };
-        }
-
-        case EDIT_NAME_FAILURE: {
-            return {
-                ...state,
-                isEditingName: false,
-            };
-        }
-        
-        default: {
-            return {
-                ...state,
-                editNameErrorReason: action.error,
-            };
-        }
-    }
 };
 
 export default reducer;
