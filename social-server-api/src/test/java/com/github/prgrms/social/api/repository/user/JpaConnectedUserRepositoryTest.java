@@ -1,21 +1,15 @@
 package com.github.prgrms.social.api.repository.user;
 
 import com.github.prgrms.social.api.model.post.Comment;
+import com.github.prgrms.social.api.model.post.Likes;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
-import com.github.prgrms.social.api.model.post.Likes;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.user.projection.ConnectedId;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class JpaConnectedUserRepositoryTest {
@@ -114,20 +108,6 @@ class JpaConnectedUserRepositoryTest {
         entityManager.persist(user4);
         entityManager.persist(user5);
         entityManager.flush();
-    }
-
-    @Test
-    void findAllConnectedUser() {
-        List<ConnectedUser> connects = jpaConnectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(1L);
-
-        assertEquals(connects.size(),3);
-    }
-
-    @Test
-    void findConnectedId() {
-        List<ConnectedId> connectedIds = jpaConnectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByTargetUser_Id(1L);
-
-        assertEquals(connectedIds.size(),3);
     }
 
 }

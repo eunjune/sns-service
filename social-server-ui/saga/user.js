@@ -161,6 +161,8 @@ function* watchLoadMe() {
 }
 
 function followAPI({userId,token}) {
+    console.log('followAPI');
+    console.log(token);
     return axios.post(`user/${userId}/follow`,{},{
         headers: {
             'api_key': 'Bearer ' + token,
@@ -218,8 +220,8 @@ function* watchUnfollow() {
     yield takeLatest(UNFOLLOW_USER_REQUEST,unfollow);
 }
 
-function loadFollowerAPI(token) {
-    return axios.get(`user/followers`,{
+function loadFollowerAPI({token, offset=0}) {
+    return axios.get(`user/followers?page=${offset}&size=3`,{
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -247,8 +249,8 @@ function* watchLoadfollower() {
     yield takeLatest(LOAD_FOLLOWER_REQUEST,loadFollower,);
 }
 
-function loadFollowingAPI(token) {
-    return axios.get(`user/followings`,{
+function loadFollowingAPI({token, offset=0}) {
+    return axios.get(`user/followings?page=${offset}&size=3`,{
         headers: {
             'api_key': 'Bearer ' + token,
         },

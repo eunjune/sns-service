@@ -11,8 +11,9 @@ import axios from 'axios';
 const Profile = () => {
 
     const dispatch = useDispatch();
-    const {me, followers, followings} = useSelector(state => state.user);
+    const {me, followers, followings, hasMoreFollower, hasMoreFollowing} = useSelector(state => state.user);
     const {posts} = useSelector(state => state.post);
+    const token = cookie.load('token');
 
     const onUnfollow = useCallback(userId => () => {
 
@@ -37,6 +38,29 @@ const Profile = () => {
         
     },[]);
 
+    const loadMoreFollowings = useCallback(() => {
+        console.log(followings.length);
+
+        dispatch({
+            type: LOAD_FOLLOWING_REQUEST,
+            data: {
+                token,
+                offset: followings.length/3
+
+            }
+        })
+    },[followings])
+
+    const loadMoreFollowers = useCallback(() => {
+        dispatch({
+            type: LOAD_FOLLOWERS_REQUEST,
+            data: {
+                token,
+                offset: followers.length/3
+            }
+        })
+    },[followers])
+
     return <>
             <div>
                 <NameEditForm/>
@@ -45,7 +69,7 @@ const Profile = () => {
                     grid={{gutter: 4, xs: 2, md: 3}}
                     size="small"
                     header={<div>팔로잉 목록</div>}
-                    loadMore={<Button style={{width: '100%'}}>더 보기</Button>}
+                    loadMore={hasMoreFollowing &&  <Button style={{width: '100%'}} onClick={loadMoreFollowings}>더 보기</Button>}
                     bordered
                     dataSource={followings}
                     renderItem={item => (
@@ -61,7 +85,7 @@ const Profile = () => {
                     grid={{gutter: 4, xs: 2, md: 3}}
                     size="small"
                     header={<div>팔로워 목록</div>}
-                    loadMore={<Button style={{width: '100%'}}>더 보기</Button>}
+                    loadMore={hasMoreFollower && <Button style={{width: '100%'}} onClick={loadMoreFollowers}>더 보기</Button>}
                     bordered
                     dataSource={followers}
                     renderItem={item => (
@@ -84,14 +108,18 @@ const Profile = () => {
 Profile.getInitialProps = async(context) => {
     const token = cookie.load('token') || (context.isServer ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
 
+    const state = context.store.getState();
+    state.user.followers = [];
+    state.user.followings = [];
+
     context.store.dispatch({
         type: LOAD_FOLLOWER_REQUEST,
-        data: token
+        data: {token}
     });
 
     context.store.dispatch({
         type: LOAD_FOLLOWING_REQUEST,
-        data: token
+        data: {token}
     });
 
     context.store.dispatch({

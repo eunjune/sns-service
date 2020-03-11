@@ -8,11 +8,12 @@ import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.user.projection.ConnectedId;
 import com.github.prgrms.social.api.repository.user.JpaConnectedUserRepository;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.user.projection.ConnectedId;
 import com.google.common.eventbus.EventBus;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,13 +126,6 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<ConnectedUser> findAllConnectedUser(Long userId) {
-        checkNotNull(userId, "userId must be provided.");
-
-        return connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(userId);
-    }
-
-    @Transactional(readOnly = true)
     public List<ConnectedId> findConnectedIds(Long userId) {
         checkNotNull(userId, "userId must be provided.");
 
@@ -180,17 +174,17 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(User.class, meId));
     }
 
-    public List<User> getFollowings(Long id) {
+    public List<User> getFollowings(Long id, Pageable pageable) {
         checkNotNull(id, "id must be provided.");
 
-        List<ConnectedUser> result =  connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(id);
+        List<ConnectedUser> result =  connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(id,pageable);
         return result.stream().map(ConnectedUser::getTargetUser).collect(Collectors.toList());
     }
 
-    public List<User> getFollowers(Long id) {
+    public List<User> getFollowers(Long id, Pageable pageable) {
         checkNotNull(id, "id must be provided.");
 
-        List<ConnectedUser> result = connectedUserRepository.findByTargetUser_IdAndCreateAtIsNotNullOrderByIdDesc(id);
+        List<ConnectedUser> result = connectedUserRepository.findByTargetUser_IdAndCreateAtIsNotNullOrderByIdDesc(id,pageable);
         return result.stream().map(ConnectedUser::getUser).collect(Collectors.toList());
     }
 

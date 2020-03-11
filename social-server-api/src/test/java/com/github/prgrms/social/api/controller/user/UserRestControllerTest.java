@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.controller.user;
 
-import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
@@ -18,11 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -133,27 +129,4 @@ class UserRestControllerTest {
         then(userService).should(times(1)).findById(any());
     }
 
-    @Test
-    void connections() throws Exception {
-        ConnectedUser connectedUser1 = new ConnectedUser(null, null);
-        ConnectedUser connectedUser2 = new ConnectedUser(null, null);
-
-        List<ConnectedUser> givenConnected = new ArrayList<>();
-        givenConnected.add(connectedUser1);
-        givenConnected.add(connectedUser2);
-
-        JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-
-        User user = User.builder().name("test1").password("1234").email(new Email("test1@gmail.com")).id(1L).build();
-        String apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
-
-        given(userService.findAllConnectedUser(1L)).willReturn(givenConnected);
-
-        mockMvc.perform(get("/api/user/connections").header(tokenHeader,apiToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.*",hasSize(2)))
-                .andDo(print());
-
-        then(userService).should(times(1)).findAllConnectedUser(any());
-    }
 }

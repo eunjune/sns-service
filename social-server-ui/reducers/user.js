@@ -16,7 +16,8 @@ export const initialState = {
     user: null,
     isEditingName: false,
     editNameErrorReason: '',
-
+    hasMoreFollower: false,
+    hasMoreFollowing: false,
 };
 
 export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
@@ -258,13 +259,17 @@ const reducer = (state = initialState, action) => {
 
             return {
                 ...state,
+                hasMoreFollowing: action.data.offset ? state.hasMoreFollowing : true, 
             };
         }
 
         case LOAD_FOLLOWING_SUCCESS: {
+            console.log(state.followings.concat(action.data));
+
             return {
                 ...state,
-                followings: action.data,
+                followings: state.followings.concat(action.data),
+                hasMoreFollowing : action.data.length === 3,
             
             };
         }
@@ -279,13 +284,15 @@ const reducer = (state = initialState, action) => {
 
             return {
                 ...state,
+                hasMoreFollower: action.data.offset ? state.hasMoreFollower : true, 
             };
         }
 
         case LOAD_FOLLOWER_SUCCESS: {
             return {
                 ...state,
-                followers: action.data,
+                followers: state.followers.concat(action.data),
+                hasMoreFollower : action.data.length === 3,
             };
         }
 

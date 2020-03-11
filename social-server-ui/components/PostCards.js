@@ -134,7 +134,7 @@ const PostCards = ({post}) => {
           token
         }
       });
-    })
+    },[])
 
   return (
         <div>

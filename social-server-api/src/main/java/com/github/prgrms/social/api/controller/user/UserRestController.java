@@ -18,6 +18,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
@@ -141,26 +142,22 @@ public class UserRestController {
         );
     }
 
-    @GetMapping(path = "user/connections")
-    @ApiOperation(value = "내 친구 목록")
-    public ApiResult<List<ConnectedUser>> connections(@AuthenticationPrincipal JwtAuthentication authentication) {
-        return OK(userService.findAllConnectedUser(authentication.id.getValue()));
-    }
-
     @GetMapping(path = "user/followings")
     @ApiOperation(value = "팔로우 목록")
     public ApiResult<List<User>> followings(
-            @AuthenticationPrincipal JwtAuthentication authentication
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            Pageable pageable
     ) {
-        return OK(userService.getFollowings(authentication.id.getValue()));
+        return OK(userService.getFollowings(authentication.id.getValue(),pageable));
     }
 
     @GetMapping(path = "user/followers")
     @ApiOperation(value = "팔로우 목록")
     public ApiResult<List<User>> followers(
-            @AuthenticationPrincipal JwtAuthentication authentication
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            Pageable pageable
     ) {
-        return OK(userService.getFollowers(authentication.id.getValue()));
+        return OK(userService.getFollowers(authentication.id.getValue(),pageable));
     }
 
     @PostMapping(path = "user/{userId}/follow")
