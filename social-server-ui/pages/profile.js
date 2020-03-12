@@ -108,10 +108,6 @@ const Profile = () => {
 Profile.getInitialProps = async(context) => {
     const token = cookie.load('token') || (context.isServer ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
 
-    // const state = context.store.getState();
-    // state.user.followers = [];
-    // state.user.followings = [];
-
     context.store.dispatch({
         type: LOAD_FOLLOWER_REQUEST,
         data: {token}

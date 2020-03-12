@@ -104,7 +104,7 @@ const reducer = (state = initialState, action) => {
             }
     
             case LOAD_HASHTAG_POSTS_REQUEST: {
-                draft.posts = action.lastId === 0 ? [] : draft.posts;
+                draft.posts = !action.lastId ? [] : draft.posts;
                 draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
                 break;
             }

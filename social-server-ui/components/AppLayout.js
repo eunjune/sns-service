@@ -8,10 +8,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import LoginForm from './LoginForm';
 import UserProfile from './UserProfile';
 import { LOAD_ME_REQUEST } from '../reducers/user';
+import Router from 'next/router';
 
 const AppLayout = ({ children }) => {
   const { me } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
+  const onSearch = (value) => {
+    Router.push({pathname: '/hashtag', query: {tag: value}}, `/hashtag/${value}`);
+  };
 
   return (
     <div>
@@ -20,7 +25,11 @@ const AppLayout = ({ children }) => {
         <Menu.Item key="home"><Link href="/"><a>SNS</a></Link></Menu.Item>
         <Menu.Item key="profile" style={{ float: 'right' }}><Link href="/profile"><a>프로필</a></Link></Menu.Item>
         <Menu.Item key="mail" style={{ float: 'right' }}>
-          <Input.Search enterButton style={{ verticalAlign: 'middle' }} />
+          <Input.Search 
+            enterButton 
+            style={{ verticalAlign: 'middle' }} 
+            onSearch={onSearch}
+          />
         </Menu.Item>
       </Menu>
       <Row gutter={8}>
