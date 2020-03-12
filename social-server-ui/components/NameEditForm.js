@@ -8,7 +8,7 @@ const NameEditForm = () => {
 
     const [editedName, setEditedName] = useState('');
     const dispatch = useDispatch();
-    const {me, isEditingName} = useSelector(state => state.user);
+    const {isEditingName} = useSelector(state => state.user);
 
     const onChangeName = useCallback((e) => {
         setEditedName(e.target.value)

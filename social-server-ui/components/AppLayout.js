@@ -1,18 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import {
   Menu, Input, Row, Col, 
 } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import LoginForm from './LoginForm';
 import UserProfile from './UserProfile';
-import { LOAD_ME_REQUEST } from '../reducers/user';
 import Router from 'next/router';
 
 const AppLayout = ({ children }) => {
   const { me } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
 
   const onSearch = (value) => {
     Router.push({pathname: '/hashtag', query: {tag: value}}, `/hashtag/${value}`);

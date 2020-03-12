@@ -2,7 +2,6 @@ import React, {useEffect,useCallback,useRef} from 'react';
 import PostCards from "../components/PostCards";
 import PostForm from "../components/PostForm";
 import {useDispatch, useSelector} from "react-redux";
-import Router from 'next/router';
 import { LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 
 const Home = () => {

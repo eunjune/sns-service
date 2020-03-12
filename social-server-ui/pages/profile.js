@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWING_REQUEST, UNFOLLOW_USER_REQUEST, REMOVE_FOLLOWER_REQUEST } from '../reducers/user';
 import { LOAD_USER_POSTS_REQUEST, LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 import PostCards from '../components/PostCards';
-import axios from 'axios';
 
 const Profile = () => {
 

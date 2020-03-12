@@ -1,5 +1,4 @@
 import React from 'react';
-import Head from 'next/head';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
 import withRedux from 'next-redux-wrapper';
@@ -7,7 +6,6 @@ import withReduxSaga from 'next-redux-saga';
 import { Provider } from 'react-redux';
 import { createStore, compose, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import axios from 'axios';
 import reducer from '../reducers';
 import AppLayout from '../components/AppLayout';
 import rootSaga from '../saga';
