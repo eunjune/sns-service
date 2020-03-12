@@ -24,15 +24,21 @@ const Root = ({ Component, store, pageProps }) => (
           meta = {[{
             charset: 'UTF-8',
           } , {
-            name: 'viewport', content='width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=yes,viewport-fit=cover'
+            name: 'viewport', content: 'width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=yes,viewport-fit=cover'
           } , {
             'http-equiv' : 'X-UA-Compatible', content: 'IE-edge',
           }, {
-            name: 'description', content: 'SNS'
+            name: 'description', content: '트위터 클론 페이지'
+          }, {
+            name: 'og:tittle', content: 'SNS',
+          }, {
+            name: 'og:description',content: '트위터 클론 페이지'
           }, {
             property: 'og:type', content: 'website',
           }]}
           link={[{
+            
+          }, {
             rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.css',
           }, {
             rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css',

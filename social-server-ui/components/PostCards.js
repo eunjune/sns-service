@@ -8,6 +8,11 @@ import {FOLLOW_USER_REQUEST,UNFOLLOW_USER_REQUEST} from '../reducers/user'
 import Link from 'next/link';
 import PostImages from '../components/PostImages'
 import PostCardContent from '../components/PostCardContent'
+import styled from 'styled-components';
+
+const CardWrapper = styled.div`
+  margin-bottom: 20px;
+`;
 
 const PostCards = ({post}) => {
     const [commentFormOpened, setCommentFormOpened] = useState(false);
@@ -137,7 +142,7 @@ const PostCards = ({post}) => {
     },[])
 
   return (
-        <div>
+        <CardWrapper>
           <Card
               key={+post.createAt}
               cover={post.images[0] && <PostImages images={post.images}/>}
@@ -223,7 +228,7 @@ const PostCards = ({post}) => {
               />
             </>
           )}
-        </div>
+        </CardWrapper>
     );
 };
 
