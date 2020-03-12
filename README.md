@@ -30,7 +30,6 @@
 
 
 ### 개발 예정
-- 검색엔진 최적화
 - 배포
 - oAuth
 - Notification
