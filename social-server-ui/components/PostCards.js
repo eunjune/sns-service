@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, {useState, useCallback, useEffect, memo} from 'react';
 import cookie from 'react-cookies';
 import PropTypes from 'prop-types';
 import { Button, Card, Icon, Avatar, Form, List,Comment,Input,Popover } from 'antd';
@@ -9,12 +9,14 @@ import Link from 'next/link';
 import PostImages from '../components/PostImages'
 import PostCardContent from '../components/PostCardContent'
 import styled from 'styled-components';
+import moment from "moment";
+moment.locale('ko');
 
 const CardWrapper = styled.div`
   margin-bottom: 20px;
 `;
 
-const PostCards = ({post}) => {
+const PostCards = memo(({post}) => {
     const [commentFormOpened, setCommentFormOpened] = useState(false);
     const [commentText, setCommentText] = useState('');
     const { me } = useSelector(state => state.user);
@@ -23,6 +25,10 @@ const PostCards = ({post}) => {
     const token = cookie.load('token');
 
     const liked = post.likes && post.likes.find(v =>v.user.id === me.id);
+
+    console.log('liked');
+    console.log(post.likes);
+    console.log(liked);
 
     useEffect(() => {
       setCommentText('');
@@ -198,10 +204,7 @@ const PostCards = ({post}) => {
               )
               
             }
-
-
-              
-
+              {moment(post.createAt).format('YYYY.MM.DD.')}
           </Card>
           {commentFormOpened && (
             <>
@@ -229,7 +232,7 @@ const PostCards = ({post}) => {
           )}
         </CardWrapper>
     );
-};
+});
 
 PostCards.propTypes = {
     post: PropTypes.shape({

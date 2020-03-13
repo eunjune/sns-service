@@ -21,7 +21,7 @@ const AppLayout = ({ children }) => {
       <Menu mode="horizontal">
         
         <Menu.Item key="home"><Link href="/"><a>SNS</a></Link></Menu.Item>
-        <Menu.Item key="profile" style={{ float: 'right' }}><Link href="/profile"><a>프로필</a></Link></Menu.Item>
+        <Menu.Item key="profile" style={{ float: 'right' }}><Link href="/profile" prefetch><a>프로필</a></Link></Menu.Item>
         <Menu.Item key="mail" style={{ float: 'right' }}>
           <Input.Search 
             enterButton 

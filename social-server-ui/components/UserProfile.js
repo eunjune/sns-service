@@ -24,9 +24,9 @@ const UserProfile = (props) => {
         <div>
             <Card
                 actions={[
-                    <Link href="/profile" key="twit"><a><div>게시글<br/>{posts.length}</div></a></Link>,
-                    <Link href="/profile" key="following"><a><div>팔로윙<br/>{me.followings.length}</div></a></Link>,
-                    <Link href="/profile" key="follower"><a><div>팔로워<br/>{me.followers.length}</div></a></Link>,         
+                    <Link href="/profile" key="twit" prefetch><a><div>게시글<br/>{posts.length}</div></a></Link>,
+                    <Link href="/profile" key="following" prefetch><a><div>팔로윙<br/>{me.followings.length}</div></a></Link>,
+                    <Link href="/profile" key="follower" prefetch><a><div>팔로워<br/>{me.followers.length}</div></a></Link>,         
                 ]}
             >
                 <Card.Meta avatar={<Avatar>{me.name[0]}</Avatar>}

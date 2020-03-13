@@ -153,7 +153,7 @@ const reducer = (state = initialState, action) => {
             }
     
             case LOAD_COMMENTS_SUCCESS: {
-                const postIndex = state.posts.findIndex(p => p.id === action.data.postId);
+                const postIndex = draft.posts.findIndex(p => p.id === action.data.postId);
                 draft.posts[postIndex].comments = action.data.comments;
                 break;
             }
@@ -170,7 +170,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case ADD_COMMENT_SUCCESS: {
-                const postIndex = state.posts.findIndex(p => p.id === action.data.postId);
+                const postIndex = draft.posts.findIndex(p => p.id === action.data.postId);
                 draft.posts[postIndex].comments.push(action.data.comment);
                 draft.isAddingComment = false;
                 draft.addedComment = true;
@@ -209,7 +209,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case LIKE_POST_SUCCESS: {
-                const postIndex = state.posts.findIndex(v => v.id === action.data.id);
+                const postIndex = draft.posts.findIndex(v => v.id === action.data.id);
                 draft.posts[postIndex] = action.data;
                 
                 break;
@@ -224,7 +224,7 @@ const reducer = (state = initialState, action) => {
                 break;
             }
             case UNLIKE_POST_SUCCESS: {
-                const postIndex = state.posts.findIndex(v => v.id === action.data.id);
+                const postIndex = draft.posts.findIndex(v => v.id === action.data.id);
                 draft.posts[postIndex] = action.data;
                 
                 break;
