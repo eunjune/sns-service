@@ -10,6 +10,8 @@ import PostImages from '../components/PostImages'
 import PostCardContent from '../components/PostCardContent'
 import styled from 'styled-components';
 import moment from "moment";
+import CommentForm from "./CommentForm";
+import FollowButton from "./FollowButton";
 moment.locale('ko');
 
 const CardWrapper = styled.div`
@@ -18,21 +20,10 @@ const CardWrapper = styled.div`
 
 const PostCards = memo(({post}) => {
     const [commentFormOpened, setCommentFormOpened] = useState(false);
-    const [commentText, setCommentText] = useState('');
-    const { me } = useSelector(state => state.user);
-    const { addedComment,isAddingComment } = useSelector(state => state.post);
+    const meId = useSelector(state => state.user.me && state.user.me.id);
     const dispatch = useDispatch();
     const token = cookie.load('token');
-
-    const liked = post.likes && post.likes.find(v =>v.user.id === me.id);
-
-    console.log('liked');
-    console.log(post.likes);
-    console.log(liked);
-
-    useEffect(() => {
-      setCommentText('');
-    }, [addedComment === true]);
+    const liked = post.likes && post.likes.find(v =>v.user.id === meId);
 
     const onToggleComment = useCallback(() => {
         setCommentFormOpened(prev => !prev);
@@ -43,7 +34,7 @@ const PostCards = memo(({post}) => {
               type: LOAD_COMMENTS_REQUEST,
               data: {
                   postId: post.id,
-                  userId: me.id,
+                  userId: meId,
                   token,
               },
           })
@@ -51,29 +42,31 @@ const PostCards = memo(({post}) => {
 
     },[]);
 
-    const onSubmitComment = useCallback((e) => {
-        e.preventDefault();
-        if(!me) {
-        alert('로그인이 필요합니다.');
-        }
-        dispatch({
-            type: ADD_COMMENT_REQUEST,
-            data: {
-                userId: me.id,
-                postId: post.id,
-                comment: commentText,
-                token,
-            }
-            })
-    },[me && me.id, commentText]);
+    const onFollow = useCallback(userId => () => {
 
-    const onChangeCommentText = useCallback((e) => {
-      setCommentText(e.target.value);
+        dispatch({
+            type: FOLLOW_USER_REQUEST,
+            data: {
+                userId,
+                token
+            }
+        });
+    },[]);
+
+    const onUnfollow = useCallback(userId => () => {
+
+        dispatch({
+            type: UNFOLLOW_USER_REQUEST,
+            data: {
+                userId,
+                token
+            }
+        });
     },[]);
 
     const onToggleLike = useCallback(() => {
 
-      if(!me) {
+      if(!meId) {
         return alert('로그인이 필요합니다.');
       }
 
@@ -97,12 +90,12 @@ const PostCards = memo(({post}) => {
         });
       }
 
-    },[me && me.id, post]);
+    },[meId, post]);
 
     const onRetweet = useCallback(() => {
 
 
-      if(!me) {
+      if(!meId) {
         return alert('로그인이 필요합니다.');
       }
 
@@ -113,29 +106,9 @@ const PostCards = memo(({post}) => {
           token,
         }
       });
-    }, [me && me.id, post.id] );
+    }, [meId, post.id] );
 
-    const onFollow = useCallback(userId => () => {
 
-      dispatch({
-        type: FOLLOW_USER_REQUEST,
-        data: {
-          userId,
-          token
-        }
-      });
-    },[]);
-
-    const onUnfollow = useCallback(userId => () => {
-
-      dispatch({
-        type: UNFOLLOW_USER_REQUEST,
-        data: {
-          userId,
-          token
-        }
-      });
-    },[]);
 
     const onRemovePost = useCallback(postId => () => {
       dispatch({
@@ -160,7 +133,7 @@ const PostCards = memo(({post}) => {
                     key="ellipsis"
                     content={(
                       <Button.Group>
-                        {me && post.user.id === me.id
+                        {meId && post.user.id === meId
                           ? (
                             <>
                               <Button>수정</Button>
@@ -175,12 +148,7 @@ const PostCards = memo(({post}) => {
                   </Popover>,
               ]}
               title={post.isRetweet ? `${post.user.name}님이 리트윗 하셨습니다.` : null}
-              extra = { !me || post.user.id === me.id
-              ? null
-              : me.followings && me.followings.find(id => id === post.user.id)
-              ? <Button onClick={onUnfollow(post.user.id)}>언팔로우</Button>
-              : <Button onClick={onFollow(post.user.id)}>팔로우</Button>
-              }
+              extra = { <FollowButton post={post} onUnfollow={onUnfollow} onFollow={onFollow} /> }
           >
             {post.isRetweet ? 
                 <Card
@@ -208,26 +176,21 @@ const PostCards = memo(({post}) => {
           </Card>
           {commentFormOpened && (
             <>
-              <Form onSubmit={onSubmitComment}>
-                <Form.Item>
-                  <Input.TextArea rows={4} value={commentText} onChange={onChangeCommentText} />
-                </Form.Item>
-                <Button type="primary" htmlType="submit" loading={isAddingComment}>댓글작성</Button>
-              </Form>
-              <List
-                header={` 댓글`}
-                itemLayout = "horizontal"
-                dataSource={post.comments || []}
-                renderItem={ item => (
-                  <li>
-                    <Comment
-                      author={item.user.name}
-                      avatar={<Link href={{pathname: '/user', query: {id : post.user.id}}} as={`/user/${post.user.id}`}><a><Avatar>{post.user.name[0]}</Avatar></a></Link> }
-                      content={item.content}
-                    />
-                  </li>
-                )}
-              />
+                <CommentForm post={post}/>
+                <List
+                    header={` 댓글`}
+                    itemLayout = "horizontal"
+                    dataSource={post.comments || []}
+                    renderItem={ item => (
+                      <li>
+                        <Comment
+                          author={item.user.name}
+                          avatar={<Link href={{pathname: '/user', query: {id : post.user.id}}} as={`/user/${post.user.id}`}><a><Avatar>{post.user.name[0]}</Avatar></a></Link> }
+                          content={item.content}
+                        />
+                      </li>
+                    )}
+                />
             </>
           )}
         </CardWrapper>

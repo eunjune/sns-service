@@ -18,7 +18,7 @@ const Hashtag = ({ tag }) => {
               type: LOAD_HASHTAG_POSTS_REQUEST,
               data : {
                 tag,
-                lastId: posts[posts.length-1].id,
+                lastId: posts[posts.length-1] && posts[posts.length-1].id,
               }
           });
       }

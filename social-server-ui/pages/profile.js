@@ -6,11 +6,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWING_REQUEST, UNFOLLOW_USER_REQUEST, REMOVE_FOLLOWER_REQUEST } from '../reducers/user';
 import { LOAD_USER_POSTS_REQUEST, LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 import PostCards from '../components/PostCards';
+import FollowList from "../components/FollowList";
 
 const Profile = () => {
 
     const dispatch = useDispatch();
-    const {me, followers, followings, hasMoreFollower, hasMoreFollowing} = useSelector(state => state.user);
+    const {followers, followings, hasMoreFollower, hasMoreFollowing} = useSelector(state => state.user);
     const {posts} = useSelector(state => state.post);
     const token = cookie.load('token');
 
@@ -63,37 +64,20 @@ const Profile = () => {
     return <>
             <div>
                 <NameEditForm/>
-                <List
-                    style={{marginBottom: '20px'}}
-                    grid={{gutter: 4, xs: 2, md: 3}}
-                    size="small"
-                    header={<div>팔로잉 목록</div>}
-                    loadMore={hasMoreFollowing &&  <Button style={{width: '100%'}} onClick={loadMoreFollowings}>더 보기</Button>}
-                    bordered
-                    dataSource={followings}
-                    renderItem={item => (
-                        <List.Item style={{marginTop: '20px'}}>
-                            <Card actions={[<Icon key="stop" type="stop" onClick={onUnfollow(item.id)} />]}>
-                                <Card.Meta description={item.name}/>
-                            </Card>
-                        </List.Item>
-                    )}
+                <FollowList
+                    header="팔로잉 목록"
+                    hasMore={hasMoreFollowing}
+                    onClickMore={loadMoreFollowings}
+                    onClickStop={onUnfollow}
+                    data={followings}
                 />
-                <List
-                    style={{marginBottom: '20px'}}
-                    grid={{gutter: 4, xs: 2, md: 3}}
-                    size="small"
-                    header={<div>팔로워 목록</div>}
-                    loadMore={hasMoreFollower && <Button style={{width: '100%'}} onClick={loadMoreFollowers}>더 보기</Button>}
-                    bordered
-                    dataSource={followers}
-                    renderItem={item => (
-                        <List.Item style={{marginTop: '20px'}}>
-                            <Card actions={[<Icon key="stop" type="stop" onClick={onRemoveFollower(item.id)}/>]}>
-                                <Card.Meta description={item.name}/>
-                            </Card>
-                        </List.Item>
-                    )}
+
+                <FollowList
+                    header="팔로워 목록"
+                    hasMore={hasMoreFollower}
+                    onClickMore={loadMoreFollowers}
+                    onClickStop={onRemoveFollower}
+                    data={followers}
                 />
                 <div>
                     {posts.map((p) => (
