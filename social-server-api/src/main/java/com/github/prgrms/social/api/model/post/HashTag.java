@@ -26,7 +26,7 @@ public class HashTag {
     private final Long id;
 
     @ApiModelProperty(value = "태그이름", required = true)
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private final String name;
 
     @ApiModelProperty(value = "생성일시", required = true)

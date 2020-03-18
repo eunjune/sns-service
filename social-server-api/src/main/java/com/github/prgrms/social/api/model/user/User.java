@@ -38,13 +38,13 @@ public class User {
     private final Long id;
 
     @ApiModelProperty(value = "사용자명", required = true)
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @Setter
     private final String name;
 
     @ApiModelProperty(value = "이메일", required = true)
     @AttributeOverrides({
-            @AttributeOverride(name = "address", column = @Column(name = "email", nullable = false))
+            @AttributeOverride(name = "address", column = @Column(name = "email", nullable = false, unique = true))
     })
     private final Email email;
 

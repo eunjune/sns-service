@@ -78,13 +78,16 @@ public class PostService {
         checkNotNull(userId, "userId must be provided.");
         checkNotNull(postWriterId, "writerId must be provided.");
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(Long.class,userId));
+
         return postRepository.findByIdCustom(postId, userId, postWriterId)
             .map(post -> {
                 if (!post.isLikesOfMe()) {
                     //post.incrementAndGetLikes();
 
                     Likes like = new Likes(null,null);
-                    post.getUser().addLike(like);
+                    user.addLike(like);
                     post.incrementAndGetLikes(like);
                     postLikeRepository.save(like);
                 }

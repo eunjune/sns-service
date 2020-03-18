@@ -3,6 +3,7 @@ import PostCards from "../components/PostCards";
 import PostForm from "../components/PostForm";
 import {useDispatch, useSelector} from "react-redux";
 import { LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
+import Login from "./login";
 
 const Home = () => {
     const {me,loginErrorReason} = useSelector(state => state.user);

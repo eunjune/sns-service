@@ -20,7 +20,7 @@ app.prepare().then(() => {
   server.use(express.json());
   //server.use('/', express.static(path.join(__dirname, 'public')));
   server.use(express.urlencoded({extended: true}));
-  server.use(cookieParser(process.env.COOKIE_SCRET));
+  /*server.use(cookieParser(process.env.COOKIE_SCRET));
   server.use(expressSession({
     resave: false,
     saveUninitialized: false,
@@ -29,7 +29,7 @@ app.prepare().then(() => {
       httpOnly: true,
       secure: false,
     }
-  }));
+  }));*/
 
   server.get('/hashtag/:tag', (req,res) => {
     return app.render(req,res, '/hashtag', {tag : req.params.tag});
