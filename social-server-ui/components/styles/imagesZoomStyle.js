@@ -43,7 +43,7 @@ export const CloseButton= styled(Icon)`
 `
 
 export const Indicator = styled.div`
-  text-align: 'center';
+  text-align: center;
 
   & > div {
     width: 75px;
@@ -63,7 +63,8 @@ export const ImgWrapper = styled.div`
   text-align: center;
 
   & img {
-    margin: '0 auto';
+    margin: 0 auto;
     max-height: 750px;
   }
 `;
+

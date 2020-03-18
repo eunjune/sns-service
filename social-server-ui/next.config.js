@@ -36,13 +36,7 @@ module.exports = withBunddleAnalyzer({
                 ...config.module,
                 rules: [
                     ...config.module.rules,
-                    {
-                        loader: 'webpack-ant-icon-loader',
-                        enforce: 'pre',
-                        include: [
-                            require.resolve('@ant-design/icons/lib/dist'),
-                        ],
-                    },
+
                 ],
             },
             plugins

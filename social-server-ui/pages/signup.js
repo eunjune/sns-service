@@ -1,4 +1,4 @@
-import {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import { Form, Button, Input, Checkbox } from 'antd';
 import {
     EMAIL_CHECK_REQUEST,
@@ -6,6 +6,9 @@ import {
 } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
+import {DivWrap} from "../components/styles/ContainerStyle";
+import CenterAlignment from "../components/CenterAlignment";
+import {LockOutlined, UserOutlined} from "@ant-design/icons";
 
 const Signup = () => {
 
@@ -93,42 +96,69 @@ const Signup = () => {
     }
 
     return (
-    <>
-        <Form onSubmit={onSubmit} style={{padding: 10}}>
-            <div>
-                <label htmlFor="user-email">아이디</label>
-                <br/>
-                <Input name="user-email" value={email} required onChange={onChangeEmail}/>
-                <Button onClick={onClickChecking} loading={isEmailChecking}>중복확인</Button>
-                {isEmailOk === true ? <div style={{color: 'green'}}>사용 가능한 이메일입니다.</div> :
-                (isEmailOk === false ? <div style={{color: 'red'}}>이메일이 중복입니다.</div> : null)}
-                {emailCheckingErrorReason !== '' ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : null}
-            </div>
-            <div>
-                <label htmlFor="user-name">닉네임</label>
-                <br/>
-                <Input name="user-name" value={name} required onChange={onChangeName}/>
-            </div>
-            <div>
-                <label htmlFor="user-password">비밀번호</label>
-                <br/>
-                <Input name="user-password" value={password} type="password" required onChange={onChangePassword}/>
-            </div>
-            <div>
-                <label htmlFor="user-password-check">비밀번호 체크</label>
-                <br/>
-                <Input name="user-password-check" value={passwordCheck} type="password" required onChange={onChangePasswordCheck}/>
-                {passwordError && <div style={{color: 'red'}}>비밀번호가 일치하지 않습니다.</div>}
-            </div>
-            <div>
-                <Checkbox name="user-term" value={term} onChange={onChangeTerm}>약관 동의</Checkbox>
-                {termError && <div style={{color: 'red'}}>약관에 동의하셔야 합니다.</div>}
-            </div>
-            <div style={{marginTop: 10}}>
-                <Button type="primary" htmlType="submit" loading={isSigningUp}>가입하기</Button>
-            </div>
-        </Form>
-    </>
+        <DivWrap>
+            <CenterAlignment children={
+                <Form onSubmit={onSubmit} style={{padding: 10}}>
+                    <Form.Item
+                        label='이메일'
+                        rules={[
+                            {
+                                required: true,
+                                message: '이메일을 입력해주세요!',
+                            }
+                        ]}>
+                        <Input name="user-email" value={email} required onChange={onChangeEmail}/>
+                        <Button onClick={onClickChecking} loading={isEmailChecking}>중복확인</Button>
+                        {isEmailOk === true ? <div style={{color: 'green'}}>사용 가능한 이메일입니다.</div> :
+                            (isEmailOk === false ? <div style={{color: 'red'}}>이메일이 중복입니다.</div> : null)}
+                        {emailCheckingErrorReason !== '' ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : null}
+                    </Form.Item>
+
+                    <Form.Item
+                        label='이름'
+                        rules={[
+                            {
+                                required: true,
+                                message: '이름을 입력해주세요!',
+                            }
+                        ]}>
+                        <Input name="user-name" value={name} required onChange={onChangeName}/>
+                    </Form.Item>
+
+                    <Form.Item
+                        label='비밀번호'
+                        rules={[
+                            {
+                                required: true,
+                                message: '비밀번호를 입력해주세요!',
+                            }
+                        ]}>
+                        <Input name="user-password" value={password} type="password" required onChange={onChangePassword}/>
+                    </Form.Item>
+
+                    <Form.Item
+                        label='비밀번호 확인'
+                        rules={[
+                            {
+                                required: true,
+                                message: '비밀번호를 입력해주세요!',
+                            }
+                        ]}>
+                        <Input name="user-password-check" value={passwordCheck} type="password" required onChange={onChangePasswordCheck}/>
+                        {passwordError && <div style={{color: 'red'}}>비밀번호가 일치하지 않습니다.</div>}
+                    </Form.Item>
+
+                    <Form.Item>
+                        <Checkbox name="user-term" value={term} onChange={onChangeTerm}>약관 동의</Checkbox>
+                        {termError && <div style={{color: 'red'}}>약관에 동의하셔야 합니다.</div>}
+                    </Form.Item>
+
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" loading={isSigningUp}>가입하기</Button>
+                    </Form.Item>
+                </Form>
+            }/>
+        </DivWrap>
     )
 };
 

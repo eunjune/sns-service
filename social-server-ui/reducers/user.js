@@ -193,8 +193,7 @@ const reducer = (state = initialState, action) => {
             }
     
             case UNFOLLOW_USER_SUCCESS: {
-                draft.me.followings = draft.me.followings.filter(v=>v.id !== action.data);
-                draft.followings = draft.followings.filter(v => v.id !== action.data);
+                draft.me.followings = draft.me.followings.filter(v=>v !== action.data);
                 break;
             }
     

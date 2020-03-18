@@ -4,6 +4,7 @@ import PostForm from "../components/PostForm";
 import {useDispatch, useSelector} from "react-redux";
 import { LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 import Login from "./login";
+import CenterAlignment from "../components/CenterAlignment";
 
 const Home = () => {
     const {me,loginErrorReason} = useSelector(state => state.user);
@@ -39,12 +40,14 @@ const Home = () => {
     }, [posts]);
 
     return (
-        <div>
-            {me && <PostForm />}
-            {posts.map((post) => {
-                return <PostCards key={post.id} post={post}/>;
-            })}
-        </div>
+        <CenterAlignment children={
+            <div>
+                {me && <PostForm />}
+                {posts.map((post) => {
+                    return <PostCards key={post.id} post={post}/>;
+                })}
+            </div>}/>
+
     );
 };
 

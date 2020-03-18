@@ -2,13 +2,14 @@ import React, {useCallback} from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import {
-    Menu, Input, Button
+    Menu, Input, Button, Col, Row
 } from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
-import LoginForm from './LoginForm';
 import UserProfile from './UserProfile';
 import Router from 'next/router';
 import {LOG_OUT} from "../reducers/user";
+import {DivWrap} from "./styles/ContainerStyle";
+import CenterAlignment from "./CenterAlignment";
 
 const AppLayout = ({ children }) => {
     const { me } = useSelector((state) => state.user);
@@ -28,7 +29,7 @@ const AppLayout = ({ children }) => {
     }, []);
 
     return (
-    <div style={{backgroundColor: '#f8f9fa', height: '100%'}}>
+    <div>
       <Menu mode="horizontal" theme="dark">
 
         <Menu.Item key="home"><Link href="/"><a>SNS</a></Link></Menu.Item>
@@ -69,7 +70,7 @@ const AppLayout = ({ children }) => {
         }
 
       </Menu>
-      {children}
+        {children}
     </div>
     );
 };
