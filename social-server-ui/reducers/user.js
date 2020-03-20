@@ -5,11 +5,14 @@ export const initialState = {
     isEmailOk: null,
     isEmailChecking: false,
     emailCheckingErrorReason: null,
+    isNameOk: null,
+    isNameChecking: false,
+    nameCheckingErrorReason: null,
     isLoggingIn: false,
     loginErrorReason: null,
     isSignedUp: false,
     isSigningUp: false,
-    signUpErrorReason: null,
+    signUpErrorReason: '',
     me: null,
     followings: [],
     followers: [],
@@ -23,6 +26,10 @@ export const initialState = {
 export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
 export const EMAIL_CHECK_SUCCESS = 'EMAIL_CHECK_SUCCESS';
 export const EMAIL_CHECK_FAILURE = 'EMAIL_CHECK_FAILURE';
+
+export const NAME_CHECK_REQUEST = 'NAME_CHECK_REQUEST';
+export const NAME_CHECK_SUCCESS = 'NAME_CHECK_SUCCESS';
+export const NAME_CHECK_FAILURE = 'NAME_CHECK_FAILURE';
 
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
@@ -74,14 +81,14 @@ const reducer = (state = initialState, action) => {
     return produce(state, (draft) => {
         switch (action.type) {
             case EMAIL_CHECK_REQUEST: {
-                draft.isEmailOk = null;
+                draft.isEmailOk = false;
                 draft.isEmailChecking = true;
                 draft.emailCheckingErrorReason = null;
                 break;
             }
     
             case EMAIL_CHECK_SUCCESS: {
-                draft.isEmailOk = action.data;
+                draft.isEmailOk = true;
                 draft.isEmailChecking = false;
                 break;
             }
@@ -89,6 +96,25 @@ const reducer = (state = initialState, action) => {
             case EMAIL_CHECK_FAILURE: {
                 draft.emailCheckingErrorReason = action.error;
                 draft.isEmailChecking = false;
+                break;
+            }
+
+            case NAME_CHECK_REQUEST: {
+                draft.isNameOk = false;
+                draft.isNameChecking = true;
+                draft.nameCheckingErrorReason = null;
+                break;
+            }
+
+            case NAME_CHECK_SUCCESS: {
+                draft.isNameOk = true;
+                draft.isNameChecking = false;
+                break;
+            }
+
+            case NAME_CHECK_FAILURE: {
+                draft.nameCheckingErrorReason = action.error;
+                draft.isNameChecking = false;
                 break;
             }
     

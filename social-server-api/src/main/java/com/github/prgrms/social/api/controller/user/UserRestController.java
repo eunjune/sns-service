@@ -2,17 +2,24 @@ package com.github.prgrms.social.api.controller.user;
 
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.api.request.user.CheckEmailRequest;
+import com.github.prgrms.social.api.model.api.request.user.CheckNameRequest;
 import com.github.prgrms.social.api.model.api.request.user.JoinRequest;
 import com.github.prgrms.social.api.model.api.request.user.SubscribeRequest;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
 import com.github.prgrms.social.api.model.api.response.user.JoinResult;
-import com.github.prgrms.social.api.model.user.*;
+import com.github.prgrms.social.api.model.user.Email;
+import com.github.prgrms.social.api.model.user.Role;
+import com.github.prgrms.social.api.model.user.Subscription;
+import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.user.UserService;
+import com.github.prgrms.social.api.validator.CheckEmailValidator;
+import com.github.prgrms.social.api.validator.CheckNameValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -24,9 +31,12 @@ import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +48,7 @@ import static com.github.prgrms.social.api.model.commons.AttachedFile.toAttached
 @RestController
 @RequestMapping("api")
 @Api(tags = "사용자 APIs")
+@RequiredArgsConstructor
 public class UserRestController {
 
     private final JWT jwt;
@@ -46,34 +57,71 @@ public class UserRestController {
 
     private final ReplyingKafkaTemplate<String, Subscription, Subscription> replyingKafkaTemplate;
 
+    private final CheckEmailValidator checkEmailValidator;
+
+    private final CheckNameValidator checkNameValidator;
+
     @Value("${spring.kafka.topic.request}")
     private String requestTopic;
 
     @Value("${spring.kafka.topic.response}")
     private String responseTopic;
 
-
-    public UserRestController(JWT jwt, UserService userService, ReplyingKafkaTemplate<String, Subscription, Subscription> replyingKafkaTemplate) {
-        this.jwt = jwt;
-        this.userService = userService;
-        this.replyingKafkaTemplate = replyingKafkaTemplate;
+    @InitBinder("checkEmailRequest")
+    public void initEmailCheckBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(checkEmailValidator);
     }
 
-    @PostMapping(path = "user/exists")
+    @InitBinder("checkNameRequest")
+    public void initNameCheckBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(checkNameValidator);
+    }
+
+    @PostMapping(path = "user/exists/email")
     @ApiOperation(value = "이메일 중복확인 (API 토큰 필요없음)")
     public ApiResult<Boolean> checkEmail(
             @ApiParam(value = "example: {\"address\": \"test00@gmail.com\"}")
-            @RequestBody CheckEmailRequest checkEmailRequest
+            @Valid CheckEmailRequest checkEmailRequest,
+            Errors errors
     ) {
-        return OK(userService.findByEmail(checkEmailRequest.emailOf()).isPresent());
+
+        if(errors.hasErrors()) {
+            String message = errors.getFieldError().getDefaultMessage();
+            throw new IllegalArgumentException(message == null ? "" : message);
+        }
+
+        return OK(true);
+    }
+
+    @PostMapping(path = "user/exists/name")
+    @ApiOperation(value = "이름 중복확인 (API 토큰 필요없음)")
+    public ApiResult<Boolean> checkName(
+            @ApiParam(value = "example: {\"name\": \"test00\"}")
+            @Valid CheckNameRequest checkNameRequest,
+            Errors errors
+    ) {
+
+        if(errors.hasErrors()) {
+            String message = errors.getFieldError().getDefaultMessage();
+            throw new IllegalArgumentException(message == null ? "" : message);
+        }
+
+        return OK(true);
     }
 
     @PostMapping(path = "user/join", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "회원가입 (API 토큰 필요없음)")
     public ApiResult<JoinResult> join(
-            @ModelAttribute JoinRequest joinRequest,
-            @RequestPart(required = false) MultipartFile file
+            @RequestPart(required = false) MultipartFile file,
+            @Valid JoinRequest joinRequest,
+            Errors errors
     ) throws IOException {
+
+        if(errors.hasErrors()) {
+            String message = errors.getFieldError().getDefaultMessage();
+            throw new IllegalArgumentException(message == null ? "" : message);
+        }
+
         User user = userService.join(
                 joinRequest.getName(),
                 new Email(joinRequest.getAddress()),

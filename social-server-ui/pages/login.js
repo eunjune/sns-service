@@ -45,7 +45,7 @@ const Login = () => {
     return (
         <DivWrap>
             <CenterAlignment children={
-                <Form onSubmit={onSubmitForm} style={{paddingTop: '50%', paddingLeft: 10, paddingRight: 10, paddingBottom: 10}}>
+                <Form onSubmit={onSubmitForm} style={{maxWidth: '500px', padding: 50}}>
                     <Form.Item
                         label='이메일'
                         rules={[

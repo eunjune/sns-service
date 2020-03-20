@@ -113,7 +113,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/user/join").permitAll()
                 .antMatchers("/api/post/{tag}/list").permitAll()
                 .antMatchers("/api/user/post/list").permitAll()
-                .antMatchers("/api/user/exists").permitAll()
+                .antMatchers("/api/user/exists/**").permitAll()
                 .antMatchers("/api/_hcheck").permitAll()
                 .antMatchers("/api/**").hasRole("USER")
                 .accessDecisionManager(accessDecisionManager())

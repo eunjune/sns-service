@@ -7,6 +7,7 @@ import { LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWING_REQUEST, UNFOLLOW_USER_REQUEST, R
 import { LOAD_USER_POSTS_REQUEST, LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 import PostCards from '../components/PostCards';
 import FollowList from "../components/FollowList";
+import CenterAlignment from "../components/CenterAlignment";
 
 const Profile = () => {
 
@@ -61,31 +62,35 @@ const Profile = () => {
         })
     },[followers])
 
-    return <>
-            <div>
-                <NameEditForm/>
-                <FollowList
-                    header="팔로잉 목록"
-                    hasMore={hasMoreFollowing}
-                    onClickMore={loadMoreFollowings}
-                    onClickStop={onUnfollow}
-                    data={followings}
-                />
-
-                <FollowList
-                    header="팔로워 목록"
-                    hasMore={hasMoreFollower}
-                    onClickMore={loadMoreFollowers}
-                    onClickStop={onRemoveFollower}
-                    data={followers}
-                />
+    return (
+            <CenterAlignment>
                 <div>
-                    {posts.map((p) => (
-                        <PostCards key={+p.id} post={p} />
-                    ))}
+                    <NameEditForm/>
+                    <FollowList
+                        header="팔로잉 목록"
+                        hasMore={hasMoreFollowing}
+                        onClickMore={loadMoreFollowings}
+                        onClickStop={onUnfollow}
+                        data={followings}
+                    />
+
+                    <FollowList
+                        header="팔로워 목록"
+                        hasMore={hasMoreFollower}
+                        onClickMore={loadMoreFollowers}
+                        onClickStop={onRemoveFollower}
+                        data={followers}
+                    />
+                    <div>
+                        {posts.map((p) => (
+                            <PostCards key={+p.id} post={p} />
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </>
+
+            </CenterAlignment>
+    );
+
 };
 
 Profile.getInitialProps = async(context) => {

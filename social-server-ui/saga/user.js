@@ -10,18 +10,38 @@ import {
     EMAIL_CHECK_REQUEST,
     EMAIL_CHECK_SUCCESS,
     EMAIL_CHECK_FAILURE,
-    LOAD_USER_REQUEST, LOAD_USER_SUCCESS, LOAD_USER_FAILURE, 
-    LOAD_ME_REQUEST, LOAD_ME_SUCCESS, LOAD_ME_FAILURE,
-    FOLLOW_USER_REQUEST,FOLLOW_USER_SUCCESS,FOLLOW_USER_FAILURE,
-    UNFOLLOW_USER_REQUEST,UNFOLLOW_USER_SUCCESS,UNFOLLOW_USER_FAILURE, 
-    LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWER_SUCCESS, LOAD_FOLLOWER_FAILURE, 
-    REMOVE_FOLLOWER_FAILURE, REMOVE_FOLLOWER_REQUEST, REMOVE_FOLLOWER_SUCCESS,
-    LOAD_FOLLOWING_REQUEST, LOAD_FOLLOWING_FAILURE, LOAD_FOLLOWING_SUCCESS, EDIT_NAME_REQUEST, EDIT_NAME_FAILURE, EDIT_NAME_SUCCESS
+    LOAD_USER_REQUEST,
+    LOAD_USER_SUCCESS,
+    LOAD_USER_FAILURE,
+    LOAD_ME_REQUEST,
+    LOAD_ME_SUCCESS,
+    LOAD_ME_FAILURE,
+    FOLLOW_USER_REQUEST,
+    FOLLOW_USER_SUCCESS,
+    FOLLOW_USER_FAILURE,
+    UNFOLLOW_USER_REQUEST,
+    UNFOLLOW_USER_SUCCESS,
+    UNFOLLOW_USER_FAILURE,
+    LOAD_FOLLOWER_REQUEST,
+    LOAD_FOLLOWER_SUCCESS,
+    LOAD_FOLLOWER_FAILURE,
+    REMOVE_FOLLOWER_FAILURE,
+    REMOVE_FOLLOWER_REQUEST,
+    REMOVE_FOLLOWER_SUCCESS,
+    LOAD_FOLLOWING_REQUEST,
+    LOAD_FOLLOWING_FAILURE,
+    LOAD_FOLLOWING_SUCCESS,
+    EDIT_NAME_REQUEST,
+    EDIT_NAME_FAILURE,
+    EDIT_NAME_SUCCESS,
+    NAME_CHECK_SUCCESS, NAME_CHECK_FAILURE, NAME_CHECK_REQUEST
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
-function emailCheckAPI(email) {
-    return axios.post('user/exists', email)
+function emailCheckAPI(address) {
+    const formData = new FormData();
+    formData.append('address', address);
+    return axios.post('user/exists/email', formData);
 }
 
 function* emailCheck(action) {
@@ -31,17 +51,41 @@ function* emailCheck(action) {
             type: EMAIL_CHECK_SUCCESS,
             data: !result.data.response,
         });
-    } catch (e) { // 실패
-        console.error(e);
+    } catch (error) { // 실패
         yield put({
             type: EMAIL_CHECK_FAILURE,
-            error: '이메일 형식이 맞지 않습니다.',
+            error: error.response.data.error.message,
         });
     }
 }
 
 function* watchEmailCheck() {
     yield takeLatest(EMAIL_CHECK_REQUEST, emailCheck);
+}
+
+function nameCheckAPI(name) {
+    const formData = new FormData();
+    formData.append('name', name);
+    return axios.post('user/exists/name', formData);
+}
+
+function* nameCheck(action) {
+    try {
+        const result = yield call(nameCheckAPI, action.data);
+        yield put({
+            type: NAME_CHECK_SUCCESS,
+            data: !result.data.response,
+        });
+    } catch (error) { // 실패
+        yield put({
+            type: NAME_CHECK_FAILURE,
+            error: error.response.data.error.message,
+        });
+    }
+}
+
+function* watchNameCheck() {
+    yield takeLatest(NAME_CHECK_REQUEST, nameCheck);
 }
 
 
@@ -67,7 +111,7 @@ function* signUp(action) {
         console.error(e);
         yield put({
             type: SIGN_UP_FAILURE,
-            error: e
+            error: e.response.data.error.message,
         });
     }
 }
@@ -339,6 +383,7 @@ function* watchEditName() {
 export default function* userSaga() {
     yield all([
         fork(watchEmailCheck),
+        fork(watchNameCheck),
         fork(watchLogin),
         fork(watchSignUp),
         fork(watchLoadUser),

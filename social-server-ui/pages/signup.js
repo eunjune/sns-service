@@ -1,7 +1,7 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import { Form, Button, Input, Checkbox } from 'antd';
 import {
-    EMAIL_CHECK_REQUEST,
+    EMAIL_CHECK_REQUEST, NAME_CHECK_REQUEST,
     SIGN_UP_REQUEST,
 } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +22,7 @@ const Signup = () => {
 
   const dispatch = useDispatch();
     const { isEmailOk, isEmailChecking, emailCheckingErrorReason } = useSelector((state) => state.user);
+    const { isNameOk, isNameChecking, nameCheckingErrorReason } = useSelector((state) => state.user);
     const { isSigningUp, signUpErrorReason } = useSelector((state) => state.user);
     const { me } = useSelector((state) => state.user);
 
@@ -30,7 +31,12 @@ const Signup = () => {
             alert('회원가입 성공');
             Router.push('/');
         }
-    }, [me && me.id]);
+
+        if(signUpErrorReason && signUpErrorReason.length() > 0) {
+            alert(signUpErrorReason);
+        }
+
+    }, [me && me.id, signUpErrorReason]);
 
     const onSubmit = useCallback((e) => {
         e.preventDefault();
@@ -79,26 +85,36 @@ const Signup = () => {
         setTerm(e.target.value);
     }, []);
 
-    const onClickChecking = useCallback((e) => {
-        if (email == null) {
+    const onBlurEmail = useCallback((e) => {
+        if (email == null || email === '') {
             return;
         }
         dispatch({
             type: EMAIL_CHECK_REQUEST,
-            data: {
-                address: email,
-            },
+            data: email,
     });
     }, [email]);
+
+    const onBlurName = useCallback((e) => {
+        if (name == null || name === '') {
+            return;
+        }
+        dispatch({
+            type: NAME_CHECK_REQUEST,
+            data: name,
+        });
+    }, [name]);
 
     if(me) {
         return null;
     }
 
+
+
     return (
         <DivWrap>
             <CenterAlignment children={
-                <Form onSubmit={onSubmit} style={{padding: 10}}>
+                <Form onSubmit={onSubmit} style={{padding: 50}}>
                     <Form.Item
                         label='이메일'
                         rules={[
@@ -107,11 +123,9 @@ const Signup = () => {
                                 message: '이메일을 입력해주세요!',
                             }
                         ]}>
-                        <Input name="user-email" value={email} required onChange={onChangeEmail}/>
-                        <Button onClick={onClickChecking} loading={isEmailChecking}>중복확인</Button>
+                        <Input name="user-email" value={email} required onChange={onChangeEmail} onBlur={onBlurEmail}/>
                         {isEmailOk === true ? <div style={{color: 'green'}}>사용 가능한 이메일입니다.</div> :
-                            (isEmailOk === false ? <div style={{color: 'red'}}>이메일이 중복입니다.</div> : null)}
-                        {emailCheckingErrorReason !== '' ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : null}
+                            (isEmailOk === false ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : null)}
                     </Form.Item>
 
                     <Form.Item
@@ -122,7 +136,9 @@ const Signup = () => {
                                 message: '이름을 입력해주세요!',
                             }
                         ]}>
-                        <Input name="user-name" value={name} required onChange={onChangeName}/>
+                        <Input name="user-name" value={name} required onChange={onChangeName} onBlur={onBlurName}/>
+                        {isNameOk === true ? <div style={{color: 'green'}}>사용 가능한 이름입니다.</div> :
+                            (isNameOk === false ? <div style={{color: 'red'}}>{nameCheckingErrorReason}</div> : null)}
                     </Form.Item>
 
                     <Form.Item

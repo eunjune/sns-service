@@ -90,6 +90,7 @@ public class PostService {
                     user.addLike(like);
                     post.incrementAndGetLikes(like);
                     postLikeRepository.save(like);
+
                 }
             return post;
         });

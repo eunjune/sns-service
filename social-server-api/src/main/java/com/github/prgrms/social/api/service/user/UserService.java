@@ -12,6 +12,7 @@ import com.github.prgrms.social.api.repository.user.JpaConnectedUserRepository;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
 import com.github.prgrms.social.api.repository.user.projection.ConnectedId;
 import com.google.common.eventbus.EventBus;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
     private final S3Client s3Client;
@@ -40,14 +42,6 @@ public class UserService {
     private final JpaConnectedUserRepository connectedUserRepository;
 
     private final EventBus eventBus;
-
-    public UserService(S3Client s3Client, PasswordEncoder passwordEncoder, JpaUserRepository userRepository, JpaConnectedUserRepository connectedUserRepository, EventBus eventBus) {
-        this.s3Client = s3Client;
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-        this.connectedUserRepository = connectedUserRepository;
-        this.eventBus = eventBus;
-    }
 
     // S3에 이미지 업로드
     private String uploadProfileImage(AttachedFile profileFile) {

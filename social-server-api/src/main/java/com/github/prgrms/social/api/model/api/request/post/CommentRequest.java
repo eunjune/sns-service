@@ -4,10 +4,7 @@ import com.github.prgrms.social.api.model.post.Comment;
 import lombok.*;
 
 // 댓글작성 요청 데이터를 받는 DTO
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-@ToString
+@Data
 public class CommentRequest {
 
     private String content;

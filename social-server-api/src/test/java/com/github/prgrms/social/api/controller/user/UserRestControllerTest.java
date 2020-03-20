@@ -5,20 +5,19 @@ import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.user.UserService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -27,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -37,9 +37,6 @@ class UserRestControllerTest {
     MockMvc mockMvc;
 
     @Autowired
-    EntityManager entityManager;
-
-    @MockBean
     UserService userService;
 
     @Value("${jwt.token.issuer}") String issuer;
@@ -47,69 +44,96 @@ class UserRestControllerTest {
     @Value("${jwt.token.expirySeconds}") int expirySeconds;
     @Value("${jwt.token.header}") String tokenHeader;
 
+    @DisplayName("이메일 확인 성공")
     @Test
     void checkEmail() throws Exception {
 
-        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).id(1L).build();
-
-        given(userService.findByEmail(new Email("test@gmail.com"))).willReturn(Optional.ofNullable(user));
-
-        mockMvc.perform(post("/api/user/exists")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"address\" : \"test@gmail.com\"}"))
+        mockMvc.perform(post("/api/user/exists/email")
+                .param("address","test@gmail.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("response").value("true"))
                 .andDo(print());
-
-        then(userService).should().findByEmail(any());
     }
 
+    @DisplayName("이메일 확인 실패 - 이메일 형식 아님")
     @Test
     void checkEmailFail() throws Exception {
 
-        given(userService.findByEmail(new Email("test@gmail.com"))).willReturn(Optional.empty());
-
-        mockMvc.perform(post("/api/user/exists")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"address\" : \"test@gmail.com\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("response").value("false"))
-                .andDo(print());
-
-        then(userService).should().findByEmail(any());
-    }
-
-    @Test
-    void emailMismatch() throws Exception {
-        mockMvc.perform(post("/api/user/exists")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"address\" : \"testm\"}"))
+        mockMvc.perform(post("/api/user/exists/email")
+                .param("address","test"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("success").value("false"))
                 .andDo(print());
 
-        then(userService).shouldHaveNoMoreInteractions();
+
     }
 
+    @DisplayName("이메일 확인 실패 - 이메일 중복")
+    @Test
+    void checkEmailFailOverlap() throws Exception {
+
+        userService.join("name",new Email("test@gmail.com"),"12345678", null);
+
+        mockMvc.perform(post("/api/user/exists/email")
+                .param("address","test@gmail.com"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("success").value("false"))
+                .andDo(print());
+    }
+
+    @DisplayName("이름 확인 성공")
+    @Test
+    void checkName() throws Exception {
+
+        mockMvc.perform(post("/api/user/exists/name")
+                .param("name","test"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("response").value("true"))
+                .andDo(print());
+    }
+
+    @DisplayName("이름 확인 실패")
+    @Test
+    void checkNameFail() throws Exception {
+
+        userService.join("name",new Email("test@gmail.com"),"12345678", null);
+
+        mockMvc.perform(post("/api/user/exists/name")
+                .param("name","test"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("success").value("false"))
+                .andDo(print());
+    }
+
+    @DisplayName("회원가입 성공")
     @Test
     void join() throws Exception {
-
-        JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-
-        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).id(1L).build();
-
-        given(userService.join("test",new Email("test@gmail.com"), "1234", null)).willReturn(user);
 
         MockMultipartFile file = new MockMultipartFile("file", (byte[]) null);
 
         mockMvc.perform(multipart("/api/user/join")
                 .file(file)
-                .param("name","test").param("principal","test@gmail.com").param("credentials","1234"))
+                .param("name","test").param("address","test@gmail.com").param("password","12345678"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.apiToken").value(user.newApiToken(jwt, new String[]{Role.USER.getValue()})))
+                .andExpect(jsonPath("$.success").value(true))
                 .andDo(print());
 
-        then(userService).should().join(any(),any(),any(),any());
+        assertNotEquals(userService.findByEmail(new Email("test@gmail.com")).orElse(null).getPassword(), "12345678");
+    }
+
+    @DisplayName("회원가입 실패")
+    @Test
+    void joinFail() throws Exception {
+
+        MockMultipartFile file = new MockMultipartFile("file", (byte[]) null);
+
+        mockMvc.perform(multipart("/api/user/join")
+                .file(file)
+                .param("name","test").param("address","test").param("password","12345678"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andDo(print());
+
     }
 
     @Test

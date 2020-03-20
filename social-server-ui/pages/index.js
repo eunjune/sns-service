@@ -41,7 +41,7 @@ const Home = () => {
 
     return (
         <CenterAlignment children={
-            <div>
+            <div className='index'>
                 {me && <PostForm />}
                 {posts.map((post) => {
                     return <PostCards key={post.id} post={post}/>;
