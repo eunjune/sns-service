@@ -2,15 +2,14 @@ import React, {useCallback} from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import {
-    Menu, Input, Button, Dropdown,
+    Menu, Input, Dropdown, Avatar,
 } from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
-import UserProfile from './UserProfile';
 import Router from 'next/router';
 import {LOG_OUT} from "../reducers/user";
-import {DivWrap} from "./styles/ContainerStyle";
-import CenterAlignment from "./CenterAlignment";
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined,BellOutlined } from '@ant-design/icons';
+import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
+import {MenuItem} from "./styles/MenuItemStyle";
 
 const AppLayout = ({ children }) => {
     const { me } = useSelector((state) => state.user);
@@ -33,35 +32,35 @@ const AppLayout = ({ children }) => {
     <div>
       <Menu mode="horizontal" theme="dark">
 
-        <Menu.Item key="home"><Link href="/"><a>SNS</a></Link></Menu.Item>
-        <Menu.Item key="mail">
+        <MenuItem key="home"><Link href="/"><a>SNS</a></Link></MenuItem>
+        <MenuItem key="mail" >
           <Input.Search
               style={{width: 400,  verticalAlign: 'middle' }}
               onSearch={onSearch}
           />
-        </Menu.Item>
+        </MenuItem>
 
         {
             !me &&
-          <Menu.Item key="signup" style={{ float: 'right' }}>
+          <MenuItem key="signup" style={{ float: 'right'}}>
             <Link href="/signup" prefetch><a>회원가입</a></Link>
-          </Menu.Item>
+          </MenuItem>
         }
 
         {
           !me &&
-          <Menu.Item key="login" style={{ float: 'right' }}>
+          <MenuItem key="login" style={{ float: 'right'}}>
             <Link href="/login" prefetch><a>로그인</a></Link>
-          </Menu.Item>
+          </MenuItem>
         }
-
 
         {
           me &&
-          <Menu.Item key="profile" style={{ float: 'right' }}>
+          <MenuItem key="profile" style={{ float: 'right' }}>
               <Dropdown overlay={
                   <Menu>
                       <Menu.Item key="0">
+
                           <Link href="/profile" prefetch><a>프로필</a></Link>
                       </Menu.Item>
                       <Menu.Divider />
@@ -74,11 +73,18 @@ const AppLayout = ({ children }) => {
                   </Menu>
               } trigger={['click']}>
                   <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                      프로필 <DownOutlined  />
+                      <Avatar shape="square" size="small" icon={<UserOutlined style={{marginRight: 0}} />} /> <DownOutlined  />
                   </a>
               </Dropdown>
-          </Menu.Item>
+          </MenuItem>
         }
+
+          {
+              me &&
+              <MenuItem key="notification" style={{ float: 'right', padding: 0}}>
+                <BellOutlined style={{margin: 'auto'}}/>
+              </MenuItem>
+          }
 
       </Menu>
         {children}
