@@ -1,5 +1,6 @@
 import cookie from 'react-cookies';
 import produce from 'immer';
+import Router from "next/router";
 
 export const initialState = {
     isEmailOk: null,
@@ -17,8 +18,8 @@ export const initialState = {
     followings: [],
     followers: [],
     user: null,
-    isEditingName: false,
-    editNameErrorReason: '',
+    isEditing: false,
+    editErrorReason: '',
     hasMoreFollower: false,
     hasMoreFollowing: false,
 };
@@ -172,6 +173,8 @@ const reducer = (state = initialState, action) => {
             case LOG_OUT: {
                 cookie.remove('token', { path: '/' });
                 draft.me = null;
+
+                Router.push("/");
                 break;
             }
     

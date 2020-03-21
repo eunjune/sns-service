@@ -20,13 +20,9 @@ const AppLayout = ({ children }) => {
 
 
     const onLogout = useCallback(() => {
-
-        Router.push('/');
         dispatch({
             type: LOG_OUT,
         });
-
-
     }, []);
 
     return (

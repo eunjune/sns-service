@@ -12,15 +12,15 @@ import {LockOutlined, UserOutlined} from "@ant-design/icons";
 
 const Signup = () => {
 
-  const [email, setEmail] = useState('');
+    const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [passwordCheck, setPasswordCheck] = useState('');
-    const [term, setTerm] = useState(true);
     const [passwordError, setPasswordError] = useState(false);
+    const [term, setTerm] = useState(true);
     const [termError, setTermError] = useState(false);
 
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const { isEmailOk, isEmailChecking, emailCheckingErrorReason } = useSelector((state) => state.user);
     const { isNameOk, isNameChecking, nameCheckingErrorReason } = useSelector((state) => state.user);
     const { isSigningUp, signUpErrorReason } = useSelector((state) => state.user);
