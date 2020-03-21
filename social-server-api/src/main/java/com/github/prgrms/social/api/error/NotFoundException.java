@@ -9,6 +9,10 @@ public class NotFoundException extends ServiceRuntimeException {
     static final String MESSAGE_KEY = "error.notfound";
     static final String MESSAGE_DETAILS = "error.notfound.details";
 
+    public NotFoundException(String message) {
+        super(message);
+    }
+
     public NotFoundException(Class cls, Object... values) {
         this(cls.getSimpleName(), values);
     }
@@ -19,8 +23,13 @@ public class NotFoundException extends ServiceRuntimeException {
 
     @Override
     public String getMessage() {
-        return MessageUtils.getInstance().getMessage(getDetailKey(), getParams());
+        return super.getMessage();
     }
+
+    /*@Override
+    public String getMessage() {
+        return MessageUtils.getInstance().getMessage(getDetailKey(), getParams());
+    }*/
 
     @Override
     public String toString() {

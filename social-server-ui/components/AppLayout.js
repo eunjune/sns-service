@@ -18,6 +18,7 @@ const AppLayout = ({ children }) => {
         Router.push({pathname: '/hashtag', query: {tag: value}}, `/hashtag/${value}`);
     };
 
+
     const onLogout = useCallback(() => {
 
         Router.push('/');

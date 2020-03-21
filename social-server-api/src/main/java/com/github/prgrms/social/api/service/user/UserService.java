@@ -95,14 +95,14 @@ public class UserService {
                 .map(user -> {
 
                     if (!passwordEncoder.matches(password, user.getPassword()))
-                        throw new IllegalArgumentException("Bad credential");
+                        throw new IllegalArgumentException("비밀번호가 틀립니다");
 
                     user.afterLoginSuccess();
                     userRepository.save(user);
 
                     return user;
 
-        }).orElseThrow(() -> new NotFoundException(User.class, email));
+        }).orElseThrow(() -> new NotFoundException("이메일이 존재하지 않습니다"));
     }
 
     @Transactional(readOnly = true)

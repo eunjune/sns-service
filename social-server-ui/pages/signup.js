@@ -170,7 +170,7 @@ const Signup = () => {
                     </Form.Item>
 
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" loading={isSigningUp}>가입하기</Button>
+                        <Button type="primary" htmlType="submit" loading={isSigningUp} style={{width: '100%'}}>가입하기</Button>
                     </Form.Item>
                 </Form>
             }/>

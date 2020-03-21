@@ -12,12 +12,11 @@ const Login = () => {
     const {me} = useSelector(state=>state.user);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {isLoggingIn} = useSelector(state => state.user);
+    const {isLoggingIn, loginErrorReason} = useSelector(state => state.user);
     const dispatch = useDispatch();
 
     useEffect(() => {
         if(me) {
-            alert('로그인이 되어있습니다.');
             Router.push('/');
         }
     },[me]);
@@ -31,7 +30,6 @@ const Login = () => {
                 password: password,
             }
         });
-        Router.push('/');
     }, [email, password]);
 
     const onChangeEmail = (e) => {
@@ -55,6 +53,7 @@ const Login = () => {
                             }
                         ]}>
                         <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="이메일" name="user-email" value={email} onChange={onChangeEmail}/>
+
                     </Form.Item>
 
                     <Form.Item
@@ -74,6 +73,8 @@ const Login = () => {
                         <a className="login-form-forgot" href="" style={{float: 'right'}}>
                             Forgot password
                         </a>
+
+                        {loginErrorReason.length > 0 ? <div style={{color: 'red'}}>{loginErrorReason}</div> : null}
                     </Form.Item>
                 </Form>
 

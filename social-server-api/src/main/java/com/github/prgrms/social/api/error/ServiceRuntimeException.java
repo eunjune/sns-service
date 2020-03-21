@@ -8,6 +8,10 @@ public abstract class  ServiceRuntimeException extends RuntimeException {
 
     private Object[] params;
 
+    public ServiceRuntimeException(String message) {
+        super(message);
+    }
+
     public ServiceRuntimeException(String messageKey, String detailKey, Object[] params) {
         this.messageKey = messageKey;
         this.detailKey = detailKey;

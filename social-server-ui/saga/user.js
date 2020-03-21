@@ -136,7 +136,7 @@ function* login(action) {
         console.error(e);
         yield put({
             type: LOG_IN_FAILURE,
-            error: e,
+            error: e.response.data.error.message,
         });
     }
 }

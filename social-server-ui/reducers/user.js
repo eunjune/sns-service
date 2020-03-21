@@ -9,7 +9,7 @@ export const initialState = {
     isNameChecking: false,
     nameCheckingErrorReason: null,
     isLoggingIn: false,
-    loginErrorReason: null,
+    loginErrorReason: '',
     isSignedUp: false,
     isSigningUp: false,
     signUpErrorReason: '',
@@ -147,7 +147,7 @@ const reducer = (state = initialState, action) => {
             case LOG_IN_REQUEST: {
                 cookie.remove('token', { path: '/' });
                 draft.isLoggingIn = true;
-                draft.loginErrorReason = null;
+                draft.loginErrorReason = '';
                 break;
             }
     

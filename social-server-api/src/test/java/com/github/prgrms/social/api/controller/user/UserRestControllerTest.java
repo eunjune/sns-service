@@ -11,22 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -39,17 +33,21 @@ class UserRestControllerTest {
     @Autowired
     UserService userService;
 
-    @Value("${jwt.token.issuer}") String issuer;
-    @Value("${jwt.token.clientSecret}") String clientSecret;
-    @Value("${jwt.token.expirySeconds}") int expirySeconds;
-    @Value("${jwt.token.header}") String tokenHeader;
+    @Value("${jwt.token.issuer}")
+    String issuer;
+    @Value("${jwt.token.clientSecret}")
+    String clientSecret;
+    @Value("${jwt.token.expirySeconds}")
+    int expirySeconds;
+    @Value("${jwt.token.header}")
+    String tokenHeader;
 
     @DisplayName("이메일 확인 성공")
     @Test
     void checkEmail() throws Exception {
 
         mockMvc.perform(post("/api/user/exists/email")
-                .param("address","test@gmail.com"))
+                .param("address", "test@gmail.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("response").value("true"))
                 .andDo(print());
@@ -60,7 +58,7 @@ class UserRestControllerTest {
     void checkEmailFail() throws Exception {
 
         mockMvc.perform(post("/api/user/exists/email")
-                .param("address","test"))
+                .param("address", "test"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("success").value("false"))
                 .andDo(print());
@@ -72,10 +70,10 @@ class UserRestControllerTest {
     @Test
     void checkEmailFailOverlap() throws Exception {
 
-        userService.join("name",new Email("test@gmail.com"),"12345678", null);
+        userService.join("name", new Email("test@gmail.com"), "12345678", null);
 
         mockMvc.perform(post("/api/user/exists/email")
-                .param("address","test@gmail.com"))
+                .param("address", "test@gmail.com"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("success").value("false"))
                 .andDo(print());
@@ -86,7 +84,7 @@ class UserRestControllerTest {
     void checkName() throws Exception {
 
         mockMvc.perform(post("/api/user/exists/name")
-                .param("name","test"))
+                .param("name", "test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("response").value("true"))
                 .andDo(print());
@@ -96,10 +94,10 @@ class UserRestControllerTest {
     @Test
     void checkNameFail() throws Exception {
 
-        userService.join("name",new Email("test@gmail.com"),"12345678", null);
+        userService.join("name", new Email("test@gmail.com"), "12345678", null);
 
         mockMvc.perform(post("/api/user/exists/name")
-                .param("name","test"))
+                .param("name", "test"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("success").value("false"))
                 .andDo(print());
@@ -113,7 +111,7 @@ class UserRestControllerTest {
 
         mockMvc.perform(multipart("/api/user/join")
                 .file(file)
-                .param("name","test").param("address","test@gmail.com").param("password","12345678"))
+                .param("name", "test").param("address", "test@gmail.com").param("password", "12345678"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andDo(print());
@@ -129,28 +127,70 @@ class UserRestControllerTest {
 
         mockMvc.perform(multipart("/api/user/join")
                 .file(file)
-                .param("name","test").param("address","test").param("password","12345678"))
+                .param("name", "test").param("address", "test").param("password", "12345678"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andDo(print());
 
     }
 
+    @DisplayName("유저 정보를 가져온다")
     @Test
     void me() throws Exception {
+        User user = User.builder().name("test").password("12345678").email(new Email("test@gmail.com")).id(1L).build();
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-
-        User user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).id(1L).build();
         String apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
 
-        given(userService.findById(1L)).willReturn(Optional.ofNullable(user));
+        userService.join("name", new Email("test@gmail.com"), "12345678", null);
 
-        mockMvc.perform(get("/api/user/me").header(tokenHeader,apiToken))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.response.id()").value(1L))
-                        .andDo(print());
+        mockMvc.perform(get("/api/user/me").header(tokenHeader, apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.id").value(1L))
+                .andDo(print());
 
-        then(userService).should(times(1)).findById(any());
+    }
+
+
+    @DisplayName("로그인 성공")
+    @Test
+    void login() throws Exception {
+        userService.join("name",new Email("test@gmail.com"),"12345678", null);
+
+        mockMvc.perform(post("/api/auth")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"address\" : \"test@gmail.com\", \"password\" : \"12345678\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.token").isNotEmpty())
+                .andExpect(jsonPath("$.response.user").isNotEmpty())
+                .andDo(print());
+
+    }
+
+    @DisplayName("로그인 실패 - 이메일 존재하지 않음")
+    @Test
+    void loginFailEmail() throws Exception {
+
+        mockMvc.perform(post("/api/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"address\" : \"test@gmail.com\", \"password\" : \"12345678\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value("false"))
+                .andDo(print());
+
+    }
+
+    @DisplayName("로그인 실패 - 비밀번호 틀림")
+    @Test
+    void loginFailPassword() throws Exception {
+        userService.join("name",new Email("test@gmail.com"),"12345678", null);
+
+        mockMvc.perform(post("/api/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"address\" : \"test@gmail.com\", \"password\" : \"11111111\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value("false"))
+                .andDo(print());
+
     }
 
 }
