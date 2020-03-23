@@ -1,10 +1,7 @@
 package com.github.prgrms.social.api.controller.user;
 
 import com.github.prgrms.social.api.error.NotFoundException;
-import com.github.prgrms.social.api.model.api.request.user.CheckEmailRequest;
-import com.github.prgrms.social.api.model.api.request.user.CheckNameRequest;
-import com.github.prgrms.social.api.model.api.request.user.JoinRequest;
-import com.github.prgrms.social.api.model.api.request.user.SubscribeRequest;
+import com.github.prgrms.social.api.model.api.request.user.*;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
 import com.github.prgrms.social.api.model.api.response.user.JoinResult;
 import com.github.prgrms.social.api.model.user.Email;
@@ -16,6 +13,7 @@ import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.user.UserService;
 import com.github.prgrms.social.api.validator.CheckEmailValidator;
 import com.github.prgrms.social.api.validator.CheckNameValidator;
+import com.github.prgrms.social.api.validator.CheckProfileValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -61,6 +59,8 @@ public class UserRestController {
 
     private final CheckNameValidator checkNameValidator;
 
+    private final CheckProfileValidator checkProfileValidator;
+
     @Value("${spring.kafka.topic.request}")
     private String requestTopic;
 
@@ -75,6 +75,11 @@ public class UserRestController {
     @InitBinder("checkNameRequest")
     public void initNameCheckBinder(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(checkNameValidator);
+    }
+
+    @InitBinder("profileRequest")
+    public void initProfileCheckBinder(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(checkProfileValidator);
     }
 
     @PostMapping(path = "user/exists/email")
@@ -170,15 +175,23 @@ public class UserRestController {
         );
     }
 
-    @PatchMapping(path = "user/{name}")
-    @ApiOperation(value = "이름 수정")
-    public ApiResult<User> name(
+    @PutMapping(path = "user/profile")
+    @ApiOperation(value = "유저 정보 수정")
+    public ApiResult<User> updateProfile(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable String name
+            @Valid ProfileRequest profileRequest,
+            Errors errors
     ) {
-        return OK(userService.updateName(authentication.id.getValue(), name));
+
+        if(errors.hasErrors()) {
+            String message = errors.getFieldError().getDefaultMessage();
+            throw new IllegalArgumentException(message == null ? "" : message);
+        }
+
+        return OK(userService.updateProfile(authentication.id.getValue(), profileRequest));
 
     }
+
 
     @GetMapping(path = "user/{id}")
     @ApiOperation(value = "다른 사람 정보")

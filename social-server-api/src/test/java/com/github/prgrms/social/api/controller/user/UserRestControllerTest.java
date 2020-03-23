@@ -3,8 +3,10 @@ package com.github.prgrms.social.api.controller.user;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
+import com.github.prgrms.social.api.repository.user.JpaUserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.user.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ class UserRestControllerTest {
     @Autowired
     UserService userService;
 
+    @Autowired
+    JpaUserRepository userRepository;
+
     @Value("${jwt.token.issuer}")
     String issuer;
     @Value("${jwt.token.clientSecret}")
@@ -41,6 +46,17 @@ class UserRestControllerTest {
     int expirySeconds;
     @Value("${jwt.token.header}")
     String tokenHeader;
+
+    User user;
+
+    String apiToken;
+
+    @BeforeEach
+    void setup() {
+        JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
+        user = User.builder().name("test").password("12345678").email(new Email("test@gmail.com")).id(1L).build();
+        apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
+    }
 
     @DisplayName("이메일 확인 성공")
     @Test
@@ -193,4 +209,40 @@ class UserRestControllerTest {
 
     }
 
+    @DisplayName("프로필 수정 - 성공")
+    @Test
+    void updateProfile() throws Exception {
+
+        userService.join("test", new Email("test@gmail.com"), "12345678", null);
+        User user = userRepository.findByName("test").orElse(null);
+
+        String previousPassword = userRepository.findByName("test").orElse(null).getPassword();
+        mockMvc.perform(put("/api/user/profile")
+                        .header(tokenHeader, apiToken)
+                        .param("name","testupdate")
+                        .param("password","87654321"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.name").value("testupdate"))
+                .andDo(print());
+
+
+        User updatedUser = userRepository.findById(user.getId()).orElse(null);
+        assertNotEquals(user.getName(), updatedUser.getName());
+        assertNotEquals(user.getPassword(), updatedUser.getPassword());
+    }
+
+    @DisplayName("프로필 수정 - 실패")
+    @Test
+    void updateProfileFail() throws Exception {
+
+        userService.join("test", new Email("test@gmail.com"), "12345678", null);
+
+        mockMvc.perform(put("/api/user/profile")
+                   .header(tokenHeader, apiToken)
+                    .param("name","")
+//                   .param("password","")
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
 }

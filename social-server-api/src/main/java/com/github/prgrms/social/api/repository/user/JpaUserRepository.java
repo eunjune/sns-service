@@ -18,6 +18,9 @@ public interface JpaUserRepository extends JpaRepository<User,Long>{
     Optional<User> findByEmail(Email email);
 
     @Transactional(readOnly = true)
+    Optional<User> findByName(String name);
+
+    @Transactional(readOnly = true)
     boolean existsByEmail(Email email);
 
     @Transactional(readOnly = true)

@@ -155,7 +155,6 @@ Profile.getInitialProps = async(context) => {
         ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
 
     if(token.length > 0) {
-        console.log('dispatch')
         context.store.dispatch({
             type: LOAD_FOLLOWER_REQUEST,
             data: {token}

@@ -31,9 +31,9 @@ import {
     LOAD_FOLLOWING_REQUEST,
     LOAD_FOLLOWING_FAILURE,
     LOAD_FOLLOWING_SUCCESS,
-    EDIT_NAME_REQUEST,
-    EDIT_NAME_FAILURE,
-    EDIT_NAME_SUCCESS,
+    EDIT_PROFILE_REQUEST,
+    EDIT_PROFILE_FAILURE,
+    EDIT_PROFILE_SUCCESS,
     NAME_CHECK_SUCCESS, NAME_CHECK_FAILURE, NAME_CHECK_REQUEST
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
@@ -351,33 +351,39 @@ function* watchRemovefollower() {
     yield takeLatest(REMOVE_FOLLOWER_REQUEST,removeFollower);
 }
 
-function editNameAPI({name, token}) {
-    return axios.patch(`user/${name}`, null, {
+function editPorfileAPI({name=null,password=null, token}) {
+    const formData = new FormData();
+
+    console.log(name,password);
+    formData.append('name', name);
+    formData.append('password', password);
+
+    return axios.put(`user/profile`, formData, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
     });
 }
 
-function* editName(action) {
+function* editProfile(action) {
 
     try {
-        const result = yield call(editNameAPI, action.data);
+        const result = yield call(editPorfileAPI, action.data);
         yield put({
-            type: EDIT_NAME_SUCCESS,
+            type: EDIT_PROFILE_SUCCESS,
             data: result.data.response,
         });
     } catch (e) { // 실패
         console.error(e);
         yield put({
-            type: EDIT_NAME_FAILURE,
-            error: e
+            type: EDIT_PROFILE_FAILURE,
+            error: e.response.data.error.message,
         });
     }
 }
 
-function* watchEditName() {
-    yield takeLatest(EDIT_NAME_REQUEST,editName);
+function* watchEditProfile() {
+    yield takeLatest(EDIT_PROFILE_REQUEST,editProfile);
 }
 
 export default function* userSaga() {
@@ -393,6 +399,6 @@ export default function* userSaga() {
         fork(watchLoadfollower),
         fork(watchLoadfollowing),
         fork(watchRemovefollower),
-        fork(watchEditName),
+        fork(watchEditProfile),
     ]);
 }

@@ -70,9 +70,9 @@ export const SIGN_UP_REQUEST = 'SIGN_UP_REQUEST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 
-export const EDIT_NAME_REQUEST = 'EDIT_NAME_REQUEST';
-export const EDIT_NAME_SUCCESS = 'EDIT_NAME_SUCCESS';
-export const EDIT_NAME_FAILURE = 'EDIT_NAME_FAILURE';
+export const EDIT_PROFILE_REQUEST = 'EDIT_PROFILE_REQUEST';
+export const EDIT_PROFILE_SUCCESS = 'EDIT_PROFILE_SUCCESS';
+export const EDIT_PROFILE_FAILURE = 'EDIT_PROFILE_FAILURE';
 
 export const INCREMENT_NUMBER = 'INCREMENT_NUMBER';
 
@@ -276,20 +276,21 @@ const reducer = (state = initialState, action) => {
                 break;
             }
     
-            case EDIT_NAME_REQUEST: {
-                draft.isEditingName = true;
-                draft.editNameErrorReason = '';
+            case EDIT_PROFILE_REQUEST: {
+                draft.isEditing = true;
+                draft.editErrorReason = '';
                 break;
             }
     
-            case EDIT_NAME_SUCCESS: {
+            case EDIT_PROFILE_SUCCESS: {
                 draft.me = action.data;
-                draft.isEditingName = false;
+                draft.isEditing = false;
                 break;
             }
     
-            case EDIT_NAME_FAILURE: {
-                draft.isEditingName = false;
+            case EDIT_PROFILE_FAILURE: {
+                draft.isEditing = false;
+                draft.editErrorReason = action.error;
                 break;
             }
             

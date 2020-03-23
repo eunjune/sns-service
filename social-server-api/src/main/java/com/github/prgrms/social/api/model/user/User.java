@@ -26,6 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Entity(name = "users")
 @Getter
+@Setter
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(of = "id")
 @ToString(exclude = {"connectedUsers","posts","comments"})
@@ -39,19 +40,18 @@ public class User {
 
     @ApiModelProperty(value = "사용자명", required = true)
     @Column(nullable = false, unique = true)
-    @Setter
-    private final String name;
+    private String name;
 
     @ApiModelProperty(value = "이메일", required = true)
     @AttributeOverrides({
             @AttributeOverride(name = "address", column = @Column(name = "email", nullable = false, unique = true))
     })
-    private final Email email;
+    private Email email;
 
     @JsonIgnore
     @ApiModelProperty(hidden = true)
     @Column(nullable = false)
-    private final String password;
+    private String password;
 
     // TODO profileImageUrl 추가 (컬럼 profile_image_url varchar(255) 추가도 필요함)
     @ApiModelProperty(value = "프로필 이미지 URL")
@@ -70,7 +70,6 @@ public class User {
     @ApiModelProperty(value = "팔로잉 목록")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
-    @Setter
     private List<ConnectedUser> connectedUsers = new ArrayList<>();
 
     @ApiModelProperty(value = "사용자의 포스트")
@@ -107,20 +106,6 @@ public class User {
         this.lastLoginAt = lastLoginAt;
         this.createAt = defaultIfNull(createAt, now());
     }
-/*
-    @Builder
-    private User(User user) {
-        checkNotNull(user, "user must be provided.");
-
-        this.id = user.getId();
-        this.name = user.getName();
-        this.email = user.getEmail();
-        this.password = user.getPassword();
-        this.profileImageUrl = user.getProfileImageUrl().orElse(null);
-        this.loginCount = user.getLoginCount();
-        this.lastLoginAt = user.getLastLoginAt().orElse(null);
-        this.createAt = user.getCreateAt();
-    }*/
 
     public void afterLoginSuccess() {
         loginCount++;

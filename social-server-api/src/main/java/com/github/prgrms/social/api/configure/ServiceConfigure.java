@@ -11,6 +11,7 @@ import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.util.MessageUtils;
 import com.zaxxer.hikari.HikariDataSource;
 import net.sf.log4jdbc.Log4jdbcProxyDataSource;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.MessageSource;
@@ -87,4 +88,8 @@ public class ServiceConfigure {
         return builder;
     }
 
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
 }

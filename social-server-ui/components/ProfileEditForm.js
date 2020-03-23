@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react';
-import {Button, Checkbox, Form, Input} from "antd";
+import React, {useState, useCallback, useEffect} from 'react';
+import {Button, Form, Input} from "antd";
 import { useDispatch, useSelector } from 'react-redux';
-import {EDIT_NAME_REQUEST, EMAIL_CHECK_REQUEST, NAME_CHECK_REQUEST, SIGN_UP_REQUEST} from '../reducers/user';
+import {EDIT_PROFILE_REQUEST} from '../reducers/user';
+import cookie from "react-cookies";
 
 const ProfileEditForm = ({me}) => {
     const [editName, setEditName] = useState(me.name);
@@ -11,6 +12,8 @@ const ProfileEditForm = ({me}) => {
 
     const dispatch = useDispatch();
     const {isEditing, editErrorReason} = useSelector(state => state.user);
+    const token = cookie.load('token');
+
 
     const onSubmit = useCallback((e) => {
         e.preventDefault();
@@ -20,12 +23,15 @@ const ProfileEditForm = ({me}) => {
         }
 
         dispatch({
-            type: SIGN_UP_REQUEST,
+            type: EDIT_PROFILE_REQUEST,
             data: {
                 name: editName,
                 password: editPassword,
+                token: token,
             },
         });
+        setEditPassword('');
+        setEditPasswordCheck('');
     }, [editName,editPassword, editPasswordCheck]);
 
     const onChangeName = useCallback((e) => {
@@ -92,6 +98,7 @@ const ProfileEditForm = ({me}) => {
 
             <Form.Item>
                 <Button type="primary" htmlType="submit" loading={isEditing} style={{width: '100%'}}>수정</Button>
+                {editErrorReason.length > 0 ? <div style={{color: 'red'}}>{editErrorReason}</div> : null}
             </Form.Item>
         </Form>
 

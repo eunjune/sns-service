@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.github.prgrms.social.api.aws.S3Client;
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.event.JoinEvent;
+import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
@@ -14,6 +15,7 @@ import com.github.prgrms.social.api.repository.user.projection.ConnectedId;
 import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,8 @@ public class UserService {
     private final JpaUserRepository userRepository;
 
     private final JpaConnectedUserRepository connectedUserRepository;
+
+    private final ModelMapper modelMapper;
 
     private final EventBus eventBus;
 
@@ -182,6 +186,7 @@ public class UserService {
         return result.stream().map(ConnectedUser::getUser).collect(Collectors.toList());
     }
 
+    @Transactional
     public Long removeFollower(Long meId, Long userId) {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
@@ -204,12 +209,25 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(User.class, userId));
     }
 
-    public User updateName(Long id, String name) {
+    @Transactional
+    public User updateProfile(Long id, ProfileRequest profileRequest) {
 
         return userRepository.findById(id)
                 .map(user -> {
-                    User newUser =user.toBuilder().name(name).build();
-                    return userRepository.save(newUser);
+                    profileRequest.setPassword(passwordEncoder.encode(profileRequest.getPassword()));
+                    modelMapper.map(profileRequest,user);
+                    return user;
+                })
+                .orElseThrow(() -> new NotFoundException(User.class, id));
+    }
+
+    @Transactional
+    public User updatePassword(Long id, String password) {
+
+        return userRepository.findById(id)
+                .map(user -> {
+
+                    return user;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, id));
     }
