@@ -1,5 +1,5 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {Button, Form, Input} from "antd";
+import {Button, Card, Form, Input} from "antd";
 import { useDispatch, useSelector } from 'react-redux';
 import {EDIT_PROFILE_REQUEST} from '../reducers/user';
 import cookie from "react-cookies";
@@ -48,8 +48,8 @@ const ProfileEditForm = ({me}) => {
     }, [editPassword]);
 
     return (
-
         <Form onSubmit={onSubmit} style={{padding: 50}}>
+
             <Form.Item
                 label='이메일'
                 rules={[

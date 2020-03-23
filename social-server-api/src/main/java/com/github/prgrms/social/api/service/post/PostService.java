@@ -197,6 +197,8 @@ public class PostService {
         // 20 * 1024 * 1024
         checkNotNull(files, "files must be provided.");
 
+        //Todo 메소드 분리
+        //Todo 배포시 변경 필요
         realPath = realPath.substring(0,34) + "uploads";
 
         List<String> result = new ArrayList<>();

@@ -1,6 +1,7 @@
 import cookie from 'react-cookies';
 import produce from 'immer';
 import Router from "next/router";
+import {UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS} from "./post";
 
 export const initialState = {
     isEmailOk: null,
@@ -73,6 +74,10 @@ export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 export const EDIT_PROFILE_REQUEST = 'EDIT_PROFILE_REQUEST';
 export const EDIT_PROFILE_SUCCESS = 'EDIT_PROFILE_SUCCESS';
 export const EDIT_PROFILE_FAILURE = 'EDIT_PROFILE_FAILURE';
+
+export const UPLOAD_IMAGE_REQUEST = 'UPLOAD_IMAGE_REQUEST';
+export const UPLOAD_IMAGE_SUCCESS = 'UPLOAD_IMAGE_SUCCESS';
+export const UPLOAD_IMAGE_FAILURE = 'UPLOAD_IMAGE_FAILURE';
 
 export const INCREMENT_NUMBER = 'INCREMENT_NUMBER';
 
@@ -289,6 +294,24 @@ const reducer = (state = initialState, action) => {
             }
     
             case EDIT_PROFILE_FAILURE: {
+                draft.isEditing = false;
+                draft.editErrorReason = action.error;
+                break;
+            }
+
+            case UPLOAD_IMAGE_REQUEST: {
+                draft.isEditing = true;
+                draft.editErrorReason = '';
+                break;
+            }
+
+            case UPLOAD_IMAGE_SUCCESS: {
+                draft.me = action.data;
+                draft.isEditing = false;
+                break;
+            }
+
+            case UPLOAD_IMAGE_FAILURE: {
                 draft.isEditing = false;
                 draft.editErrorReason = action.error;
                 break;

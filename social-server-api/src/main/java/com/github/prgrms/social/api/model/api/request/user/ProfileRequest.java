@@ -17,6 +17,4 @@ public class ProfileRequest {
     @ApiModelProperty(value = "회원가입 비밀번호", required = true)
     @Length(min = 8,max = 50)
     private String password;
-
-    private String profileImageUrl;
 }

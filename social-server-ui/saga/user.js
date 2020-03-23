@@ -34,7 +34,12 @@ import {
     EDIT_PROFILE_REQUEST,
     EDIT_PROFILE_FAILURE,
     EDIT_PROFILE_SUCCESS,
-    NAME_CHECK_SUCCESS, NAME_CHECK_FAILURE, NAME_CHECK_REQUEST
+    NAME_CHECK_SUCCESS,
+    NAME_CHECK_FAILURE,
+    NAME_CHECK_REQUEST,
+    UPLOAD_IMAGE_REQUEST,
+    UPLOAD_IMAGE_FAILURE,
+    UPLOAD_IMAGE_SUCCESS
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
@@ -351,7 +356,7 @@ function* watchRemovefollower() {
     yield takeLatest(REMOVE_FOLLOWER_REQUEST,removeFollower);
 }
 
-function editPorfileAPI({name=null,password=null, token}) {
+function editProfileAPI({name=null,password=null,token}) {
     const formData = new FormData();
 
     console.log(name,password);
@@ -368,7 +373,7 @@ function editPorfileAPI({name=null,password=null, token}) {
 function* editProfile(action) {
 
     try {
-        const result = yield call(editPorfileAPI, action.data);
+        const result = yield call(editProfileAPI, action.data);
         yield put({
             type: EDIT_PROFILE_SUCCESS,
             data: result.data.response,
@@ -386,6 +391,39 @@ function* watchEditProfile() {
     yield takeLatest(EDIT_PROFILE_REQUEST,editProfile);
 }
 
+function editProfileImageAPI({file,token}) {
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    return axios.put(`user/profile-image`, formData, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* editProfileImage(action) {
+
+    try {
+        const result = yield call(editProfileImageAPI, action.data);
+        yield put({
+            type: UPLOAD_IMAGE_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: UPLOAD_IMAGE_FAILURE,
+            error: e.response.data.error.message,
+        });
+    }
+}
+
+function* watchEditProfileImage() {
+    yield takeLatest(UPLOAD_IMAGE_REQUEST,editProfileImage);
+}
+
 export default function* userSaga() {
     yield all([
         fork(watchEmailCheck),
@@ -400,5 +438,6 @@ export default function* userSaga() {
         fork(watchLoadfollowing),
         fork(watchRemovefollower),
         fork(watchEditProfile),
+        fork(watchEditProfileImage),
     ]);
 }

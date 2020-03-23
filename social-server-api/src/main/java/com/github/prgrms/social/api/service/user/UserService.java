@@ -20,7 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -210,7 +213,8 @@ public class UserService {
     }
 
     @Transactional
-    public User updateProfile(Long id, ProfileRequest profileRequest) {
+    public User updateProfile(Long id, ProfileRequest profileRequest){
+        checkNotNull(profileRequest, "files must be provided.");
 
         return userRepository.findById(id)
                 .map(user -> {
@@ -222,11 +226,22 @@ public class UserService {
     }
 
     @Transactional
-    public User updatePassword(Long id, String password) {
+    public User updateProfileImage(Long id, MultipartFile file, String realPath) throws IOException {
+        checkNotNull(file, "file must be provided.");
+
+        //Todo 메소드 분리
+        //Todo 배포시 변경 필요
+        realPath = realPath.substring(0,34) + "uploads" + File.separator + "profile";
+        AttachedFile attachedFile = AttachedFile.toAttachedFile(file);
+        assert attachedFile != null;
+        String extension = attachedFile.extension("png");
+        String randomName = attachedFile.randomName(realPath,extension);
+        file.transferTo(new File(randomName));
+        String newProfileImageUrl = randomName.substring(realPath.length()+1);
 
         return userRepository.findById(id)
                 .map(user -> {
-
+                    user.setProfileImageUrl(newProfileImageUrl);
                     return user;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, id));

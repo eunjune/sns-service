@@ -70,7 +70,11 @@ const AppLayout = ({ children }) => {
                   </Menu>
               } trigger={['click']}>
                   <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                      <Avatar shape="square" size="small" icon={<UserOutlined style={{marginRight: 0}} />} /> <DownOutlined  />
+                      <Avatar shape="square" size="small" icon={me.profileImageUrl ?
+                          <img src={`http://localhost:8080/image/profile/${me.profileImageUrl}`} alt=""/> :
+                          <UserOutlined style={{marginRight: 0}} />} />
+                          <DownOutlined/>
+
                   </a>
               </Dropdown>
           </MenuItem>

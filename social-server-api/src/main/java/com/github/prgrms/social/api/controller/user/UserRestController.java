@@ -33,6 +33,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -181,7 +182,7 @@ public class UserRestController {
             @AuthenticationPrincipal JwtAuthentication authentication,
             @Valid ProfileRequest profileRequest,
             Errors errors
-    ) {
+    ) throws IOException {
 
         if(errors.hasErrors()) {
             String message = errors.getFieldError().getDefaultMessage();
@@ -189,6 +190,18 @@ public class UserRestController {
         }
 
         return OK(userService.updateProfile(authentication.id.getValue(), profileRequest));
+
+    }
+
+    @PutMapping(path = "user/profile-image")
+    @ApiOperation(value = "유저 정보 수정",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResult<User> updateProfileImage(
+            @RequestPart MultipartFile file,
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            MultipartHttpServletRequest request
+    ) throws IOException {
+
+        return OK(userService.updateProfileImage(authentication.id.getValue(), file, request.getServletContext().getRealPath("/")));
 
     }
 
