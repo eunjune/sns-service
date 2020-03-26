@@ -37,7 +37,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     // 로그인 인증 확인 후 JWT 토큰 생성
     private Authentication processUserAuthentication(AuthenticationRequest request) {
         try {
-            User user = userService.login(new Email(request.getAddress()), request.getPassword());
+            User user = request.getPassword() == null ?
+                    userService.login(new Email(request.getAddress())) :
+                    userService.login(new Email(request.getAddress()), request.getPassword());
             JwtAuthenticationToken authenticated =
                     new JwtAuthenticationToken(user.getId(), null, createAuthorityList(Role.USER.getValue()));
             String apiToken = user.newApiToken(jwt, new String[]{Role.USER.getValue()});

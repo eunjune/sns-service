@@ -136,10 +136,15 @@ public class UserRestController {
         );
 
 
-        emailService.sendMessage(user);
+        emailService.sendEmailCertificationMessage(user);
 
         String apiToken = user.newApiToken(jwt, new String[]{Role.USER.getValue()});
         return OK(new JoinResult(apiToken, user));
+    }
+
+    @PostMapping("check-email-token")
+    public ApiResult<User> checkEmailToken(@RequestBody EmailAuthenticationRequest emailAuthenticationRequest) {
+        return OK(userService.certificateEmail(emailAuthenticationRequest.getEmailToken(),emailAuthenticationRequest.getEmail()));
     }
 
     @GetMapping(path = "user/resend-email")
@@ -147,7 +152,7 @@ public class UserRestController {
         User user = userService.findById(authentication.id.getValue())
                 .orElseThrow(() -> new NotFoundException(User.class, authentication.id.getValue()));
 
-        emailService.sendMessage(user);
+        emailService.sendEmailCertificationMessage(user);
 
         return OK(true);
     }

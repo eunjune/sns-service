@@ -28,7 +28,14 @@ public class EmailServiceImpl implements EmailService {
     private String host;
 
     @Override
-    public void sendMessage(User user) {
+    public void sendEmailCertificationMessage(User user) {
+
+        EmailHtmlMessage emailHtmlMessage = EmailHtmlMessage.builder()
+                .link("/check-email-token?token=" + user.getEmailCertificationToken() + "&email=" +user.getEmail().getAddress())
+                .name(user.getName())
+                .linkName("인증하기")
+                .message("회원가입 인증을 위해 링크를 클릭하세요.")
+                .build();
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
 
@@ -36,7 +43,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(user.getEmail().getAddress());
             mimeMessageHelper.setSubject("SNS service, 회원가입 인증");
-            mimeMessageHelper.setText(getHtmlMessage(user), true);
+            mimeMessageHelper.setText(getHtmlMessage(emailHtmlMessage), true);
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error("fail to send email", e);
@@ -44,12 +51,34 @@ public class EmailServiceImpl implements EmailService {
 
     }
 
-    private String getHtmlMessage(User user) {
+    @Override
+    public void sendEmailLoginLinkMessage(User user, String apiToken) {
+        EmailHtmlMessage emailHtmlMessage = EmailHtmlMessage.builder()
+                .link("/login-link?token=" + user.getEmailCertificationToken() + "&email=" +user.getEmail().getAddress())
+                .name(user.getName())
+                .linkName("이메일 로그인")
+                .message("이메일 로그인을 위해 링크를 클릭하세요.")
+                .build();
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(user.getEmail().getAddress());
+            mimeMessageHelper.setSubject("SNS service, 이메일 로그인");
+            mimeMessageHelper.setText(getHtmlMessage(emailHtmlMessage), true);
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            log.error("fail to send email", e);
+        }
+    }
+
+    private String getHtmlMessage(EmailHtmlMessage emailHtmlMessage) {
         Context context = new Context();
-        context.setVariable("link", "/check-email-token?token=" + user.getEmailCertificationToken() + "&email=" +user.getEmail().getAddress());
-        context.setVariable("name", user.getName());
-        context.setVariable("linkName", "인증하기");
-        context.setVariable("message", "회원가입 인증을 위해 링크를 클릭하세요.");
+        context.setVariable("link",emailHtmlMessage.getLink());
+        context.setVariable("name",emailHtmlMessage.getName());
+        context.setVariable("linkName", emailHtmlMessage.getLinkName());
+        context.setVariable("message", emailHtmlMessage.getMessage());
         context.setVariable("host", host);
 
         return templateEngine.process("mail/email-link", context);

@@ -9,8 +9,8 @@ import {Alert} from "antd";
 import cookie from "react-cookies";
 import {EMAIL_RESEND_REQUEST} from "../reducers/user";
 
-const Home = () => {
-    const {me} = useSelector(state => state.user);
+const Home = ({isEmailLogin}) => {
+    const {me,isEmailLogInWaiting} = useSelector(state => state.user);
     const {posts,hasMorePost} = useSelector(state => state.post);
     const dispatch = useDispatch();
     const usedLastIds = useRef([]);
@@ -53,10 +53,24 @@ const Home = () => {
     return (
         <CenterAlignment children={
             <div className='index' style={{padding: 50}}>
-                {me && me.isEmailCertification === false ?
-                <div style={{paddingBottom: 40}}>
-                    <Alert message='서비스를 이용하려면 계정 인증 이메일을 확인하세요.' type="warning" /> <span><a onClick={onClickResendEmail}>인증 이메일 재전송</a></span>
-                </div> : null}
+                {
+                    me && me.isEmailCertification === false ?
+                    <div style={{paddingBottom: 40}}>
+                        <Alert message='서비스를 이용하려면 계정 인증 이메일을 확인하세요.' type="warning" /> <span><a onClick={onClickResendEmail}>인증 이메일 재전송</a></span>
+                    </div> : null
+                }
+                {
+                    isEmailLogin === false && isEmailLogInWaiting === true ?
+                    <div style={{paddingBottom: 40}}>
+                        <Alert message='이메일을 확인하여 로그인하세요.' type="warning" />
+                    </div> : null
+                }
+                {
+                    isEmailLogin === true ?
+                    <div style={{paddingBottom: 40}}>
+                        <Alert message='이메일로 로그인 했습니다. 패스워드를 변경하세요.' type="success" />
+                    </div> : null
+                }
                 {me && <PostForm />}
                 {posts.map((post) => {
                     return <PostCards key={post.id} post={post}/>;
@@ -66,11 +80,13 @@ const Home = () => {
 };
 
 Home.getInitialProps = async (context) => {
+    const isEmailLogin = !!context.query.token;
 
     context.store.dispatch({
         type: LOAD_MAIN_POSTS_REQUEST,
     });
 
+    return {isEmailLogin};
 };
 
 export default Home;

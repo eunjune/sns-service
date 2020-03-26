@@ -43,7 +43,12 @@ import {
     EMAIL_CERTIFICATION_REQUEST,
     EMAIL_CERTIFICATION_SUCCESS,
     EMAIL_CERTIFICATION_FAILURE,
-    EMAIL_RESEND_REQUEST, EMAIL_RESEND_FAILURE
+    EMAIL_RESEND_REQUEST,
+    EMAIL_RESEND_FAILURE,
+    EMAIL_RESEND_SUCCESS,
+    EMAIL_LOG_IN_REQUEST,
+    EMAIL_LOG_IN_SUCCESS,
+    EMAIL_LOG_IN_FAILURE
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
@@ -129,8 +134,8 @@ function* watchSignUp() {
     yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
 
-function emailCertificateAPI({emailToken,email}) {
-    return axios.get(`auth/check-email-token?token=${emailToken}&email=${email}`);
+function emailCertificateAPI(data) {
+    return axios.post('check-email-token', data);
 }
 
 
@@ -167,8 +172,8 @@ function* resendEmail(action) {
     try {
         const result = yield call(resendEmailAPI,action.data);
         yield put({
-            type: EMAIL_CHECK_SUCCESS,
-            data: result.data,
+            type: EMAIL_RESEND_SUCCESS,
+            data: result.data.response,
         });
     } catch (e) { // 실패
         console.error(e);
@@ -206,6 +211,30 @@ function* login(action) {
 
 function* watchLogin() {
     yield takeLatest(LOG_IN_REQUEST, login);
+}
+
+function emailLoginAPI(address) {
+    return axios.get(`auth/${address}`);
+}
+
+function* emailLogin(action) {
+    try {
+        const result = yield call(emailLoginAPI, action.data);
+        yield put({
+            type: EMAIL_LOG_IN_SUCCESS,
+            data: result.data,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: EMAIL_LOG_IN_FAILURE,
+            error: e.response.data.error.message,
+        });
+    }
+}
+
+function* watchEmailLogin() {
+    yield takeLatest(EMAIL_LOG_IN_REQUEST, emailLogin);
 }
 
 function loadUserAPI({userId,token}) {
@@ -489,6 +518,7 @@ export default function* userSaga() {
         fork(watchResendEmail),
         fork(watchNameCheck),
         fork(watchLogin),
+        fork(watchEmailLogin),
         fork(watchSignUp),
         fork(watchLoadUser),
         fork(watchLoadMe),

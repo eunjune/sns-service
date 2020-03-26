@@ -69,7 +69,7 @@ public class Post {
     private List<Comment> comments = new ArrayList<>();
 
     @ApiModelProperty(value = "해쉬태그 리스트")
-    @ManyToMany(mappedBy = "posts", cascade = CascadeType.ALL)
+    @ManyToMany
     @JsonBackReference
     private List<HashTag> hashTags = new ArrayList<>();
 

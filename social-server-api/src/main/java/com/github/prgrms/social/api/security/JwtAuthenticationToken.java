@@ -13,6 +13,15 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     private String credentials;
 
     // 인증되지 않은 Authentication
+
+
+    public JwtAuthenticationToken(String principal) {
+        super(null);
+        super.setAuthenticated(false);
+
+        this.principal = principal;
+    }
+
     public JwtAuthenticationToken(String principal, String credentials) {
         super(null);
         super.setAuthenticated(false);

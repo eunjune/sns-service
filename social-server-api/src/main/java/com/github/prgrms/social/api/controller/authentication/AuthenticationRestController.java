@@ -2,10 +2,10 @@ package com.github.prgrms.social.api.controller.authentication;
 
 import com.github.prgrms.social.api.error.UnauthorizedException;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
-import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.AuthenticationRequest;
 import com.github.prgrms.social.api.security.AuthenticationResult;
 import com.github.prgrms.social.api.security.JwtAuthenticationToken;
+import com.github.prgrms.social.api.service.user.EmailService;
 import com.github.prgrms.social.api.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +28,8 @@ public class AuthenticationRestController {
 
     private final UserService userService;
 
+    private final EmailService emailService;
+
     @PostMapping
     @ApiOperation(value = "사용자 로그인 (API 토큰 필요없음)")
     public ApiResult<AuthenticationResult> authentication(@RequestBody AuthenticationRequest authRequest) throws UnauthorizedException {
@@ -41,9 +43,19 @@ public class AuthenticationRestController {
         }
     }
 
-    @GetMapping("check-email-token")
-    public ApiResult<User> checkEmailToken(String token, String email) {
-        return OK(userService.certificateEmail(token,email));
-    }
+    @GetMapping("{address}")
+    @ApiOperation(value = "사용자 이메일 로그인 (API 토큰 필요없음)")
+    public ApiResult<AuthenticationResult> emailAuthentication(@PathVariable String address) throws UnauthorizedException {
+        try {
+            JwtAuthenticationToken authToken = new JwtAuthenticationToken(address);
+            Authentication authentication = authenticationManager.authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            AuthenticationResult authenticationResult = (AuthenticationResult) authentication.getDetails();
+            emailService.sendEmailLoginLinkMessage(authenticationResult.getUser(), authenticationResult.getToken());
+            return OK(authenticationResult);
+        } catch (AuthenticationException e) {
+            throw new UnauthorizedException(e.getMessage());
+        }
+    }
 }

@@ -63,10 +63,11 @@ Root.getInitialProps = async (context) => {
   let pageProps = {};
 
   const state = ctx.store.getState();
-  const token = cookie.load('token') || (ctx.isServer && ctx.req.headers.cookie.includes('token')
-      ? ctx.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
+  const token = cookie.load('token') ||
+      ctx.query.token ||
+      (ctx.isServer && ctx.req.headers.cookie.includes('token') ? ctx.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
 
-  if(!state.user.me && token.length > 0) {
+  if(!state.user.me && token.length > 0 && state.user.isEmailLogInWaiting === false) {
     ctx.store.dispatch({
       type: LOAD_ME_REQUEST,
       data : token,

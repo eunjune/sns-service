@@ -145,7 +145,7 @@ class UserRestControllerTest {
         assertNotNull(user);
         assertNotEquals(user.getPassword(), "12345678");
         assertNotNull(user.getEmailCertificationToken());
-        then(emailService).should().sendMessage(any(User.class));
+        then(emailService).should().sendEmailCertificationMessage(any(User.class));
     }
 
     @DisplayName("회원가입 실패")
@@ -174,7 +174,7 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andDo(print());
 
-        then(emailService).should().sendMessage(any(User.class));
+        then(emailService).should().sendEmailCertificationMessage(any(User.class));
     }
 
     @DisplayName("이메일 인증 확인 - 성공")
@@ -268,6 +268,20 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$.success").value("false"))
                 .andDo(print());
 
+    }
+
+    @DisplayName("이메일 로그인 성공")
+    @Test
+    void emailLogin() throws Exception {
+        userService.join("name",new Email("test@gmail.com"),"12345678", null);
+
+        mockMvc.perform(get("/api/auth/test@gmail.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.token").isNotEmpty())
+                .andExpect(jsonPath("$.response.user").isNotEmpty())
+                .andDo(print());
+
+        then(emailService).should().sendEmailLoginLinkMessage(any(User.class), any());
     }
 
     @DisplayName("프로필 수정 - 성공")

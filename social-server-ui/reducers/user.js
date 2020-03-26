@@ -13,6 +13,7 @@ export const initialState = {
     isNameChecking: false,
     nameCheckingErrorReason: null,
     isLoggingIn: false,
+    isEmailLogInWaiting: false,
     loginErrorReason: '',
     isSignedUp: false,
     isSigningUp: false,
@@ -46,6 +47,10 @@ export const NAME_CHECK_FAILURE = 'NAME_CHECK_FAILURE';
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
 export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
+
+export const EMAIL_LOG_IN_REQUEST = 'EMAIL_LOG_IN_REQUEST';
+export const EMAIL_LOG_IN_SUCCESS = 'EMAIL_LOG_IN_SUCCESS';
+export const EMAIL_LOG_IN_FAILURE = 'EMAIL_LOG_IN_FAILURE';
 
 export const LOG_OUT = 'LOG_OUT';
 
@@ -203,10 +208,35 @@ const reducer = (state = initialState, action) => {
 
                 draft.isLoggingIn = false;
                 draft.me = me;
+                draft.isEmailLogin = true;
                 break;
             }
     
             case LOG_IN_FAILURE: {
+                draft.isLoggingIn = false;
+                draft.loginErrorReason = action.error;
+                draft.me = null;
+                break;
+            }
+
+            case EMAIL_LOG_IN_REQUEST: {
+                cookie.remove('token', { path: '/' });
+                draft.isLoggingIn = true;
+                draft.loginErrorReason = '';
+                break;
+            }
+
+            case EMAIL_LOG_IN_SUCCESS: {
+                const token = action.data.response.token;
+
+                cookie.save('token',token, { path: '/' });
+
+                draft.isLoggingIn = false;
+                draft.isEmailLogInWaiting = true;
+                break;
+            }
+
+            case EMAIL_LOG_IN_FAILURE: {
                 draft.isLoggingIn = false;
                 draft.loginErrorReason = action.error;
                 draft.me = null;

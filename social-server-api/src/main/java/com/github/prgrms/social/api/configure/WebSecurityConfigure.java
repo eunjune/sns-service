@@ -115,6 +115,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/user/post/list").permitAll()
                 .antMatchers("/api/user/exists/**").permitAll()
                 .antMatchers("/api/_hcheck").permitAll()
+                .antMatchers("/api/check-email-token").permitAll()
                 .antMatchers("/api/**").hasRole("USER")
                 .accessDecisionManager(accessDecisionManager())
                 .anyRequest().permitAll()

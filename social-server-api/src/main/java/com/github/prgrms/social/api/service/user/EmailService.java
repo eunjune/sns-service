@@ -4,6 +4,8 @@ import com.github.prgrms.social.api.model.user.User;
 
 public interface EmailService {
 
-    public void sendMessage(User user);
+    public void sendEmailCertificationMessage(User user);
+
+    public void sendEmailLoginLinkMessage(User user, String apiToken);
 
 }

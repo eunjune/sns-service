@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {LOG_IN_REQUEST} from "../reducers/user";
+import {EMAIL_LOG_IN_REQUEST, FORGOT_PASSWORD, LOG_IN_REQUEST} from "../reducers/user";
 import {Button, Checkbox, Col, Form, Input, Row} from "antd";
 import Link from "next/link";
 import Router from "next/router";
@@ -12,24 +12,34 @@ const Login = () => {
     const {me} = useSelector(state=>state.user);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {isLoggingIn, loginErrorReason} = useSelector(state => state.user);
+    const [forgotPassword, setForgotPassword] = useState(false);
+    const {isLoggingIn, loginErrorReason,isEmailLogInWaiting} = useSelector(state => state.user);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if(me) {
+        if(me || isEmailLogInWaiting === true) {
             Router.push('/');
         }
-    },[me]);
+    },[me,isEmailLogInWaiting]);
 
     const onSubmitForm = useCallback((e) => {
         e.preventDefault();
-        dispatch({
-            type: LOG_IN_REQUEST,
-            data: {
-                address: email,
-                password: password,
-            }
-        });
+
+        if(forgotPassword) {
+            dispatch({
+                type: EMAIL_LOG_IN_REQUEST,
+                data: email
+            });
+        } else {
+            dispatch({
+                type: LOG_IN_REQUEST,
+                data: {
+                    address: email,
+                    password: password,
+                }
+            });
+        }
+
     }, [email, password]);
 
     const onChangeEmail = (e) => {
@@ -40,10 +50,16 @@ const Login = () => {
         setPassword(e.target.value);
     };
 
+    const onClickForgotPassword = (e) => {
+        setForgotPassword(true);
+    };
+
     return (
         <DivWrap>
             <CenterAlignment children={
+
                 <Form onSubmit={onSubmitForm} style={{maxWidth: '500px', padding: 50}}>
+                    {forgotPassword === true ? <h1>이메일 로그인</h1> : null}
                     <Form.Item
                         label='이메일'
                         rules={[
@@ -56,24 +72,31 @@ const Login = () => {
 
                     </Form.Item>
 
-                    <Form.Item
-                        label='비밀번호'
-                        rules={[
-                            {
-                                required: true,
-                                message: '비밀번호를을 입력해주세요!',
-                            }
-                        ]}>
-                        <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="패스워드" name="user-password" type="password" value={password} onChange={onChangePassword}/>
-                    </Form.Item>
+                    {
+                        forgotPassword === false ?
+                            <Form.Item
+                                label='비밀번호'
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: '비밀번호를을 입력해주세요!',
+                                    }
+                                ]}>
+                                <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="패스워드" name="user-password" type="password" value={password} onChange={onChangePassword}/>
+                            </Form.Item>
+                            :
+                            null
+                    }
 
                     <Form.Item>
                         <Button type="primary" htmlType="submit" loading={isLoggingIn}>로그인</Button>
 
-                        <a className="login-form-forgot" href="" style={{float: 'right'}}>
-                            Forgot password
-                        </a>
-
+                        {forgotPassword === true ?
+                            null :
+                            <a className="login-form-forgot" style={{float: 'right'}} onClick={onClickForgotPassword}>
+                                Forgot password
+                            </a>
+                        }
                         {loginErrorReason.length > 0 ? <div style={{color: 'red'}}>{loginErrorReason}</div> : null}
                     </Form.Item>
                 </Form>
