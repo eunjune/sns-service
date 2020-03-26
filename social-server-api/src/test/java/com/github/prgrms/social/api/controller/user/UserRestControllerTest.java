@@ -5,6 +5,7 @@ import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
 import com.github.prgrms.social.api.security.JWT;
+import com.github.prgrms.social.api.service.user.EmailService;
 import com.github.prgrms.social.api.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,12 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,6 +40,9 @@ class UserRestControllerTest {
 
     @Autowired
     UserService userService;
+
+    @MockBean
+    EmailService emailService;
 
     @Autowired
     JpaUserRepository userRepository;
@@ -132,7 +141,11 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andDo(print());
 
-        assertNotEquals(userService.findByEmail(new Email("test@gmail.com")).orElse(null).getPassword(), "12345678");
+        User user = userService.findByEmail(new Email("test@gmail.com")).orElse(null);
+        assertNotNull(user);
+        assertNotEquals(user.getPassword(), "12345678");
+        assertNotNull(user.getEmailCertificationToken());
+        then(emailService).should().sendMessage(any(User.class));
     }
 
     @DisplayName("회원가입 실패")
@@ -148,6 +161,54 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$.success").value(false))
                 .andDo(print());
 
+    }
+
+    @DisplayName("인증 이메일 재전송")
+    @Test
+    void resendEmail() throws Exception {
+        userService.join("name", new Email("test@gmail.com"), "12345678", null);
+
+        mockMvc.perform(get("/api/user/resend-email")
+                .header(tokenHeader, apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andDo(print());
+
+        then(emailService).should().sendMessage(any(User.class));
+    }
+
+    @DisplayName("이메일 인증 확인 - 성공")
+    @Test
+    void checkEmailToken() throws Exception {
+        User user = User.builder().name("test").password("12345678").email(new Email("test@gmail.com")).id(1L).build();
+        user.newEmailToken();
+
+        User savedUser = userRepository.save(user);
+
+        mockMvc.perform(get("/api/auth/check-email-token")
+                .param("email", "test@gmail.com")
+                .param("token", savedUser.getEmailCertificationToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.isEmailCertification").value(true))
+                .andDo(print());
+
+    }
+
+    @DisplayName("이메일 인증 확인 - 실패")
+    @Transactional
+    @Test
+    void checkEmailTokenFail() throws Exception {
+        User user = User.builder().name("test").password("12345678").email(new Email("test@gmail.com")).id(1L).build();
+
+        User savedUser = userRepository.save(user);
+        savedUser.newEmailToken();
+
+        mockMvc.perform(get("/api/auth/check-email-token")
+                .param("email", "test@gmail.com")
+                .param("token", "afasfasd"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andDo(print());
     }
 
     @DisplayName("유저 정보를 가져온다")

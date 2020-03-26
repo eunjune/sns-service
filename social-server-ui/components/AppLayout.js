@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import {
@@ -17,7 +17,6 @@ const AppLayout = ({ children }) => {
     const onSearch = (value) => {
         Router.push({pathname: '/hashtag', query: {tag: value}}, `/hashtag/${value}`);
     };
-
 
     const onLogout = useCallback(() => {
         dispatch({

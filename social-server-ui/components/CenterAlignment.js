@@ -1,8 +1,8 @@
 import {Col, Row} from "antd";
-import React from "react";
+import React, {memo} from "react";
 
-const CenterAlignment = ({children}) => {
-    console.log(children);
+const CenterAlignment = memo(({children}) => {
+     console.log(children);
     const center = children.props.className === 'index' ? 12 : 8;
     const side = children.props.className === 'index' ? 6 : 8;
 
@@ -15,6 +15,6 @@ const CenterAlignment = ({children}) => {
             <Col xs={24} md={side}/>
         </Row>
     );
-};
+});
 
 export default CenterAlignment;

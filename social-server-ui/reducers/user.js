@@ -6,6 +6,8 @@ import {UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS} fro
 export const initialState = {
     isEmailOk: null,
     isEmailChecking: false,
+    isCertificated: false,
+    certificateErrorReason: '',
     emailCheckingErrorReason: null,
     isNameOk: null,
     isNameChecking: false,
@@ -28,6 +30,14 @@ export const initialState = {
 export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
 export const EMAIL_CHECK_SUCCESS = 'EMAIL_CHECK_SUCCESS';
 export const EMAIL_CHECK_FAILURE = 'EMAIL_CHECK_FAILURE';
+
+export const EMAIL_CERTIFICATION_REQUEST = 'EMAIL_CERTIFICATION_REQUEST';
+export const EMAIL_CERTIFICATION_SUCCESS = 'EMAIL_CERTIFICATION_SUCCESS';
+export const EMAIL_CERTIFICATION_FAILURE = 'EMAIL_CERTIFICATION_FAILURE';
+
+export const EMAIL_RESEND_REQUEST = 'EMAIL_RESEND_REQUEST';
+export const EMAIL_RESEND_SUCCESS = 'EMAIL_RESEND_SUCCESS';
+export const EMAIL_RESEND_FAILURE = 'EMAIL_RESEND_FAILURE';
 
 export const NAME_CHECK_REQUEST = 'NAME_CHECK_REQUEST';
 export const NAME_CHECK_SUCCESS = 'NAME_CHECK_SUCCESS';
@@ -105,6 +115,34 @@ const reducer = (state = initialState, action) => {
                 break;
             }
 
+            case EMAIL_CERTIFICATION_REQUEST: {
+                break;
+            }
+
+            case EMAIL_CERTIFICATION_SUCCESS: {
+                draft.me = action.data;
+                break;
+            }
+
+            case EMAIL_CERTIFICATION_FAILURE: {
+                alert(action.error);
+                break;
+            }
+
+            case EMAIL_RESEND_REQUEST: {
+                break;
+            }
+
+            case EMAIL_RESEND_SUCCESS: {
+                alert('인증 이메일이 재전송 되었습니다.');
+                break;
+            }
+
+            case EMAIL_RESEND_FAILURE: {
+                alert(action.error);
+                break;
+            }
+
             case NAME_CHECK_REQUEST: {
                 draft.isNameOk = false;
                 draft.isNameChecking = true;
@@ -178,8 +216,6 @@ const reducer = (state = initialState, action) => {
             case LOG_OUT: {
                 cookie.remove('token', { path: '/' });
                 draft.me = null;
-
-                Router.push("/");
                 break;
             }
     

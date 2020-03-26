@@ -5,7 +5,7 @@ import {EDIT_PROFILE_REQUEST} from '../reducers/user';
 import cookie from "react-cookies";
 
 const ProfileEditForm = ({me}) => {
-    const [editName, setEditName] = useState(me.name);
+    const [editName, setEditName] = useState(me && me.name);
     const [editPassword, setEditPassword] = useState('');
     const [editPasswordCheck, setEditPasswordCheck] = useState('');
     const [editPasswordError, setEditPasswordError] = useState(false);
@@ -58,7 +58,7 @@ const ProfileEditForm = ({me}) => {
                         message: '이메일을 입력해주세요!',
                     }
                 ]}>
-                <div>{me.email}</div>
+                <div>{me && me.email}</div>
             </Form.Item>
 
             <Form.Item

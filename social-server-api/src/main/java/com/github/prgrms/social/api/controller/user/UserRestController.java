@@ -4,12 +4,10 @@ import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.api.request.user.*;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
 import com.github.prgrms.social.api.model.api.response.user.JoinResult;
-import com.github.prgrms.social.api.model.user.Email;
-import com.github.prgrms.social.api.model.user.Role;
-import com.github.prgrms.social.api.model.user.Subscription;
-import com.github.prgrms.social.api.model.user.User;
+import com.github.prgrms.social.api.model.user.*;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.security.JwtAuthentication;
+import com.github.prgrms.social.api.service.user.EmailService;
 import com.github.prgrms.social.api.service.user.UserService;
 import com.github.prgrms.social.api.validator.CheckEmailValidator;
 import com.github.prgrms.social.api.validator.CheckNameValidator;
@@ -53,6 +51,8 @@ public class UserRestController {
     private final JWT jwt;
 
     private final UserService userService;
+
+    private final EmailService emailService;
 
     private final ReplyingKafkaTemplate<String, Subscription, Subscription> replyingKafkaTemplate;
 
@@ -135,8 +135,21 @@ public class UserRestController {
                 toAttachedFile(file)
         );
 
+
+        emailService.sendMessage(user);
+
         String apiToken = user.newApiToken(jwt, new String[]{Role.USER.getValue()});
         return OK(new JoinResult(apiToken, user));
+    }
+
+    @GetMapping(path = "user/resend-email")
+    public ApiResult<Boolean> resendEmail(@AuthenticationPrincipal JwtAuthentication authentication) {
+        User user = userService.findById(authentication.id.getValue())
+                .orElseThrow(() -> new NotFoundException(User.class, authentication.id.getValue()));
+
+        emailService.sendMessage(user);
+
+        return OK(true);
     }
 
     // Subscribe 요청 처리.(카프카에게 Subscribe 정보 전송 후 응답 처리)

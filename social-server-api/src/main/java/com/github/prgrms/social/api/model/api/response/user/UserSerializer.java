@@ -25,6 +25,7 @@ public class UserSerializer extends StdSerializer<User> {
         gen.writeStringField("name",value.getName());
         gen.writeStringField("email",value.getEmail().getAddress());
         gen.writeNumberField("loginCount", value.getLoginCount());
+        gen.writeBooleanField("isEmailCertification", value.isEmailCertification());
         gen.writeStringField("createAt", value.getCreateAt().toString());
 
         if(value.getLastLoginAt().isPresent()) {

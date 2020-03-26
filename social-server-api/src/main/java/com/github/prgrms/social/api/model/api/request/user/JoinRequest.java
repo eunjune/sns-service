@@ -23,9 +23,10 @@ public class JoinRequest {
     @Email(message = "이메일 형식이 맞지 않습니다.")
     private String address;
 
+    // Todo 비밀번호 패턴 설정
     @ApiModelProperty(value = "회원가입 비밀번호", required = true)
     @NotBlank
-    @Length(min = 8,max = 50)
+    @Length(min = 8,max = 50,message = "비밀번호는 8자 이상")
     private String password;
 
     private String profileImageUrl;

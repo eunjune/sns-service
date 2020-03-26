@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -39,12 +40,12 @@ public class User {
     private final Long id;
 
     @ApiModelProperty(value = "사용자명", required = true)
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String name;
 
     @ApiModelProperty(value = "이메일", required = true)
     @AttributeOverrides({
-            @AttributeOverride(name = "address", column = @Column(name = "email", nullable = false, unique = true))
+            @AttributeOverride(name = "address", column = @Column(name = "email", unique = true))
     })
     private Email email;
 
@@ -52,6 +53,12 @@ public class User {
     @ApiModelProperty(hidden = true)
     @Column(nullable = false)
     private String password;
+
+    @JsonIgnore
+    private boolean isEmailCertification;
+
+    @JsonIgnore
+    private String emailCertificationToken;
 
     // TODO profileImageUrl 추가 (컬럼 profile_image_url varchar(255) 추가도 필요함)
     @ApiModelProperty(value = "프로필 이미지 URL")
@@ -65,7 +72,7 @@ public class User {
 
     @ApiModelProperty(value = "생성일시", required = true)
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private final LocalDateTime createAt;
+    private LocalDateTime createAt;
 
     @ApiModelProperty(value = "팔로잉 목록")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -88,7 +95,7 @@ public class User {
     private List<Likes> likes = new ArrayList<>();
 
     @Builder(toBuilder = true)
-    private User(Long id, String name, Email email, String password, String profileImageUrl, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
+    private User(Long id, String name, Email email, String password, boolean isEmailCertification, String emailCertificationToken, String profileImageUrl, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
         checkArgument(isNotEmpty(name), "name must be provided.");
         checkArgument(
                 name.length() >= 1 && name.length() <= 10,
@@ -101,6 +108,8 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.isEmailCertification = isEmailCertification;
+        this.emailCertificationToken = emailCertificationToken;
         this.profileImageUrl = profileImageUrl;
         this.loginCount = loginCount;
         this.lastLoginAt = lastLoginAt;
@@ -110,6 +119,10 @@ public class User {
     public void afterLoginSuccess() {
         loginCount++;
         lastLoginAt = now();
+    }
+
+    public void newEmailToken() {
+        this.emailCertificationToken = UUID.randomUUID().toString();
     }
 
     public String newApiToken(JWT jwt, String[] roles) {

@@ -39,7 +39,11 @@ import {
     NAME_CHECK_REQUEST,
     UPLOAD_IMAGE_REQUEST,
     UPLOAD_IMAGE_FAILURE,
-    UPLOAD_IMAGE_SUCCESS
+    UPLOAD_IMAGE_SUCCESS,
+    EMAIL_CERTIFICATION_REQUEST,
+    EMAIL_CERTIFICATION_SUCCESS,
+    EMAIL_CERTIFICATION_FAILURE,
+    EMAIL_RESEND_REQUEST, EMAIL_RESEND_FAILURE
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
@@ -123,6 +127,60 @@ function* signUp(action) {
 
 function* watchSignUp() {
     yield takeLatest(SIGN_UP_REQUEST, signUp);
+}
+
+function emailCertificateAPI({emailToken,email}) {
+    return axios.get(`auth/check-email-token?token=${emailToken}&email=${email}`);
+}
+
+
+function* emailCertificate(action) {
+    try {
+        const result = yield call(emailCertificateAPI,action.data);
+        yield put({
+            type: EMAIL_CERTIFICATION_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: EMAIL_CERTIFICATION_FAILURE,
+            error: e.response.data.error.message,
+        });
+    }
+}
+
+function* watchEmailCertificate() {
+    yield takeLatest(EMAIL_CERTIFICATION_REQUEST, emailCertificate);
+}
+
+function resendEmailAPI(token) {
+    return axios.get('user/resend-email',{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+
+function* resendEmail(action) {
+    try {
+        const result = yield call(resendEmailAPI,action.data);
+        yield put({
+            type: EMAIL_CHECK_SUCCESS,
+            data: result.data,
+        });
+    } catch (e) { // 실패
+        console.error(e);
+        yield put({
+            type: EMAIL_RESEND_FAILURE,
+            error: e.response.data.error.message,
+        });
+    }
+}
+
+function* watchResendEmail() {
+    yield takeLatest(EMAIL_RESEND_REQUEST, resendEmail);
 }
 
 
@@ -427,6 +485,8 @@ function* watchEditProfileImage() {
 export default function* userSaga() {
     yield all([
         fork(watchEmailCheck),
+        fork(watchEmailCertificate),
+        fork(watchResendEmail),
         fork(watchNameCheck),
         fork(watchLogin),
         fork(watchSignUp),

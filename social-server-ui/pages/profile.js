@@ -27,10 +27,21 @@ const Profile = () => {
     const dispatch = useDispatch();
     const updateProfileImage = useRef();
     const imageInput = useRef();
-    const {followers, followings, hasMoreFollower, hasMoreFollowing, me} = useSelector(state => state.user);
+    const {me,followers, followings, hasMoreFollower, hasMoreFollowing} = useSelector(state => state.user);
     const {posts} = useSelector(state => state.post);
     const token = cookie.load('token');
     let uploadImageFile = null;
+
+    useEffect(() => {
+        if(!me) {
+            Router.push("/");
+        }
+
+        if(me.isEmailCertification === false) {
+            alert('이메일 인증 후에 이용할 수 있습니다.');
+            Router.push("/");
+        }
+    },[me]);
 
     const onUnfollow = useCallback(userId => () => {
 
@@ -56,26 +67,32 @@ const Profile = () => {
     },[]);
 
     const loadMoreFollowings = useCallback(() => {
-        console.log(followings.length);
+        if(followings) {
+            console.log(followings.length);
 
-        dispatch({
-            type: LOAD_FOLLOWING_REQUEST,
-            data: {
-                token,
-                offset: followings.length/3
+            dispatch({
+                type: LOAD_FOLLOWING_REQUEST,
+                data: {
+                    token,
+                    offset: followings.length/3
 
-            }
-        })
+                }
+            });
+        }
+
     },[followings]);
 
     const loadMoreFollowers = useCallback(() => {
-        dispatch({
-            type: LOAD_FOLLOWER_REQUEST,
-            data: {
-                token,
-                offset: followers.length/3
-            }
-        })
+        if(followers) {
+            dispatch({
+                type: LOAD_FOLLOWER_REQUEST,
+                data: {
+                    token,
+                    offset: followers.length/3
+                }
+            });
+        }
+
     },[followers]);
 
     const clickProfile = useCallback(() => {
@@ -132,16 +149,16 @@ const Profile = () => {
                     <Card
                         actions={[
                             <div onClick={clickPost}>게시글<br/>{posts.length}</div>,
-                            <div onClick={clickFollow}>팔로윙<br/>{me.followings.length}</div>,
-                            <div onClick={clickFollow}>팔로워<br/>{me.followers.length}</div>
+                            <div onClick={clickFollow}>팔로윙<br/>{me && me.followings.length}</div>,
+                            <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
                         ]}
-                        cover={<img ref={updateProfileImage} src={me.profileImageUrl ? `http://localhost:8080/image/profile/${me.profileImageUrl}` :
+                        cover={<img ref={updateProfileImage} src={me && me.profileImageUrl ? `http://localhost:8080/image/profile/${me.profileImageUrl}` :
                                             'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
                     >
                         {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
                         {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>이미지 업로드</Button>}
-                        <Card.Meta avatar={<Avatar>{me.name[0]}</Avatar>}
-                                   title={me.name}
+                        <Card.Meta avatar={<Avatar>{me && me.name[0]}</Avatar>}
+                                   title={me && me.name}
                         />
 
 
@@ -197,6 +214,7 @@ Profile.getInitialProps = async(context) => {
         ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
 
     if(token.length > 0) {
+        console.log('왜 실행됨');
         context.store.dispatch({
             type: LOAD_FOLLOWER_REQUEST,
             data: {token}

@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -80,13 +81,12 @@ public class UserService {
         User user = User.builder()
                 .name(name)
                 .email(email)
-
-
                 .password(passwordEncoder.encode(password))
                 .profileImageUrl(profileImageUrl)
                 .build();
 
         User saved = userRepository.save(user);
+        saved.newEmailToken();
 
         // raise event
         eventBus.post(new JoinEvent(saved));
@@ -131,6 +131,21 @@ public class UserService {
         checkNotNull(userId, "userId must be provided.");
 
         return connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByTargetUser_Id(userId);
+    }
+
+    @Transactional
+    public User certificateEmail(String token, String email) {
+        return findByEmail(new Email(email))
+                .map(user -> {
+                    if(!user.getEmailCertificationToken().equals(token)) {
+                        throw new IllegalArgumentException("유효하지 않은 접근 입니다.");
+                    }
+
+                    user.setEmailCertification(true);
+                    user.setCreateAt(LocalDateTime.now());
+                    return user;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 접근 입니다."));
     }
 
     @Transactional
