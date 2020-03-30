@@ -156,11 +156,7 @@ public class UserService {
 
         return userRepository.findById(meId)
                 .map(user -> {
-                   /* ConnectedUser connectedUser = new ConnectedUser(null,null);
-                    connectedUser.setTargetUser(targetUser);
-                    user.addConnectedUser(connectedUser);
-
-                    return connectedUserRepository.save(connectedUser).getUser();*/
+                    user.addFollowing(targetUser);
                    return user;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, meId));
@@ -171,57 +167,26 @@ public class UserService {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
+        User targetUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
 
         return userRepository.findById(meId)
                 .map(user -> {
-                   /* List<ConnectedUser> connectedUsers = user.getConnectedUsers();
-                    user.setConnectedUsers(new ArrayList<>());
-
-                    for(ConnectedUser connectedUser : connectedUsers) {
-                        if(!connectedUser.getTargetUser().getId().equals(userId)) {
-                            user.addConnectedUser(connectedUser);
-                        }
-                    }*/
-
-//                    connectedUserRepository.deleteByUser_IdAndTargetUser_Id(meId, userId);
-
+                    user.removeFollowing(targetUser);
                     return userId;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, meId));
     }
-
-   /* public List<User> getFollowings(Long id, Pageable pageable) {
-        checkNotNull(id, "id must be provided.");
-
-        List<ConnectedUser> result =  connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(id,pageable);
-        return result.stream().map(ConnectedUser::getTargetUser).collect(Collectors.toList());
-    }
-
-    public List<User> getFollowers(Long id, Pageable pageable) {
-        checkNotNull(id, "id must be provided.");
-
-        List<ConnectedUser> result = connectedUserRepository.findByTargetUser_IdAndCreateAtIsNotNullOrderByIdDesc(id,pageable);
-        return result.stream().map(ConnectedUser::getUser).collect(Collectors.toList());
-    }*/
 
     @Transactional
     public Long removeFollower(Long meId, Long userId) {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
+        User me = userRepository.findById(meId).orElseThrow(() -> new NotFoundException(User.class, meId));
+
         return userRepository.findById(userId)
-                .map(user -> {
-                   /* List<ConnectedUser> connectedUsers = user.getConnectedUsers();
-                    user.setConnectedUsers(new ArrayList<>());
-
-                    for(ConnectedUser connectedUser : connectedUsers) {
-                        if(!connectedUser.getTargetUser().getId().equals(meId)) {
-                            user.addConnectedUser(connectedUser);
-                        }
-                    }*/
-
-//                    connectedUserRepository.deleteByUser_IdAndTargetUser_Id(userId, meId);
-
+                .map(targetUser -> {
+                    targetUser.removeFollowing(me);
                     return userId;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, userId));

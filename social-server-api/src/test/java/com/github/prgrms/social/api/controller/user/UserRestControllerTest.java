@@ -21,8 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -63,7 +62,7 @@ class UserRestControllerTest {
     @BeforeEach
     void setup() {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-        user = User.builder().name("test").password("12345678").email(new Email("test@gmail.com")).id(1L).build();
+        user = User.builder().name("test1").password("12345678").email(new Email("test1@gmail.com")).id(1L).build();
         apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
     }
 
@@ -319,5 +318,94 @@ class UserRestControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andDo(print());
+    }
+
+    @DisplayName("팔로우 추가")
+    @Test
+    void follow() throws Exception{
+
+        User user1 = userService.join("test1", new Email("test1@gmail.com"), "12345678", null);
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678", null);
+
+        mockMvc.perform(post("/api/user/" + user2.getId() + "/follow")
+                        .header(tokenHeader, apiToken))
+                        .andExpect(status().isOk())
+                        .andDo(print());
+
+        User resultUser1 = userService.findById(user1.getId()).orElse(null);
+        User resultUser2 = userService.findById(user2.getId()).orElse(null);
+
+        assertNotNull(resultUser1);
+        assertNotNull(resultUser2);
+        assertEquals(user1.getFollowings().size() + 1, resultUser1.getFollowings().size());
+        assertEquals(user2.getFollowers().size() + 1, resultUser2.getFollowers().size());
+    }
+
+
+    @DisplayName("언팔로우")
+    @Test
+    void unfollow() throws Exception {
+        User user1 = userService.join("test1", new Email("test1@gmail.com"), "12345678", null);
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678", null);
+
+        userService.addFollowing(user1.getId(), user2.getId());
+
+        User beforeUser1 = userService.findById(user1.getId()).orElse(null);
+        User beforeUser2 = userService.findById(user2.getId()).orElse(null);
+
+        mockMvc.perform(delete("/api/user/" + user2.getId() + "/follow")
+                .header(tokenHeader, apiToken))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        User afterUser1 = userService.findById(user1.getId()).orElse(null);
+        User afterUser2 = userService.findById(user2.getId()).orElse(null);
+
+        assertNotNull(beforeUser1);
+        assertNotNull(beforeUser2);
+        assertNotNull(afterUser1);
+        assertNotNull(afterUser2);
+        assertEquals(beforeUser1.getFollowings().size() - 1, afterUser1.getFollowings().size());
+        assertEquals(beforeUser2.getFollowers().size() - 1, afterUser2.getFollowers().size());
+    }
+
+    @DisplayName("팔로워 삭제")
+    @Test
+    void removeFollower() throws Exception {
+
+        User user1 = userService.join("test1", new Email("test1@gmail.com"), "12345678", null);
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678", null);
+
+        JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
+        String user2apiToken = "Bearer " + user2.newApiToken(jwt, new String[]{Role.USER.getValue()});
+
+        userService.addFollowing(user1.getId(), user2.getId());
+
+        User beforeUser1 = userService.findById(user1.getId()).orElse(null);
+        User beforeUser2 = userService.findById(user2.getId()).orElse(null);
+
+        mockMvc.perform(delete("/api/user/" + user1.getId() + "/follower")
+                .header(tokenHeader, user2apiToken))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        User afterUser1 = userService.findById(user1.getId()).orElse(null);
+        User afterUser2 = userService.findById(user2.getId()).orElse(null);
+
+        assertNotNull(beforeUser1);
+        assertNotNull(beforeUser2);
+        assertNotNull(afterUser1);
+        assertNotNull(afterUser2);
+        assertEquals(beforeUser1.getFollowings().size() - 1, afterUser1.getFollowings().size());
+        assertEquals(beforeUser2.getFollowers().size() - 1, afterUser2.getFollowers().size());
+
+
+    }
+    @Test
+    void testUpdateProfile() {
+    }
+
+    @Test
+    void updateProfileImage() {
     }
 }

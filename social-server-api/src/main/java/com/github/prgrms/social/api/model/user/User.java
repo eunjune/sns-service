@@ -10,6 +10,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -21,13 +22,13 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-@Entity(name = "users")
+@NoArgsConstructor(force = true)
 @Getter
 @Setter
-@NoArgsConstructor(force = true)
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"followings","posts","comments"})
 @JsonSerialize(using = UserSerializer.class)
+@Entity(name = "users")
+@ToString(exclude = {"followings","posts","comments"})
 public class User {
 
     @ApiModelProperty(value = "PK", required = true)
@@ -71,16 +72,16 @@ public class User {
 
     @ApiModelProperty(value = "팔로잉 목록")
     @JsonBackReference
-    @ManyToMany(mappedBy = "followers")
-    private Set<User> followings;
+    @ManyToMany(mappedBy = "followers", fetch = FetchType.EAGER)
+    private Set<User> followings = new HashSet<>();
 
 
     @ApiModelProperty(value = "팔로워 목록")
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "connected_user",
             joinColumns = @JoinColumn(name = "following_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id"))
-    private Set<User> followers;
+    private Set<User> followers = new HashSet<>();
 
 
     /*@ApiModelProperty(value = "사용자의 포스트")
@@ -140,6 +141,20 @@ public class User {
 
     public Optional<LocalDateTime> getLastLoginAt() {
         return ofNullable(lastLoginAt);
+    }
+
+    public void addFollowing(User targetUser) {
+        followings.add(targetUser);
+        targetUser.getFollowers().add(this);
+    }
+
+    public void removeFollowing(User targetUser) {
+        followings.remove(targetUser);
+        targetUser.removeFollower(this);
+    }
+
+    public void removeFollower(User targetUser) {
+        followers.remove(targetUser);
     }
 
 /*
