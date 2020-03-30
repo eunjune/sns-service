@@ -126,6 +126,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<User> findUserWithUserById(Long userId) {
+        checkNotNull(userId, "userId must be provided.");
+
+        return userRepository.findUserWithUserById(userId);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<User> findByEmail(Email email) {
         checkNotNull(email, "email must be provided.");
 
@@ -154,7 +161,7 @@ public class UserService {
 
         User targetUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
 
-        return userRepository.findById(meId)
+        return userRepository.findUserWithUserById(meId)
                 .map(user -> {
                     user.addFollowing(targetUser);
                    return user;
@@ -169,7 +176,7 @@ public class UserService {
 
         User targetUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
 
-        return userRepository.findById(meId)
+        return userRepository.findUserWithUserById(meId)
                 .map(user -> {
                     user.removeFollowing(targetUser);
                     return userId;
@@ -184,7 +191,7 @@ public class UserService {
 
         User me = userRepository.findById(meId).orElseThrow(() -> new NotFoundException(User.class, meId));
 
-        return userRepository.findById(userId)
+        return userRepository.findUserWithUserById(userId)
                 .map(targetUser -> {
                     targetUser.removeFollowing(me);
                     return userId;

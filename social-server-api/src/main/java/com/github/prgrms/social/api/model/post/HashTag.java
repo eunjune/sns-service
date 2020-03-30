@@ -6,8 +6,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
@@ -40,7 +40,7 @@ public class HashTag {
             inverseJoinColumns = @JoinColumn(name = "post_id"))
     @Setter
     @JsonManagedReference
-    private List<Post> posts = new ArrayList<>();
+    private Set<Post> posts = new HashSet<>();
 
     @Builder
     private HashTag(Long id, String name, LocalDateTime createAt) {

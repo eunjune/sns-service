@@ -332,8 +332,8 @@ class UserRestControllerTest {
                         .andExpect(status().isOk())
                         .andDo(print());
 
-        User resultUser1 = userService.findById(user1.getId()).orElse(null);
-        User resultUser2 = userService.findById(user2.getId()).orElse(null);
+        User resultUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User resultUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         assertNotNull(resultUser1);
         assertNotNull(resultUser2);
@@ -350,16 +350,16 @@ class UserRestControllerTest {
 
         userService.addFollowing(user1.getId(), user2.getId());
 
-        User beforeUser1 = userService.findById(user1.getId()).orElse(null);
-        User beforeUser2 = userService.findById(user2.getId()).orElse(null);
+        User beforeUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User beforeUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         mockMvc.perform(delete("/api/user/" + user2.getId() + "/follow")
                 .header(tokenHeader, apiToken))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        User afterUser1 = userService.findById(user1.getId()).orElse(null);
-        User afterUser2 = userService.findById(user2.getId()).orElse(null);
+        User afterUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User afterUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         assertNotNull(beforeUser1);
         assertNotNull(beforeUser2);
@@ -381,16 +381,16 @@ class UserRestControllerTest {
 
         userService.addFollowing(user1.getId(), user2.getId());
 
-        User beforeUser1 = userService.findById(user1.getId()).orElse(null);
-        User beforeUser2 = userService.findById(user2.getId()).orElse(null);
+        User beforeUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User beforeUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         mockMvc.perform(delete("/api/user/" + user1.getId() + "/follower")
                 .header(tokenHeader, user2apiToken))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        User afterUser1 = userService.findById(user1.getId()).orElse(null);
-        User afterUser2 = userService.findById(user2.getId()).orElse(null);
+        User afterUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User afterUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         assertNotNull(beforeUser1);
         assertNotNull(beforeUser2);

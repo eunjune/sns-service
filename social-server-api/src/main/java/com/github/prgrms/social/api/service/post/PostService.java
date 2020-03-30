@@ -45,6 +45,7 @@ public class PostService {
                         if(hashTag == null) {
                             hashTag = hashTagRepository.save(item);
                         }
+
 //                        post.addHashTag(hashTag);
                     }
 
@@ -155,19 +156,20 @@ public class PostService {
         checkNotNull(tag, "tag must be provided.");
         checkNotNull(lastId, "lastId must be provided.");
 
-        if(lastId == 0L) {
+        /*if(lastId == 0L) {
             return hashTagRepository.findByName(tag)
                     .map(hashTag -> {
-                        List<Post> posts = hashTag.getPosts();
+                        *//*List<Post> posts = hashTag.getPosts();
                         posts.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
-                        return posts.subList(0, Math.min(pageable.getPageSize(), posts.size()));
+                        return posts.subList(0, Math.min(pageable.getPageSize(), posts.size()));*//*
+                        return hashTag;
                     })
                     .orElseThrow(() -> new NotFoundException(HashTag.class, tag));
-        }
+        }*/
 
         return hashTagRepository.findByName(tag)
                 .map(hashTag -> {
-                    List<Post> posts = hashTag.getPosts();
+                    /*List<Post> posts = hashTag.getPosts();
                     posts.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
 
                     int startIndex = 0;
@@ -177,7 +179,8 @@ public class PostService {
                             break;
                         }
                     }
-                    return posts.subList(startIndex, Math.min(pageable.getPageSize(), posts.size() - startIndex));
+                    return posts.subList(startIndex, Math.min(pageable.getPageSize(), posts.size() - startIndex));*/
+                    return new ArrayList();
                 })
                 .orElseThrow(() -> new NotFoundException(HashTag.class, tag));
     }

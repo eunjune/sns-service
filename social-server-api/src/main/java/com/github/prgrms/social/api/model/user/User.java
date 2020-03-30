@@ -72,12 +72,12 @@ public class User {
 
     @ApiModelProperty(value = "팔로잉 목록")
     @JsonBackReference
-    @ManyToMany(mappedBy = "followers", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "followers")
     private Set<User> followings = new HashSet<>();
 
 
     @ApiModelProperty(value = "팔로워 목록")
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "connected_user",
             joinColumns = @JoinColumn(name = "following_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id"))

@@ -10,13 +10,14 @@ import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.post.CommentService;
 import com.github.prgrms.social.api.service.post.PostService;
+import com.github.prgrms.social.api.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -49,10 +50,13 @@ class PostRestControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
+    @Autowired
+    UserService userService;
+
+    @Autowired
     PostService postService;
 
-    @MockBean
+    @Autowired
     CommentService commentService;
 
     @Value("${jwt.token.issuer}") String issuer;
@@ -67,18 +71,15 @@ class PostRestControllerTest {
     @BeforeEach
     void setup() {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-        user = User.builder().name("test").password("1234").email(new Email("test@gmail.com")).id(1L).build();
+        user = userService.join("test", new Email("test@gmail.com"), "12345678", null);
         apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
     }
 
 
+    @DisplayName("포스트 작성")
     @Test
     void posting() throws Exception {
         String content = randomAlphabetic(40);
-
-        Post post = Post.builder().id(1L).content(content).build();
-
-        given(postService.write(Post.builder().content(content).build(),1L, new ArrayList<>())).willReturn(post);
 
         mockMvc.perform(post("/api/post")
                 .header(tokenHeader,apiToken)
@@ -87,9 +88,6 @@ class PostRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.id()").value(1L))
                 .andDo(print());
-
-        then(postService).should(times(1)).write(any(), any(),any());
-
     }
 
     @Test
