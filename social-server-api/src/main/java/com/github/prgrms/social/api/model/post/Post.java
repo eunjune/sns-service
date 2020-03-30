@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.model.post;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,7 +8,9 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +53,7 @@ public class Post {
     @JsonManagedReference
     private User user;
 
-    @ApiModelProperty(value = "이미지 리스트")
+    /*@ApiModelProperty(value = "이미지 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Image> images = new ArrayList<>();
@@ -71,13 +72,19 @@ public class Post {
     @ApiModelProperty(value = "해쉬태그 리스트")
     @ManyToMany
     @JsonBackReference
-    private List<HashTag> hashTags = new ArrayList<>();
+    private List<HashTag> hashTags = new ArrayList<>();*/
 
-    @ApiModelProperty(value = "리트윗한 글의 목록")
-    @OneToOne(mappedBy = "post",cascade = CascadeType.ALL)
+    @ApiModelProperty(value = "리트윗한 포스트")
+    @ManyToOne
+    @JoinTable(name = "retweet",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "target_post_id"))
     @JsonManagedReference
-    private Retweet retweet;
+    private Post retweetPost;
 
+    @ApiModelProperty(value = "내 글에 리트윗한 포스트 목록")
+    @OneToMany(mappedBy = "retweetPost",cascade = CascadeType.ALL)
+    private Set<Post> postsRetweetedMe = new HashSet<>();
 
     @Builder
     private Post(Long id, String content, boolean likesOfMe,boolean isRetweet, LocalDateTime createAt) {
@@ -104,7 +111,7 @@ public class Post {
         this.content = contents;
     }
 
-    public void incrementAndGetLikes(Likes likes) {
+   /* public void incrementAndGetLikes(Likes likes) {
         likesOfMe = true;
         this.likes.add(likes);
         likes.setPost(this);
@@ -127,7 +134,7 @@ public class Post {
 
     public void setIsRetweet() {
         this.isRetweet = this.retweet != null;
-    }
+    }*/
 
     public List<HashTag> findHashTag() {
         Pattern pattern = Pattern.compile("#[^\\s!@#$%^&*()+-=`~.;'\"?<>,./]+");
@@ -140,7 +147,7 @@ public class Post {
 
         return hashTags;
     }
-
+/*
     public void addHashTag(HashTag hashTag) {
         this.hashTags.add(hashTag);
         hashTag.getPosts().add(this);
@@ -149,13 +156,5 @@ public class Post {
     public void addImage(Image image) {
         this.images.add(image);
         image.setPost(this);
-    }
-
-    public void addRetweet(Retweet retweet, Post targetPost) {
-        this.isRetweet = true;
-        this.retweet = retweet;
-        retweet.setPost(this);
-        retweet.setTargetPost(targetPost);
-
-    }
+    }*/
 }

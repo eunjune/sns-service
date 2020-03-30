@@ -6,6 +6,7 @@ import com.github.prgrms.social.api.model.post.*;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.*;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
     private final JpaUserRepository userRepository;
@@ -32,18 +34,6 @@ public class PostService {
 
     private final JpaImageRepository imageRepository;
 
-    private final JpaRetweetRepository retweetRepository;
-
-    public PostService(JpaUserRepository userRepository, JpaPostRepository postRepository, JpaPostLikeRepository postLikeRepository
-            , JpaHashTagRepository hashTagRepository, JpaImageRepository imageRepository, JpaRetweetRepository retweetRepository) {
-        this.userRepository = userRepository;
-        this.postRepository = postRepository;
-        this.postLikeRepository = postLikeRepository;
-        this.hashTagRepository = hashTagRepository;
-        this.imageRepository = imageRepository;
-        this.retweetRepository = retweetRepository;
-    }
-
     @Transactional
     public Post write(Post post, Long userId, List<String> imagePaths) {
         return userRepository.findById(userId)
@@ -55,16 +45,16 @@ public class PostService {
                         if(hashTag == null) {
                             hashTag = hashTagRepository.save(item);
                         }
-                        post.addHashTag(hashTag);
+//                        post.addHashTag(hashTag);
                     }
 
                     for(String imagePath : imagePaths) {
                         Image image = Image.builder().path(imagePath).build();
                         image = imageRepository.save(image);
-                        post.addImage(image);
+//                        post.addImage(image);
                     }
 
-                    user.addPost(post);
+//                    user.addPost(post);
                     return postRepository.save(post);
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, userId));
@@ -86,10 +76,10 @@ public class PostService {
                 if (!post.isLikesOfMe()) {
                     //post.incrementAndGetLikes();
 
-                    Likes like = new Likes(null,null);
+                    /*Likes like = new Likes(null,null);
                     user.addLike(like);
                     post.incrementAndGetLikes(like);
-                    postLikeRepository.save(like);
+                    postLikeRepository.save(like);*/
 
                 }
             return post;
@@ -104,7 +94,7 @@ public class PostService {
 
         return postRepository.findByIdCustom(postId, userId, postWriterId)
                 .map(post -> {
-                    if (post.isLikesOfMe()) {
+                    /*if (post.isLikesOfMe()) {
                         List<Likes> likes = post.getLikes();
                         post.setLikes(new ArrayList<>());
 
@@ -119,7 +109,7 @@ public class PostService {
                         }
 
                         postLikeRepository.deleteById(deleteLike.getId());
-                    }
+                    }*/
                     return post;
                 });
 
@@ -223,7 +213,7 @@ public class PostService {
 
         return postRepository.findById(postId)
                 .map(post -> {
-                    if(post.getUser().getId().equals(userId)) {
+                   /* if(post.getUser().getId().equals(userId)) {
                         throw new IllegalArgumentException("자신의 글은 리트윗 할 수 없습니다.");
                     }
 
@@ -238,17 +228,10 @@ public class PostService {
 
                     user.addPost(retweetPost);
 
-                    return postRepository.save(retweetPost);
+                    return postRepository.save(retweetPost);*/
+                   return post;
                 })
                 .orElseThrow(() -> new NotFoundException(Post.class, postId));
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Retweet> findRetweetByPostId(Long postId) {
-        checkNotNull(postId, "postId must be provided.");
-
-        return retweetRepository.findByTargetPostId(postId);
-
     }
 
     public Long removePost(Long userId, Long postId) {

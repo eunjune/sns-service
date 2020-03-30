@@ -6,17 +6,13 @@ import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.event.JoinEvent;
 import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.commons.AttachedFile;
-import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.user.JpaConnectedUserRepository;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
-import com.github.prgrms.social.api.repository.user.projection.ConnectedId;
 import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -44,8 +37,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JpaUserRepository userRepository;
-
-    private final JpaConnectedUserRepository connectedUserRepository;
 
     private final ModelMapper modelMapper;
 
@@ -141,13 +132,6 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    @Transactional(readOnly = true)
-    public List<ConnectedId> findConnectedIds(Long userId) {
-        checkNotNull(userId, "userId must be provided.");
-
-        return connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByTargetUser_Id(userId);
-    }
-
     @Transactional
     public User certificateEmail(String token, String email) {
         return findByEmail(new Email(email))
@@ -172,11 +156,12 @@ public class UserService {
 
         return userRepository.findById(meId)
                 .map(user -> {
-                    ConnectedUser connectedUser = new ConnectedUser(null,null);
+                   /* ConnectedUser connectedUser = new ConnectedUser(null,null);
                     connectedUser.setTargetUser(targetUser);
                     user.addConnectedUser(connectedUser);
 
-                    return connectedUserRepository.save(connectedUser).getUser();
+                    return connectedUserRepository.save(connectedUser).getUser();*/
+                   return user;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, meId));
     }
@@ -189,23 +174,23 @@ public class UserService {
 
         return userRepository.findById(meId)
                 .map(user -> {
-                    List<ConnectedUser> connectedUsers = user.getConnectedUsers();
+                   /* List<ConnectedUser> connectedUsers = user.getConnectedUsers();
                     user.setConnectedUsers(new ArrayList<>());
 
                     for(ConnectedUser connectedUser : connectedUsers) {
                         if(!connectedUser.getTargetUser().getId().equals(userId)) {
                             user.addConnectedUser(connectedUser);
                         }
-                    }
+                    }*/
 
-                    connectedUserRepository.deleteByUser_IdAndTargetUser_Id(meId, userId);
+//                    connectedUserRepository.deleteByUser_IdAndTargetUser_Id(meId, userId);
 
                     return userId;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, meId));
     }
 
-    public List<User> getFollowings(Long id, Pageable pageable) {
+   /* public List<User> getFollowings(Long id, Pageable pageable) {
         checkNotNull(id, "id must be provided.");
 
         List<ConnectedUser> result =  connectedUserRepository.findByUser_IdAndCreateAtIsNotNullOrderByIdDesc(id,pageable);
@@ -217,7 +202,7 @@ public class UserService {
 
         List<ConnectedUser> result = connectedUserRepository.findByTargetUser_IdAndCreateAtIsNotNullOrderByIdDesc(id,pageable);
         return result.stream().map(ConnectedUser::getUser).collect(Collectors.toList());
-    }
+    }*/
 
     @Transactional
     public Long removeFollower(Long meId, Long userId) {
@@ -226,16 +211,16 @@ public class UserService {
 
         return userRepository.findById(userId)
                 .map(user -> {
-                    List<ConnectedUser> connectedUsers = user.getConnectedUsers();
+                   /* List<ConnectedUser> connectedUsers = user.getConnectedUsers();
                     user.setConnectedUsers(new ArrayList<>());
 
                     for(ConnectedUser connectedUser : connectedUsers) {
                         if(!connectedUser.getTargetUser().getId().equals(meId)) {
                             user.addConnectedUser(connectedUser);
                         }
-                    }
+                    }*/
 
-                    connectedUserRepository.deleteByUser_IdAndTargetUser_Id(userId, meId);
+//                    connectedUserRepository.deleteByUser_IdAndTargetUser_Id(userId, meId);
 
                     return userId;
                 })

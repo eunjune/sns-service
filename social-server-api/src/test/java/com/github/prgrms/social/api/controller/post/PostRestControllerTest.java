@@ -141,10 +141,10 @@ class PostRestControllerTest {
         givenPosts.add(post3);
         givenPosts.add(post4);
 
-        post1.addHashTag(hashTag);
+        /*post1.addHashTag(hashTag);
         post2.addHashTag(hashTag);
         post3.addHashTag(hashTag);
-        post4.addHashTag(hashTag);
+        post4.addHashTag(hashTag);*/
 
         given(postService.findByHashTag(tag.substring(1),0L, PageRequest.of(page,size))).willReturn(givenPosts.subList(page,page + size));
 

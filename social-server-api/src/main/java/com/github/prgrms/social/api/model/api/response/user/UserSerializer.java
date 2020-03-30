@@ -36,16 +36,12 @@ public class UserSerializer extends StdSerializer<User> {
             gen.writeStringField("profileImageUrl",value.getProfileImageUrl().orElse(null));
         }
 
-        long[] followings = new long[value.getConnectedUsers().size()];
-        for(int i=0; i<value.getConnectedUsers().size(); ++i) {
-            followings[i] = value.getConnectedUsers().get(i).getTargetUser().getId();
-        }
-        gen.writeFieldName("followings");
+        /*gen.writeFieldName("followings");
         gen.writeArray(followings, 0, followings.length);
 
         long[] followers = new long[0];
         gen.writeFieldName("followers");
-        gen.writeArray(followers,0,followers.length);
+        gen.writeArray(followers,0,followers.length);*/
 
         gen.writeEndObject();
 

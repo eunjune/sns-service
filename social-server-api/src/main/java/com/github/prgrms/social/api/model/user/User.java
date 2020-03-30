@@ -4,18 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.prgrms.social.api.model.api.response.user.UserSerializer;
-import com.github.prgrms.social.api.model.post.Comment;
-import com.github.prgrms.social.api.model.post.Likes;
-import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.security.JWT;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -30,7 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Setter
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(of = "id")
-@ToString(exclude = {"connectedUsers","posts","comments"})
+@ToString(exclude = {"followings","posts","comments"})
 @JsonSerialize(using = UserSerializer.class)
 public class User {
 
@@ -60,7 +56,6 @@ public class User {
     @JsonIgnore
     private String emailCertificationToken;
 
-    // TODO profileImageUrl 추가 (컬럼 profile_image_url varchar(255) 추가도 필요함)
     @ApiModelProperty(value = "프로필 이미지 URL")
     private String profileImageUrl;
 
@@ -75,11 +70,20 @@ public class User {
     private LocalDateTime createAt;
 
     @ApiModelProperty(value = "팔로잉 목록")
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<ConnectedUser> connectedUsers = new ArrayList<>();
+    @ManyToMany(mappedBy = "followers")
+    private Set<User> followings;
 
-    @ApiModelProperty(value = "사용자의 포스트")
+
+    @ApiModelProperty(value = "팔로워 목록")
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "connected_user",
+            joinColumns = @JoinColumn(name = "following_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id"))
+    private Set<User> followers;
+
+
+    /*@ApiModelProperty(value = "사용자의 포스트")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
     private List<Post> posts = new ArrayList<>();
@@ -92,7 +96,7 @@ public class User {
     @ApiModelProperty(value = "사용자의 좋아요")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<Likes> likes = new ArrayList<>();
+    private List<Likes> likes = new ArrayList<>();*/
 
     @Builder(toBuilder = true)
     private User(Long id, String name, Email email, String password, boolean isEmailCertification, String emailCertificationToken, String profileImageUrl, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
@@ -138,16 +142,7 @@ public class User {
         return ofNullable(lastLoginAt);
     }
 
-    public void addConnectedUser(ConnectedUser connectedUser) {
-        this.connectedUsers.add(connectedUser);
-        connectedUser.setUser(this);
-    }
-
-    public void addPost(Post post) {
-        this.getPosts().add(post);
-        post.setUser(this);
-    }
-
+/*
     public void addComment(Comment comment) {
         this.comments.add(comment);
         comment.setUser(this);
@@ -156,5 +151,5 @@ public class User {
     public void addLike(Likes likes) {
         this.likes.add(likes);
         likes.setUser(this);
-    }
+    }*/
 }

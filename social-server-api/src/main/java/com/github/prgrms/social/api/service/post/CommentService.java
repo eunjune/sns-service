@@ -35,8 +35,8 @@ public class CommentService {
         checkNotNull(comment, "comment must be provided.");
 
         return postRepository.findByIdCustom(postId, userId, postWriterId).map(post -> {
-            post.getUser().addComment(comment);
-            post.incrementAndGetComments(comment);
+//            post.getUser().addComment(comment);
+//            post.incrementAndGetComments(comment);
             postRepository.save(post);
 
             Comment saveComment = commentRepository.save(comment);

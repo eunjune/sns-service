@@ -47,6 +47,7 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error("fail to send email", e);
+            throw new RuntimeException(e);
         }
 
     }
@@ -70,6 +71,7 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             log.error("fail to send email", e);
+            throw new RuntimeException(e);
         }
     }
 

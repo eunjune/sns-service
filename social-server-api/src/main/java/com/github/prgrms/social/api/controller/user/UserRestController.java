@@ -4,7 +4,10 @@ import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.api.request.user.*;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
 import com.github.prgrms.social.api.model.api.response.user.JoinResult;
-import com.github.prgrms.social.api.model.user.*;
+import com.github.prgrms.social.api.model.user.Email;
+import com.github.prgrms.social.api.model.user.Role;
+import com.github.prgrms.social.api.model.user.Subscription;
+import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.user.EmailService;
@@ -21,7 +24,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
@@ -35,7 +37,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
@@ -234,7 +235,7 @@ public class UserRestController {
         );
     }
 
-    @GetMapping(path = "user/followings")
+ /*   @GetMapping(path = "user/followings")
     @ApiOperation(value = "팔로우 목록")
     public ApiResult<List<User>> followings(
             @AuthenticationPrincipal JwtAuthentication authentication,
@@ -250,7 +251,7 @@ public class UserRestController {
             Pageable pageable
     ) {
         return OK(userService.getFollowers(authentication.id.getValue(),pageable));
-    }
+    }*/
 
     @PostMapping(path = "user/{userId}/follow")
     @ApiOperation(value = "팔로우")

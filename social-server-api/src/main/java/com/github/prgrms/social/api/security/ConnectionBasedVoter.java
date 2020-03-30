@@ -2,7 +2,6 @@ package com.github.prgrms.social.api.security;
 
 import com.github.prgrms.social.api.model.commons.Id;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.user.projection.ConnectedId;
 import com.github.prgrms.social.api.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -13,7 +12,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -59,12 +57,12 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
         }
 
         // 친구관계면 승인
-        List<ConnectedId> connectedIds = userService.findConnectedIds(jwtAuthentication.id.getValue());
+        /*List<ConnectedId> connectedIds = userService.findConnectedIds(jwtAuthentication.id.getValue());
         for(int i=0; i<connectedIds.size(); ++i) {
             if(connectedIds.get(i).getTargetUserId().equals(uriId.getValue())) {
                 return ACCESS_GRANTED;
             }
-        }
+        }*/
 
         return ACCESS_DENIED;
     }

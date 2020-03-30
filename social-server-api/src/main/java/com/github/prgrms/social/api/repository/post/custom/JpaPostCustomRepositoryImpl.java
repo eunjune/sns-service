@@ -30,7 +30,7 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
                 .setParameter("postWriterId", postWriterId)
                 .setParameter("id", id).getSingleResult();
 
-        post.setLikesOfMe(userId);
+//        post.setLikesOfMe(userId);
 
         return Optional.of(post);
     }
@@ -51,8 +51,8 @@ public class JpaPostCustomRepositoryImpl implements JpaPostCustomRepository {
 
         for(int i=0; i<resultList.size(); ++i) {
             Post post = (Post)resultList.get(i);
-            post.setLikesOfMe(userId);
-            post.setIsRetweet();
+//            post.setLikesOfMe(userId);
+//            post.setIsRetweet();
         }
 
         return resultList;
