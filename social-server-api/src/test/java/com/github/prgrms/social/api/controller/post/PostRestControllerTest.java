@@ -1,16 +1,21 @@
 package com.github.prgrms.social.api.controller.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.prgrms.social.api.model.post.Comment;
+import com.github.prgrms.social.api.model.api.request.post.CommentRequest;
+import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
 import com.github.prgrms.social.api.model.post.HashTag;
+import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
+import com.github.prgrms.social.api.repository.post.*;
+import com.github.prgrms.social.api.repository.user.JpaUserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.post.CommentService;
 import com.github.prgrms.social.api.service.post.PostService;
 import com.github.prgrms.social.api.service.user.UserService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,21 +24,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -59,9 +57,30 @@ class PostRestControllerTest {
     @Autowired
     CommentService commentService;
 
+    @Autowired
+    JpaUserRepository userRepository;
+
+    @Autowired
+    JpaPostRepository postRepository;
+
+    @Autowired
+    JpaCommentRepository commentRepository;
+
+    @Autowired
+    JpaPostLikeRepository postLikeRepository;
+
+    @Autowired
+    JpaHashTagRepository hashTagRepository;
+
+    @Autowired
+    JpaImageRepository imageRepository;
+
     @Value("${jwt.token.issuer}") String issuer;
+
     @Value("${jwt.token.clientSecret}") String clientSecret;
+
     @Value("${jwt.token.expirySeconds}") int expirySeconds;
+
     @Value("${jwt.token.header}") String tokenHeader;
 
     User user;
@@ -71,146 +90,202 @@ class PostRestControllerTest {
     @BeforeEach
     void setup() {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-        user = userService.join("test", new Email("test@gmail.com"), "12345678", null);
+        user = userService.join("test", new Email("test@gmail.com"), "12345678");
         apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
+    }
+
+    @AfterEach
+    void after() {
+        imageRepository.deleteAll();
+        hashTagRepository.deleteAll();
+        commentRepository.deleteAll();
+        postLikeRepository.deleteAll();
+        postRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
 
     @DisplayName("포스트 작성")
     @Test
     void posting() throws Exception {
-        String content = randomAlphabetic(40);
+        List<String> imagePaths = new ArrayList<>();
+        imagePaths.add("image1.png");
+        imagePaths.add("image2.png");
+        String content = "content testsets #abc #hash sdfsdfsdfds";
+        PostingRequest postingRequest = new PostingRequest(content,imagePaths);
+
+        List<Post> beforePosts = postService.findAll(0L,PageRequest.of(0,4));
+        List<HashTag> beforeHashTagList = hashTagRepository.findAll();
+        List<Image> beforeImageList = imageRepository.findAll();
+
 
         mockMvc.perform(post("/api/post")
                 .header(tokenHeader,apiToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"content()\" : \"" + content + "\"}"))
+                .content(objectMapper.writeValueAsString(postingRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.id()").value(1L))
                 .andDo(print());
+
+        List<Post> afterPosts = postService.findAll(0L,PageRequest.of(0,4));
+        List<HashTag> afterHashTagList = hashTagRepository.findAll();
+        List<Image> afterImageList = imageRepository.findAll();
+
+        assertEquals(beforePosts.size() + 1, afterPosts.size());
+        assertNotEquals(beforeHashTagList.size(), afterHashTagList.size());
+        assertNotEquals(beforeImageList.size(), afterImageList.size());
     }
 
+    @DisplayName("포스트 조회 - 처음 조회시")
     @Test
-    void posts() throws Exception {
-        String content1 = randomAlphabetic(40);
-        String content2 = randomAlphabetic(40);
+    void findAllLastIdZero() throws Exception {
+        Post post1 = Post.builder().content("post1").build();
+        Post post2 = Post.builder().content("post2").build();
+        Post post3 = Post.builder().content("post3").build();
+        Post post4 = Post.builder().content("post4").build();
 
-        Post post1 = Post.builder().id(1L).content(content1).build();
-        Post post2 = Post.builder().id(1L).content(content2).build();
+        postService.write(post1,user.getId(),new ArrayList<>());
+        postService.write(post2,user.getId(),new ArrayList<>());
+        postService.write(post3,user.getId(),new ArrayList<>());
+        Post writedPost = postService.write(post4, user.getId(), new ArrayList<>());
 
-        List<Post> posts = new ArrayList<>();
-        posts.add(post1);
-        posts.add(post2);
+        postService.like(writedPost.getId(),user.getId(),user.getId());
 
-        int page = 0;
-        int size = 2;
-
-        given(postService.findAllById(1L, 1L, 0L, PageRequest.of(page,size))).willReturn(posts.subList(page,page + size));
-
-
-        mockMvc.perform(get("/api/user/1/post/list")
-                .header(tokenHeader, apiToken)
-                .param("page", String.valueOf(page)).param("size",String.valueOf(size)))
+        mockMvc.perform(get("/api/user/" + user.getId() +"/post/list?lastId=0&size=2")
+                .header(tokenHeader,apiToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.*", hasSize(size)))
+                .andExpect(jsonPath("$.response.size()").value(2))
+                .andExpect(jsonPath("$.response.[0].likesOfMe").value(true))
                 .andDo(print());
 
-        then(postService).should(times(1)).findAllById(any(),any(), any(), any());
+
     }
 
+    @DisplayName("포스트 조회 - 인피니트 스크롤링 이후")
+    @Test
+    void findAllLastIdNotZero() throws Exception {
+        Post post1 = Post.builder().content("post1").build();
+        Post post2 = Post.builder().content("post2").build();
+        Post post3 = Post.builder().content("post3").build();
+        Post post4 = Post.builder().content("post4").build();
+
+        Post writedPost = postService.write(post1, user.getId(), new ArrayList<>());
+        Post lastPost = postService.write(post2, user.getId(), new ArrayList<>());
+        postService.write(post3,user.getId(),new ArrayList<>());
+        postService.write(post4, user.getId(), new ArrayList<>());
+
+        postService.like(writedPost.getId(),user.getId(),user.getId());
+
+        mockMvc.perform(get("/api/user/" + user.getId() +"/post/list?lastId=" + lastPost.getId() +"&size=2")
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.size()").value(1))
+                .andExpect(jsonPath("$.response.[0].likesOfMe").value(true))
+                .andDo(print());
+    }
+
+    @DisplayName("해시태그 검색")
     @Test
     void postsOfHashTag() throws Exception {
+        Post post1 = Post.builder().content("#hashtag").build();
+        Post post2 = Post.builder().content("#hashtag").build();
+        Post post3 = Post.builder().content("#hashtag").build();
+        Post post4 = Post.builder().content("#hashtag").build();
 
-        int size = 4;
-        int page = 0;
-        Pageable pageable = PageRequest.of(page,size);
+        postService.write(post1,user.getId(),new ArrayList<>());
+        postService.write(post2,user.getId(),new ArrayList<>());
+        postService.write(post3,user.getId(),new ArrayList<>());
+        postService.write(post4,user.getId(),new ArrayList<>());
 
-        String tag = "#hashtag";
-        HashTag hashTag = HashTag.builder().name(tag.substring(1)).build();
-
-        List<Post> givenPosts = new ArrayList<>();
-        Post post1 = Post.builder().id(1L).content(randomAlphabetic(40) + tag).build();
-        Post post2 = Post.builder().id(2L).content(randomAlphabetic(40) + tag).build();
-        Post post3 = Post.builder().id(3L).content(randomAlphabetic(40) + tag).build();
-        Post post4 = Post.builder().id(4L).content(randomAlphabetic(40) + tag).build();
-
-        givenPosts.add(post1);
-        givenPosts.add(post2);
-        givenPosts.add(post3);
-        givenPosts.add(post4);
-
-        /*post1.addHashTag(hashTag);
-        post2.addHashTag(hashTag);
-        post3.addHashTag(hashTag);
-        post4.addHashTag(hashTag);*/
-
-        given(postService.findByHashTag(tag.substring(1),0L, PageRequest.of(page,size))).willReturn(givenPosts.subList(page,page + size));
-
-        mockMvc.perform(get("/api/post/hashtag/list")
-                .header(tokenHeader, apiToken)
-                .param("page", String.valueOf(page)).param("size",String.valueOf(size)))
+        mockMvc.perform(get("/api/post/hashtag/list?lastId=3&size=2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.*", hasSize(size)))
+                .andExpect(jsonPath("$.response.size()").value(2))
+                .andExpect(jsonPath("$.response.[0].id").value(2))
                 .andDo(print());
-
-        then(postService).should(times(1)).findByHashTag(any(), any(), any());
     }
 
+    @DisplayName("포스트 삭제")
+    @Test
+    void removePost() throws Exception {
+        Post post1 = Post.builder().content("post1").build();
+        Post savedPost = postService.write(post1, user.getId(), new ArrayList<>());
+
+        mockMvc.perform(delete("/api/post/" + savedPost.getId())
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response").value(savedPost.getId()))
+                .andDo(print());
+
+        assertNull(postService.findById(savedPost.getId()).orElse(null));
+    }
+
+    @DisplayName("좋아요")
     @Test
     void like() throws Exception {
-        String content = randomAlphabetic(40);
+        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
 
-        Post post = Post.builder().id(1L).content(content).build();
+        Post post1 = Post.builder().content("post1").build();
+        Post savedPost = postService.write(post1, user2.getId(), new ArrayList<>());
 
-        given(postService.like(1L,1L,1L)).willReturn(Optional.ofNullable(post));
-
-        mockMvc.perform(patch("/api/user/1/post/1/like")
-                        .header(tokenHeader,apiToken))
-                        .andDo(print());
-
-        then(postService).should(times(1)).like(any(),any(),any());
-
-    }
-
-    @Test
-    void comment() throws Exception {
-        String content = randomAlphabetic(40);
-        Comment comment = Comment.builder().id(1L).content(content).build();
-
-        given(commentService.write(1L, 1L, 1L, Comment.builder().content(content).build()))
-                .willReturn(comment);
-
-        mockMvc.perform(post("/api/user/1/post/1/comment")
-                        .header(tokenHeader, apiToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"content()\" : \"" + content + "\"}"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.response.id()").value(1L))
-                        .andDo(print());
-
-        then(commentService).should(times(1)).write(any(),any(),any(),any());
-    }
-
-    @Test
-    void comments() throws Exception {
-        String content1 = randomAlphabetic(40);
-        String content2 = randomAlphabetic(40);
-
-        Comment comment1 = Comment.builder().id(1L).content(content1).build();
-        Comment comment2 = Comment.builder().id(2L).content(content2).build();
-
-        List<Comment> comments = new ArrayList<>();
-        comments.add(comment1);
-        comments.add(comment2);
-
-        given(commentService.findAll(1L,1L,1L)).willReturn(comments);
-
-        mockMvc.perform(get("/api/user/1/post/1/comment/list")
-                .header(tokenHeader, apiToken))
+        mockMvc.perform(patch("/api/user/" + user2.getId() + "/post/" + savedPost.getId() +"/like")
+                .header(tokenHeader,apiToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.*",hasSize(2)))
+                .andExpect(jsonPath("$.response.likesOfMe").value(true))
                 .andDo(print());
 
-        then(commentService).should(times(1)).findAll(any(),any(),any());
+    }
+
+    @DisplayName("좋아요 취소")
+    @Test
+    void unlike() throws Exception {
+        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+
+        Post post1 = Post.builder().content("post1").build();
+        Post savedPost = postService.write(post1, user2.getId(), new ArrayList<>());
+        postService.like(savedPost.getId(),user.getId(),user2.getId());
+
+        mockMvc.perform(delete("/api/user/" + user2.getId() + "/post/" + savedPost.getId() +"/unlike")
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.likesOfMe").value(false))
+                .andDo(print());
+
+    }
+
+    @DisplayName("댓글 작성")
+    @Test
+    void comment() throws Exception {
+        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+
+        Post post1 = Post.builder().content("post1").build();
+        Post savedPost = postService.write(post1, user2.getId(), new ArrayList<>());
+        CommentRequest commentRequest = new CommentRequest("comment1");
+
+        mockMvc.perform(post("/api/user/" + user2.getId() + "/post/" + savedPost.getId() +"/comment")
+                .header(tokenHeader,apiToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(commentRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.content").value(commentRequest.getContent()))
+                .andDo(print());
+
+        Post afterPost = postService.findById(savedPost.getId(), user2.getId(), user.getId()).orElse(null);
+        assertNotNull(afterPost);
+        assertEquals(afterPost.getComments().size(),1);
+
+    }
+
+    @DisplayName("리트윗")
+    @Test
+    void retweet() throws Exception {
+        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+
+        Post post1 = Post.builder().content("post1").build();
+        Post savedPost = postService.write(post1, user2.getId(), new ArrayList<>());
+
+        mockMvc.perform(post("/api/post/" + savedPost.getId() +"/retweet")
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.isRetweet").value(true))
+                .andDo(print());
     }
 }

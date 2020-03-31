@@ -8,8 +8,10 @@ import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.post.CommentService;
+import com.github.prgrms.social.api.service.post.HashTagService;
 import com.github.prgrms.social.api.service.post.PostService;
 import io.swagger.annotations.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,18 +26,16 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 
 @RestController
 @RequestMapping("api")
+@RequiredArgsConstructor
 @Api(tags = "포스팅 APIs")
 public class PostRestController {
 
     private final PostService postService;
 
+    private final HashTagService hashTagService;
+
     private final CommentService commentService;
 
-    public PostRestController(PostService postService, CommentService commentService) {
-        this.postService = postService;
-        this.commentService = commentService;
-
-    }
 
     @PostMapping(path = "post")
     @ApiOperation(value = "포스트 작성")
@@ -61,7 +61,7 @@ public class PostRestController {
             Long lastId,
             Pageable pageable
     ) {
-        return OK(postService.findAllById(authentication.id.getValue(), userId, lastId, pageable));
+        return OK(postService.findAll(authentication.id.getValue(), userId, lastId, pageable));
     }
 
     @GetMapping(path = "user/post/list")
@@ -88,7 +88,7 @@ public class PostRestController {
             Long lastId,
             Pageable pageable
     ) {
-        return OK(postService.findByHashTag(tag, lastId, pageable));
+        return OK(hashTagService.findByHashTag(tag, lastId, pageable));
     }
 
     @DeleteMapping(path = "/post/{postId}")
@@ -147,7 +147,6 @@ public class PostRestController {
             Long postId,
             @RequestBody CommentRequest request
     ) {
-        // TODO Comment 작성 API를 구현하세요.
         Comment comment = request.newComment();
 
         return OK(commentService.write(postId, authentication.id.getValue(), userId, comment));

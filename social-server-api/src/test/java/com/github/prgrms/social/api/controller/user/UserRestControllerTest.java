@@ -1,5 +1,7 @@
 package com.github.prgrms.social.api.controller.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.prgrms.social.api.model.api.request.user.EmailAuthenticationRequest;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
@@ -7,6 +9,7 @@ import com.github.prgrms.social.api.repository.user.JpaUserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.user.EmailService;
 import com.github.prgrms.social.api.service.user.UserService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +37,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserRestControllerTest {
 
     @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     MockMvc mockMvc;
 
     @Autowired
@@ -46,14 +51,13 @@ class UserRestControllerTest {
     @Autowired
     JpaUserRepository userRepository;
 
-    @Value("${jwt.token.issuer}")
-    String issuer;
-    @Value("${jwt.token.clientSecret}")
-    String clientSecret;
-    @Value("${jwt.token.expirySeconds}")
-    int expirySeconds;
-    @Value("${jwt.token.header}")
-    String tokenHeader;
+    @Value("${jwt.token.issuer}") String issuer;
+
+    @Value("${jwt.token.clientSecret}") String clientSecret;
+
+    @Value("${jwt.token.expirySeconds}") int expirySeconds;
+
+    @Value("${jwt.token.header}") String tokenHeader;
 
     User user;
 
@@ -62,8 +66,13 @@ class UserRestControllerTest {
     @BeforeEach
     void setup() {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-        user = User.builder().name("test1").password("12345678").email(new Email("test1@gmail.com")).id(1L).build();
-        apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
+        user = userService.join("test1",new Email("test1@gmail.com"),"12345678");
+        apiToken = "Bearer " + this.user.newApiToken(jwt, new String[]{Role.USER.getValue()});
+    }
+
+    @AfterEach
+    void after() {
+        userRepository.deleteAll();
     }
 
     @DisplayName("이메일 확인 성공")
@@ -71,7 +80,7 @@ class UserRestControllerTest {
     void checkEmail() throws Exception {
 
         mockMvc.perform(post("/api/user/exists/email")
-                .param("address", "test@gmail.com"))
+                .param("address", "test2@gmail.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("response").value("true"))
                 .andDo(print());
@@ -82,7 +91,7 @@ class UserRestControllerTest {
     void checkEmailFail() throws Exception {
 
         mockMvc.perform(post("/api/user/exists/email")
-                .param("address", "test"))
+                .param("address", "test2"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("success").value("false"))
                 .andDo(print());
@@ -94,10 +103,8 @@ class UserRestControllerTest {
     @Test
     void checkEmailFailOverlap() throws Exception {
 
-        userService.join("name", new Email("test@gmail.com"), "12345678", null);
-
         mockMvc.perform(post("/api/user/exists/email")
-                .param("address", "test@gmail.com"))
+                .param("address", user.getEmail().getAddress()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("success").value("false"))
                 .andDo(print());
@@ -106,9 +113,8 @@ class UserRestControllerTest {
     @DisplayName("이름 확인 성공")
     @Test
     void checkName() throws Exception {
-
         mockMvc.perform(post("/api/user/exists/name")
-                .param("name", "test"))
+                .param("name", "test2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("response").value("true"))
                 .andDo(print());
@@ -117,11 +123,8 @@ class UserRestControllerTest {
     @DisplayName("이름 확인 실패")
     @Test
     void checkNameFail() throws Exception {
-
-        userService.join("name", new Email("test@gmail.com"), "12345678", null);
-
         mockMvc.perform(post("/api/user/exists/name")
-                .param("name", "test"))
+                .param("name", user.getName()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("success").value("false"))
                 .andDo(print());
@@ -135,15 +138,15 @@ class UserRestControllerTest {
 
         mockMvc.perform(multipart("/api/user/join")
                 .file(file)
-                .param("name", "test").param("address", "test@gmail.com").param("password", "12345678"))
+                .param("name", "test2").param("address", "test2@gmail.com").param("password", "12345678"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andDo(print());
 
-        User user = userService.findByEmail(new Email("test@gmail.com")).orElse(null);
-        assertNotNull(user);
-        assertNotEquals(user.getPassword(), "12345678");
-        assertNotNull(user.getEmailCertificationToken());
+        User user2 = userService.findByEmail(new Email("test2@gmail.com")).orElse(null);
+        assertNotNull(user2);
+        assertNotEquals(user2.getPassword(), "12345678");
+        assertNotNull(user2.getEmailCertificationToken());
         then(emailService).should().sendEmailCertificationMessage(any(User.class));
     }
 
@@ -155,7 +158,7 @@ class UserRestControllerTest {
 
         mockMvc.perform(multipart("/api/user/join")
                 .file(file)
-                .param("name", "test").param("address", "test").param("password", "12345678"))
+                .param("name", "test2").param("address", "test2@").param("password", "12345678"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andDo(print());
@@ -165,8 +168,6 @@ class UserRestControllerTest {
     @DisplayName("인증 이메일 재전송")
     @Test
     void resendEmail() throws Exception {
-        userService.join("name", new Email("test@gmail.com"), "12345678", null);
-
         mockMvc.perform(get("/api/user/resend-email")
                 .header(tokenHeader, apiToken))
                 .andExpect(status().isOk())
@@ -179,14 +180,11 @@ class UserRestControllerTest {
     @DisplayName("이메일 인증 확인 - 성공")
     @Test
     void checkEmailToken() throws Exception {
-        User user = User.builder().name("test").password("12345678").email(new Email("test@gmail.com")).id(1L).build();
-        user.newEmailToken();
+        EmailAuthenticationRequest emailAuthenticationRequest = new EmailAuthenticationRequest(user.getEmailCertificationToken(),user.getEmail().getAddress());
 
-        User savedUser = userRepository.save(user);
-
-        mockMvc.perform(get("/api/auth/check-email-token")
-                .param("email", "test@gmail.com")
-                .param("token", savedUser.getEmailCertificationToken()))
+        mockMvc.perform(post("/api/check-email-token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(emailAuthenticationRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.isEmailCertification").value(true))
                 .andDo(print());
@@ -194,34 +192,27 @@ class UserRestControllerTest {
     }
 
     @DisplayName("이메일 인증 확인 - 실패")
-    @Transactional
     @Test
     void checkEmailTokenFail() throws Exception {
-        User user = User.builder().name("test").password("12345678").email(new Email("test@gmail.com")).id(1L).build();
 
-        User savedUser = userRepository.save(user);
-        savedUser.newEmailToken();
+        user.newEmailToken();
 
-        mockMvc.perform(get("/api/auth/check-email-token")
-                .param("email", "test@gmail.com")
-                .param("token", "afasfasd"))
+        EmailAuthenticationRequest emailAuthenticationRequest = new EmailAuthenticationRequest("asdfadsfadsf",user.getEmail().getAddress());
+
+        mockMvc.perform(post("/api/check-email-token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(emailAuthenticationRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
                 .andDo(print());
     }
 
     @DisplayName("유저 정보를 가져온다")
     @Test
     void me() throws Exception {
-        User user = User.builder().name("test").password("12345678").email(new Email("test@gmail.com")).id(1L).build();
-        JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
-        String apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
-
-        userService.join("name", new Email("test@gmail.com"), "12345678", null);
 
         mockMvc.perform(get("/api/user/me").header(tokenHeader, apiToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.id").value(1L))
+                .andExpect(jsonPath("$.response.id").value(user.getId()))
                 .andDo(print());
 
     }
@@ -230,11 +221,9 @@ class UserRestControllerTest {
     @DisplayName("로그인 성공")
     @Test
     void login() throws Exception {
-        userService.join("name",new Email("test@gmail.com"),"12345678", null);
-
         mockMvc.perform(post("/api/auth")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"address\" : \"test@gmail.com\", \"password\" : \"12345678\"}"))
+                    .content("{\"address\" : \"test1@gmail.com\", \"password\" : \"12345678\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.token").isNotEmpty())
                 .andExpect(jsonPath("$.response.user").isNotEmpty())
@@ -258,11 +247,9 @@ class UserRestControllerTest {
     @DisplayName("로그인 실패 - 비밀번호 틀림")
     @Test
     void loginFailPassword() throws Exception {
-        userService.join("name",new Email("test@gmail.com"),"12345678", null);
-
         mockMvc.perform(post("/api/auth")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"address\" : \"test@gmail.com\", \"password\" : \"11111111\"}"))
+                .content("{\"address\" : \"test1@gmail.com\", \"password\" : \"11111111\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value("false"))
                 .andDo(print());
@@ -272,9 +259,7 @@ class UserRestControllerTest {
     @DisplayName("이메일 로그인 성공")
     @Test
     void emailLogin() throws Exception {
-        userService.join("name",new Email("test@gmail.com"),"12345678", null);
-
-        mockMvc.perform(get("/api/auth/test@gmail.com"))
+        mockMvc.perform(get("/api/auth/test1@gmail.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.token").isNotEmpty())
                 .andExpect(jsonPath("$.response.user").isNotEmpty())
@@ -287,10 +272,6 @@ class UserRestControllerTest {
     @Test
     void updateProfile() throws Exception {
 
-        userService.join("test", new Email("test@gmail.com"), "12345678", null);
-        User user = userRepository.findByName("test").orElse(null);
-
-        String previousPassword = userRepository.findByName("test").orElse(null).getPassword();
         mockMvc.perform(put("/api/user/profile")
                         .header(tokenHeader, apiToken)
                         .param("name","testupdate")
@@ -301,6 +282,7 @@ class UserRestControllerTest {
 
 
         User updatedUser = userRepository.findById(user.getId()).orElse(null);
+        assertNotNull(updatedUser);
         assertNotEquals(user.getName(), updatedUser.getName());
         assertNotEquals(user.getPassword(), updatedUser.getPassword());
     }
@@ -308,9 +290,6 @@ class UserRestControllerTest {
     @DisplayName("프로필 수정 - 실패")
     @Test
     void updateProfileFail() throws Exception {
-
-        userService.join("test", new Email("test@gmail.com"), "12345678", null);
-
         mockMvc.perform(put("/api/user/profile")
                    .header(tokenHeader, apiToken)
                     .param("name","")
@@ -324,20 +303,19 @@ class UserRestControllerTest {
     @Test
     void follow() throws Exception{
 
-        User user1 = userService.join("test1", new Email("test1@gmail.com"), "12345678", null);
-        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678", null);
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
 
         mockMvc.perform(post("/api/user/" + user2.getId() + "/follow")
                         .header(tokenHeader, apiToken))
                         .andExpect(status().isOk())
                         .andDo(print());
 
-        User resultUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User resultUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
         User resultUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         assertNotNull(resultUser1);
         assertNotNull(resultUser2);
-        assertEquals(user1.getFollowings().size() + 1, resultUser1.getFollowings().size());
+        assertEquals(user.getFollowings().size() + 1, resultUser1.getFollowings().size());
         assertEquals(user2.getFollowers().size() + 1, resultUser2.getFollowers().size());
     }
 
@@ -345,12 +323,11 @@ class UserRestControllerTest {
     @DisplayName("언팔로우")
     @Test
     void unfollow() throws Exception {
-        User user1 = userService.join("test1", new Email("test1@gmail.com"), "12345678", null);
-        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678", null);
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
 
-        userService.addFollowing(user1.getId(), user2.getId());
+        userService.addFollowing(user.getId(), user2.getId());
 
-        User beforeUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User beforeUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
         User beforeUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         mockMvc.perform(delete("/api/user/" + user2.getId() + "/follow")
@@ -358,7 +335,7 @@ class UserRestControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        User afterUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User afterUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
         User afterUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         assertNotNull(beforeUser1);
@@ -373,23 +350,22 @@ class UserRestControllerTest {
     @Test
     void removeFollower() throws Exception {
 
-        User user1 = userService.join("test1", new Email("test1@gmail.com"), "12345678", null);
-        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678", null);
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
 
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
         String user2apiToken = "Bearer " + user2.newApiToken(jwt, new String[]{Role.USER.getValue()});
 
-        userService.addFollowing(user1.getId(), user2.getId());
+        userService.addFollowing(user.getId(), user2.getId());
 
-        User beforeUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User beforeUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
         User beforeUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
-        mockMvc.perform(delete("/api/user/" + user1.getId() + "/follower")
+        mockMvc.perform(delete("/api/user/" + user.getId() + "/follower")
                 .header(tokenHeader, user2apiToken))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        User afterUser1 = userService.findUserWithUserById(user1.getId()).orElse(null);
+        User afterUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
         User afterUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
         assertNotNull(beforeUser1);
@@ -400,12 +376,5 @@ class UserRestControllerTest {
         assertEquals(beforeUser2.getFollowers().size() - 1, afterUser2.getFollowers().size());
 
 
-    }
-    @Test
-    void testUpdateProfile() {
-    }
-
-    @Test
-    void updateProfileImage() {
     }
 }

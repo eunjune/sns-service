@@ -12,5 +12,5 @@ INSERT INTO comment(id,user_id,post_id,content,create_at) VALUES (null,2,4,'firs
 
 INSERT INTO connected_user(id,user_id,target_user_id,create_at) VALUES (null,1,2,'2019-03-31 13:00:00');
 
-INSERT INTO likes(id,user_id,post_id,create_at) VALUES (null,1,1,'2019-03-01 15:10:00');
+INSERT INTO likeInfo(id,user_id,post_id,create_at) VALUES (null,1,1,'2019-03-01 15:10:00');
 */

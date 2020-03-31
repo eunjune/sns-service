@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
-import static com.github.prgrms.social.api.model.commons.AttachedFile.toAttachedFile;
 
 @Slf4j
 @RestController
@@ -119,7 +118,6 @@ public class UserRestController {
     @PostMapping(path = "user/join", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "회원가입 (API 토큰 필요없음)")
     public ApiResult<JoinResult> join(
-            @RequestPart(required = false) MultipartFile file,
             @Valid JoinRequest joinRequest,
             Errors errors
     ) throws IOException {
@@ -132,8 +130,7 @@ public class UserRestController {
         User user = userService.join(
                 joinRequest.getName(),
                 new Email(joinRequest.getAddress()),
-                joinRequest.getPassword(),
-                toAttachedFile(file)
+                joinRequest.getPassword()
         );
 
 
@@ -150,6 +147,8 @@ public class UserRestController {
 
     @GetMapping(path = "user/resend-email")
     public ApiResult<Boolean> resendEmail(@AuthenticationPrincipal JwtAuthentication authentication) {
+        System.out.println("resend-email");
+        System.out.println(authentication.id.getValue());
         User user = userService.findById(authentication.id.getValue())
                 .orElseThrow(() -> new NotFoundException(User.class, authentication.id.getValue()));
 
@@ -234,24 +233,6 @@ public class UserRestController {
                         .orElseThrow(() -> new NotFoundException(User.class, id))
         );
     }
-
- /*   @GetMapping(path = "user/followings")
-    @ApiOperation(value = "팔로우 목록")
-    public ApiResult<List<User>> followings(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            Pageable pageable
-    ) {
-        return OK(userService.getFollowings(authentication.id.getValue(),pageable));
-    }
-
-    @GetMapping(path = "user/followers")
-    @ApiOperation(value = "팔로우 목록")
-    public ApiResult<List<User>> followers(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            Pageable pageable
-    ) {
-        return OK(userService.getFollowers(authentication.id.getValue(),pageable));
-    }*/
 
     @PostMapping(path = "user/{userId}/follow")
     @ApiOperation(value = "팔로우")

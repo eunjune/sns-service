@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.service.user;
 
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.github.prgrms.social.api.aws.S3Client;
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.event.JoinEvent;
@@ -42,38 +41,20 @@ public class UserService {
 
     private final EventBus eventBus;
 
-    // S3에 이미지 업로드
-    private String uploadProfileImage(AttachedFile profileFile) {
 
-        String profileImage = null;
-
-        if(profileFile != null) {
-            try {
-                profileImage = s3Client.upload(profileFile.inputStream(), profileFile.length()
-                        , profileFile.randomName("eunjun","png"), profileFile.getContentType(), null);
-            } catch(AmazonS3Exception e) {
-                log.warn("Amazon S3 error (key : {} ) {}", e.getMessage(), e);
-            }
-        }
-
-        return profileImage;
-    }
 
     @Transactional
-    public User join(String name, Email email, String password, AttachedFile profileFile) {
+    public User join(String name, Email email, String password) {
         checkArgument(isNotEmpty(password), "password must be provided.");
         checkArgument(
                 password.length() >= 4 && password.length() <= 15,
                 "password length must be between 4 and 15 characters."
         );
 
-        String profileImageUrl = uploadProfileImage(profileFile);
-        // 이미지 업로드 성공/실패 결과에 관계없이 join 트랜잭션을 처리한다.
         User user = User.builder()
                 .name(name)
                 .email(email)
                 .password(passwordEncoder.encode(password))
-                .profileImageUrl(profileImageUrl)
                 .build();
 
         User saved = userRepository.save(user);
@@ -143,6 +124,9 @@ public class UserService {
     public User certificateEmail(String token, String email) {
         return findByEmail(new Email(email))
                 .map(user -> {
+                    System.out.println("토큰");
+                    System.out.println(user.getEmailCertificationToken());
+                    System.out.println(token);
                     if(!user.getEmailCertificationToken().equals(token)) {
                         throw new IllegalArgumentException("유효하지 않은 접근 입니다.");
                     }
@@ -233,4 +217,21 @@ public class UserService {
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, id));
     }
+
+    // S3에 이미지 업로드
+    /*private String uploadProfileImage(AttachedFile profileFile) {
+
+        String profileImage = null;
+
+        if(profileFile != null) {
+            try {
+                profileImage = s3Client.upload(profileFile.inputStream(), profileFile.length()
+                        , profileFile.randomName("eunjun","png"), profileFile.getContentType(), null);
+            } catch(AmazonS3Exception e) {
+                log.warn("Amazon S3 error (key : {} ) {}", e.getMessage(), e);
+            }
+        }
+
+        return profileImage;
+    }*/
 }

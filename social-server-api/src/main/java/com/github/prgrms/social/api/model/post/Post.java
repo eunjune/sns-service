@@ -1,9 +1,11 @@
 package com.github.prgrms.social.api.model.post;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,8 +23,9 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(force = true)
-@ToString(exclude = {"user","likes","comments", "images", "hashTags","retweet"})
+@ToString(exclude = {"retweetPost","postsRetweetedMe","images","likeInfos","comments"})
 @EqualsAndHashCode(of = "id")
 public class Post {
 
@@ -33,14 +36,14 @@ public class Post {
 
     @ApiModelProperty(value = "내용", required = true)
     @Column(nullable = false)
+    @Lob
     private String content;
 
     @ApiModelProperty(value = "좋아요 여부", required = true)
     @Transient
     private boolean likesOfMe;
 
-    @ApiModelProperty(value = "좋아요 여부", required = true)
-    @Transient
+    @ApiModelProperty(value = "리트윗 여부", required = true)
     private boolean isRetweet;
 
     @ApiModelProperty(value = "작성일시", required = true)
@@ -49,30 +52,25 @@ public class Post {
 
     @ApiModelProperty(value = "작성자")
     @ManyToOne
-    @Setter
     @JsonManagedReference
     private User user;
 
-    /*@ApiModelProperty(value = "이미지 리스트")
+    @ApiModelProperty(value = "이미지 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Image> images = new ArrayList<>();
+    private Set<Image> images = new HashSet<>();
 
     @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonManagedReference
     @Setter
-    private List<Likes> likes = new ArrayList<>();
+    private Set<LikeInfo> likeInfos = new HashSet<>();
+
 
     @ApiModelProperty(value = "댓글 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonBackReference
-    private List<Comment> comments = new ArrayList<>();
-
-    @ApiModelProperty(value = "해쉬태그 리스트")
-    @ManyToMany
-    @JsonBackReference
-    private List<HashTag> hashTags = new ArrayList<>();*/
+    private Set<Comment> comments = new HashSet<>();
 
     @ApiModelProperty(value = "리트윗한 포스트")
     @ManyToOne
@@ -84,6 +82,7 @@ public class Post {
 
     @ApiModelProperty(value = "내 글에 리트윗한 포스트 목록")
     @OneToMany(mappedBy = "retweetPost",cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<Post> postsRetweetedMe = new HashSet<>();
 
     @Builder
@@ -111,20 +110,9 @@ public class Post {
         this.content = contents;
     }
 
-   /* public void incrementAndGetLikes(Likes likes) {
-        likesOfMe = true;
-        this.likes.add(likes);
-        likes.setPost(this);
-    }
-
-    public void incrementAndGetComments(Comment comment) {
-        this.comments.add(comment);
-        comment.setPost(this);
-    }
-
-    public void setLikesOfMe(Long userSeq) {
-        for(Likes likes : likes) {
-            if(likes.getUser().getId().equals(userSeq)) {
+    public void setLikesOfMe(Long userId) {
+        for(LikeInfo likeInfo : likeInfos) {
+            if(likeInfo.getUser().getId().equals(userId)) {
                 this.likesOfMe = true;
                 return;
             }
@@ -132,6 +120,29 @@ public class Post {
         this.likesOfMe = false;
     }
 
+    public void incrementAndGetLikes(LikeInfo likeInfo) {
+        likesOfMe = true;
+        this.likeInfos.add(likeInfo);
+        likeInfo.setPost(this);
+    }
+
+    public void removeLikes(LikeInfo likeInfo) {
+        likesOfMe = false;
+        this.likeInfos.remove(likeInfo);
+        likeInfo.setPost(null);
+    }
+
+    public void incrementAndGetComments(Comment comment) {
+        this.comments.add(comment);
+        comment.setPost(this);
+    }
+
+    public void addRetweet(Post post) {
+        retweetPost = post;
+        post.getPostsRetweetedMe().add(this);
+    }
+
+/*
     public void setIsRetweet() {
         this.isRetweet = this.retweet != null;
     }*/

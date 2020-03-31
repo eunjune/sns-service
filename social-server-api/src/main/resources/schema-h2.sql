@@ -46,7 +46,7 @@ CREATE TABLE connections (
   CONSTRAINT fk_connection_to_user2 FOREIGN KEY (target_seq) REFERENCES users (seq) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-CREATE TABLE likes (
+CREATE TABLE likeInfo (
     seq       bigint NOT NULL AUTO_INCREMENT,
     user_seq  bigint NOT NULL,
     post_seq  bigint NOT NULL,

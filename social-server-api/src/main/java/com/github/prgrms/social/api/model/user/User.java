@@ -28,7 +28,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @EqualsAndHashCode(of = "id")
 @JsonSerialize(using = UserSerializer.class)
 @Entity(name = "users")
-@ToString(exclude = {"followings","posts","comments"})
+@ToString(exclude = {"followings","followers"})
 public class User {
 
     @ApiModelProperty(value = "PK", required = true)

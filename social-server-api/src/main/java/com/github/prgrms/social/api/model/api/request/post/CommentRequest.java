@@ -5,6 +5,8 @@ import lombok.*;
 
 // 댓글작성 요청 데이터를 받는 DTO
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommentRequest {
 
     private String content;
