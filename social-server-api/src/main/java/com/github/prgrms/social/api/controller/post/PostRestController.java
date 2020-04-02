@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.controller.post;
 
-import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.api.request.post.CommentRequest;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
@@ -113,10 +112,7 @@ public class PostRestController {
             @ApiParam(value = "대상 포스트 PK", example = "1")
             Long postId
     ) {
-        // TODO query parameter에 offset, limit 파라미터를 추가하고 페이징 처리한다.
-
-        return OK(postService.like(postId, authentication.id.getValue(),userId)
-                .orElseThrow(() -> new NotFoundException(Post.class, postId)));
+        return OK(postService.like(postId, authentication.id.getValue(),userId));
     }
 
     @DeleteMapping(path = "user/{userId}/post/{postId}/unlike")
@@ -130,13 +126,11 @@ public class PostRestController {
             @ApiParam(value = "대상 포스트 PK", example = "1")
             Long postId
     ) {
-        // TODO query parameter에 offset, limit 파라미터를 추가하고 페이징 처리한다.
-
-        return OK(postService.unlike(postId, authentication.id.getValue(),userId)
-                .orElseThrow(() -> new NotFoundException(Post.class, postId)));
+        return OK(postService.unlike(postId, authentication.id.getValue(),userId));
     }
 
     @PostMapping(path = "user/{userId}/post/{postId}/comment")
+    @ApiOperation(value = "댓글 작성")
     public ApiResult<Comment> comment(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
@@ -153,6 +147,7 @@ public class PostRestController {
     }
 
     @GetMapping(path = "user/{userId}/post/{postId}/comment/list")
+    @ApiOperation(value = "댓글 조회")
     public ApiResult<List<Comment>> comments(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
@@ -167,6 +162,7 @@ public class PostRestController {
     }
 
     @PostMapping(path = "post/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiOperation(value = "포스트 이미지 업로드")
     public ApiResult<List<String>> images(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestPart(required = false)  MultipartFile[] images,
@@ -178,6 +174,7 @@ public class PostRestController {
     }
 
     @PostMapping(path = "post/{postId}/retweet")
+    @ApiOperation(value = "리트윗")
     public ApiResult<Post> retweet(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable

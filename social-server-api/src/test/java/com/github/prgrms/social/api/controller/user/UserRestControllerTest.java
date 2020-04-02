@@ -188,7 +188,6 @@ class UserRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.isEmailCertification").value(true))
                 .andDo(print());
-
     }
 
     @DisplayName("이메일 인증 확인 - 실패")

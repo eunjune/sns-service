@@ -7,10 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.github.prgrms.social.api.model.api.response.user.MeResponse;
+import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.util.MessageUtils;
 import com.zaxxer.hikari.HikariDataSource;
 import net.sf.log4jdbc.Log4jdbcProxyDataSource;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -24,6 +27,8 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 @Configuration
 public class ServiceConfigure {
@@ -90,6 +95,24 @@ public class ServiceConfigure {
 
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+
+        Converter<Set<User>, Set<Long>> setUserToSetLong = context -> {
+            Set<User> source = context.getSource();
+            Set<Long> definition = new HashSet<>();
+
+            for(User item : source) {
+                definition.add(item.getId());
+            }
+
+            return definition;
+        };
+
+        modelMapper
+                .typeMap(User.class, MeResponse.class)
+                .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowings, MeResponse::setFollowings))
+                .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowers, MeResponse::setFollowers));
+
+        return modelMapper;
     }
 }

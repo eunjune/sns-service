@@ -41,10 +41,25 @@ public class UserService {
 
     private final EventBus eventBus;
 
+    @Transactional(readOnly = true)
+    public Optional<User> findById(Long userId) {
+        checkNotNull(userId, "userId must be provided.");
 
+        return userRepository.findById(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> findByEmail(Email email) {
+        checkNotNull(email, "email must be provided.");
+
+        return userRepository.findByEmail(email);
+    }
 
     @Transactional
     public User join(String name, Email email, String password) {
+
+        checkNotNull(email,"email must be provided.");
+        checkArgument(isNotEmpty(name), "name must be provided.");
         checkArgument(isNotEmpty(password), "password must be provided.");
         checkArgument(
                 password.length() >= 4 && password.length() <= 15,
@@ -62,15 +77,17 @@ public class UserService {
 
         // raise event
         eventBus.post(new JoinEvent(saved));
+
         return saved;
     }
 
     // 로그인 요청 처리
     @Transactional
     public User login(Email email, String password) {
-        checkNotNull(password, "password must be provided.");
+        checkNotNull(email, "email must be provided.");
+        checkArgument(isNotEmpty(password), "password must be provided.");
 
-        return userRepository.findByEmail(email)
+        return findByEmail(email)
                 .map(user -> {
 
                     if (!passwordEncoder.matches(password, user.getPassword())){
@@ -87,8 +104,9 @@ public class UserService {
 
     @Transactional
     public User login(Email email) {
+        checkNotNull(email, "email must be provided.");
 
-        return userRepository.findByEmail(email)
+        return findByEmail(email)
                 .map(user -> {
 
                     user.afterLoginSuccess();
@@ -99,12 +117,7 @@ public class UserService {
                 }).orElseThrow(() -> new NotFoundException("이메일이 존재하지 않습니다"));
     }
 
-    @Transactional(readOnly = true)
-    public Optional<User> findById(Long userId) {
-        checkNotNull(userId, "userId must be provided.");
 
-        return userRepository.findById(userId);
-    }
 
     @Transactional(readOnly = true)
     public Optional<User> findUserWithUserById(Long userId) {
@@ -113,20 +126,15 @@ public class UserService {
         return userRepository.findUserWithUserById(userId);
     }
 
-    @Transactional(readOnly = true)
-    public Optional<User> findByEmail(Email email) {
-        checkNotNull(email, "email must be provided.");
 
-        return userRepository.findByEmail(email);
-    }
 
     @Transactional
     public User certificateEmail(String token, String email) {
+        checkArgument(isNotEmpty(token), "token must be provided.");
+        checkArgument(isNotEmpty(email), "email must be provided.");
+
         return findByEmail(new Email(email))
                 .map(user -> {
-                    System.out.println("토큰");
-                    System.out.println(user.getEmailCertificationToken());
-                    System.out.println(token);
                     if(!user.getEmailCertificationToken().equals(token)) {
                         throw new IllegalArgumentException("유효하지 않은 접근 입니다.");
                     }
@@ -143,7 +151,7 @@ public class UserService {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
-        User targetUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
+        User targetUser = findById(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
 
         return userRepository.findUserWithUserById(meId)
                 .map(user -> {
@@ -158,7 +166,7 @@ public class UserService {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
-        User targetUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
+        User targetUser = findById(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
 
         return userRepository.findUserWithUserById(meId)
                 .map(user -> {
@@ -173,7 +181,7 @@ public class UserService {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
-        User me = userRepository.findById(meId).orElseThrow(() -> new NotFoundException(User.class, meId));
+        User me = findById(meId).orElseThrow(() -> new NotFoundException(User.class, meId));
 
         return userRepository.findUserWithUserById(userId)
                 .map(targetUser -> {
@@ -185,9 +193,10 @@ public class UserService {
 
     @Transactional
     public User updateProfile(Long id, ProfileRequest profileRequest){
-        checkNotNull(profileRequest, "files must be provided.");
+        checkNotNull(id, "id must be provided.");
+        checkNotNull(profileRequest, "profileRequest must be provided.");
 
-        return userRepository.findById(id)
+        return findById(id)
                 .map(user -> {
                     profileRequest.setPassword(passwordEncoder.encode(profileRequest.getPassword()));
                     modelMapper.map(profileRequest,user);
@@ -198,7 +207,9 @@ public class UserService {
 
     @Transactional
     public User updateProfileImage(Long id, MultipartFile file, String realPath) throws IOException {
+        checkNotNull(id, "id must be provided.");
         checkNotNull(file, "file must be provided.");
+        checkArgument(isNotEmpty(realPath),"realPath must be provided." );
 
         //Todo 메소드 분리
         //Todo 배포시 변경 필요
@@ -210,7 +221,7 @@ public class UserService {
         file.transferTo(new File(randomName));
         String newProfileImageUrl = randomName.substring(realPath.length()+1);
 
-        return userRepository.findById(id)
+        return findById(id)
                 .map(user -> {
                     user.setProfileImageUrl(newProfileImageUrl);
                     return user;

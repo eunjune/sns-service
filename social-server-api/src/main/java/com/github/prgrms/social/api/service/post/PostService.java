@@ -68,10 +68,10 @@ public class PostService {
 
     // 좋아요 기능 처리
     @Transactional
-    public Optional<Post> like(Long postId, Long userId, Long postWriterId) {
+    public Post like(Long postId, Long userId, Long postWriterId) {
         checkNotNull(postId, "postId must be provided.");
         checkNotNull(userId, "userId must be provided.");
-        checkNotNull(postWriterId, "writerId must be provided.");
+        checkNotNull(postWriterId, "postWriterId must be provided.");
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(Long.class,userId));
@@ -84,16 +84,17 @@ public class PostService {
                     likeInfo.setUser(user);
                     postLikeRepository.save(likeInfo);
                 }
-            return post;
-        });
+                return post;
+            })
+            .orElseThrow(() -> new NotFoundException(Post.class, postId));
     }
 
     // TODO : postWriterId 삭제
     @Transactional
-    public Optional<Post> unlike(Long postId, Long userId, Long postWriterId) {
+    public Post unlike(Long postId, Long userId, Long postWriterId) {
         checkNotNull(postId, "postId must be provided.");
         checkNotNull(userId, "userId must be provided.");
-        checkNotNull(postWriterId, "writerId must be provided.");
+        checkNotNull(postWriterId, "postWriterId must be provided.");
 
         return postLikeRepository.findByUser_IdAndPost_Id(userId, postId)
                 .map(likeInfo -> {
@@ -105,8 +106,8 @@ public class PostService {
                     }
 
                     return post;
-                });
-
+                })
+                .orElseThrow(() -> new NotFoundException(Post.class, postId));
     }
 
     @Transactional(readOnly = true)
@@ -153,6 +154,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<Post> findAll(Long lastId, Pageable pageable) {
+        checkNotNull(lastId, "lastId must be provided.");
 
         if(lastId == 0L) {
             return postRepository.findAllByOrderByIdDesc(pageable);

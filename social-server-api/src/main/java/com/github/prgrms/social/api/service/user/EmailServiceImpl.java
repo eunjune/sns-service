@@ -29,7 +29,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendEmailCertificationMessage(User user) {
-
         EmailHtmlMessage emailHtmlMessage = EmailHtmlMessage.builder()
                 .link("/check-email-token?token=" + user.getEmailCertificationToken() + "&email=" +user.getEmail().getAddress())
                 .name(user.getName())
@@ -37,19 +36,7 @@ public class EmailServiceImpl implements EmailService {
                 .message("회원가입 인증을 위해 링크를 클릭하세요.")
                 .build();
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-
-        try {
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-            mimeMessageHelper.setTo(user.getEmail().getAddress());
-            mimeMessageHelper.setSubject("SNS service, 회원가입 인증");
-            mimeMessageHelper.setText(getHtmlMessage(emailHtmlMessage), true);
-            mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
-            log.error("fail to send email", e);
-            throw new RuntimeException(e);
-        }
-
+        sendEamil(emailHtmlMessage,user,"SNS service, 회원가입 인증");
     }
 
     @Override
@@ -61,18 +48,7 @@ public class EmailServiceImpl implements EmailService {
                 .message("이메일 로그인을 위해 링크를 클릭하세요.")
                 .build();
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-
-        try {
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-            mimeMessageHelper.setTo(user.getEmail().getAddress());
-            mimeMessageHelper.setSubject("SNS service, 이메일 로그인");
-            mimeMessageHelper.setText(getHtmlMessage(emailHtmlMessage), true);
-            mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
-            log.error("fail to send email", e);
-            throw new RuntimeException(e);
-        }
+        sendEamil(emailHtmlMessage,user,"SNS service, 이메일 로그인");
     }
 
     private String getHtmlMessage(EmailHtmlMessage emailHtmlMessage) {
@@ -84,5 +60,21 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("host", host);
 
         return templateEngine.process("mail/email-link", context);
+    }
+
+    private void sendEamil(EmailHtmlMessage emailHtmlMessage, User user, String subject) {
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(user.getEmail().getAddress());
+            mimeMessageHelper.setSubject(subject);
+            mimeMessageHelper.setText(getHtmlMessage(emailHtmlMessage), true);
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            log.error("fail to send email", e);
+            throw new RuntimeException(e);
+        }
     }
 }

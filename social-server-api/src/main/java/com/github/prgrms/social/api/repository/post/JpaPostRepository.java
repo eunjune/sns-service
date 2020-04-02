@@ -17,15 +17,15 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
     Optional<Post> findById(Long id);
 
     @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"likeInfos","images", "comments"})
+    @EntityGraph(attributePaths = {"likeInfos","images"})
     Optional<Post> findByIdAndUser_Id(Long id, Long userId);
 
     @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"likeInfos","images", "comments"})
+    @EntityGraph(attributePaths = {"likeInfos","images"})
     List<Post> findAllByUser_IdAndIdLessThanOrderByIdDesc(Long postWriterId, Long lastId, Pageable pageable);
 
     @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"likeInfos","images", "comments"})
+    @EntityGraph(attributePaths = {"likeInfos","images"})
     List<Post> findAllByUser_IdOrderByIdDesc(Long postWriterId, Pageable pageable);
 
 

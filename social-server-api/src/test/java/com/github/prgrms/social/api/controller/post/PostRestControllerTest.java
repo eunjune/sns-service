@@ -3,6 +3,7 @@ package com.github.prgrms.social.api.controller.post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prgrms.social.api.model.api.request.post.CommentRequest;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
+import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.Post;
@@ -268,9 +269,9 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.content").value(commentRequest.getContent()))
                 .andDo(print());
 
-        Post afterPost = postService.findById(savedPost.getId(), user2.getId(), user.getId()).orElse(null);
-        assertNotNull(afterPost);
-        assertEquals(afterPost.getComments().size(),1);
+        List<Comment> comments = commentService.findAll(savedPost.getId(),user.getId(),null);
+        assertNotNull(comments);
+        assertEquals(comments.size(),1);
 
     }
 

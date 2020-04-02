@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -25,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Getter
 @Setter
 @NoArgsConstructor(force = true)
-@ToString(exclude = {"retweetPost","postsRetweetedMe","images","likeInfos","comments"})
+@ToString(exclude = {"retweetPost","postsRetweetedMe","images","likeInfos"})
 @EqualsAndHashCode(of = "id")
 public class Post {
 
@@ -65,12 +64,6 @@ public class Post {
     @JsonManagedReference
     @Setter
     private Set<LikeInfo> likeInfos = new HashSet<>();
-
-
-    @ApiModelProperty(value = "댓글 리스트")
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonBackReference
-    private Set<Comment> comments = new HashSet<>();
 
     @ApiModelProperty(value = "리트윗한 포스트")
     @ManyToOne
@@ -130,11 +123,6 @@ public class Post {
         likesOfMe = false;
         this.likeInfos.remove(likeInfo);
         likeInfo.setPost(null);
-    }
-
-    public void incrementAndGetComments(Comment comment) {
-        this.comments.add(comment);
-        comment.setPost(this);
     }
 
     public void addRetweet(Post post) {

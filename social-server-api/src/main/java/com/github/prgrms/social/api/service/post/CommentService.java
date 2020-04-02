@@ -39,7 +39,8 @@ public class CommentService {
 
         return postRepository.findByIdAndUser_Id(postId, postWriterId)
             .map(post -> {
-                post.incrementAndGetComments(comment);
+                System.out.println("write 테스트");
+                comment.setPost(post);
                 comment.setUser(user);
                 Comment saveComment = commentRepository.save(comment);
                 eventBus.post(new CommentCreatedEvent(saveComment, postWriterId));

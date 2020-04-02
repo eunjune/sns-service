@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.model.post;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -36,13 +35,11 @@ public class Comment {
     @ApiModelProperty(value = "댓글의 포스트")
     @ManyToOne
     @Setter
-    @JsonManagedReference
     private Post post;
 
     @ApiModelProperty(value = "댓글 작성자")
     @ManyToOne
     @Setter
-    @JsonManagedReference
     private User user;
 
     @Builder

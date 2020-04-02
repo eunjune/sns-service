@@ -8,6 +8,7 @@ import com.github.prgrms.social.api.model.user.User;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @Slf4j

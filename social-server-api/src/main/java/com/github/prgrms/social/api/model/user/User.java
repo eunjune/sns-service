@@ -2,8 +2,6 @@ package com.github.prgrms.social.api.model.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.prgrms.social.api.model.api.response.user.UserSerializer;
 import com.github.prgrms.social.api.security.JWT;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -26,7 +24,6 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-@JsonSerialize(using = UserSerializer.class)
 @Entity(name = "users")
 @ToString(exclude = {"followings","followers"})
 public class User {
@@ -36,15 +33,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private final Long id;
 
-    @ApiModelProperty(value = "사용자명", required = true)
-    @Column(unique = true)
-    private String name;
-
     @ApiModelProperty(value = "이메일", required = true)
     @AttributeOverrides({
             @AttributeOverride(name = "address", column = @Column(name = "email", unique = true))
     })
-    private Email email;
+    private final Email email;
+
+    @ApiModelProperty(value = "사용자명", required = true)
+    @Column(unique = true)
+    private String name;
 
     @JsonIgnore
     @ApiModelProperty(hidden = true)

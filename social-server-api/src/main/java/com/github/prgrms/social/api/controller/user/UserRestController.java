@@ -3,7 +3,9 @@ package com.github.prgrms.social.api.controller.user;
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.api.request.user.*;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
-import com.github.prgrms.social.api.model.api.response.user.JoinResult;
+import com.github.prgrms.social.api.model.api.response.user.JoinResponse;
+import com.github.prgrms.social.api.model.api.response.user.MeResponse;
+import com.github.prgrms.social.api.model.api.response.user.UserResponse;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.Subscription;
@@ -23,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
@@ -47,6 +50,8 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 @Api(tags = "사용자 APIs")
 @RequiredArgsConstructor
 public class UserRestController {
+
+    private final ModelMapper modelMapper;
 
     private final JWT jwt;
 
@@ -117,7 +122,7 @@ public class UserRestController {
 
     @PostMapping(path = "user/join", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "회원가입 (API 토큰 필요없음)")
-    public ApiResult<JoinResult> join(
+    public ApiResult<JoinResponse> join(
             @Valid JoinRequest joinRequest,
             Errors errors
     ) throws IOException {
@@ -133,28 +138,105 @@ public class UserRestController {
                 joinRequest.getPassword()
         );
 
-
         emailService.sendEmailCertificationMessage(user);
 
         String apiToken = user.newApiToken(jwt, new String[]{Role.USER.getValue()});
-        return OK(new JoinResult(apiToken, user));
+
+        return OK(new JoinResponse(apiToken, user));
     }
 
     @PostMapping("check-email-token")
-    public ApiResult<User> checkEmailToken(@RequestBody EmailAuthenticationRequest emailAuthenticationRequest) {
-        return OK(userService.certificateEmail(emailAuthenticationRequest.getEmailToken(),emailAuthenticationRequest.getEmail()));
+    @ApiOperation(value = "회원가입 이메일 인증")
+    public ApiResult<MeResponse> checkEmailToken(@RequestBody EmailAuthenticationRequest emailAuthenticationRequest) {
+        return OK(convertMeResponse(userService.certificateEmail(emailAuthenticationRequest.getEmailToken(), emailAuthenticationRequest.getEmail())));
     }
 
     @GetMapping(path = "user/resend-email")
+    @ApiOperation(value = "회원가입 인증 메일 재전송")
     public ApiResult<Boolean> resendEmail(@AuthenticationPrincipal JwtAuthentication authentication) {
-        System.out.println("resend-email");
-        System.out.println(authentication.id.getValue());
         User user = userService.findById(authentication.id.getValue())
                 .orElseThrow(() -> new NotFoundException(User.class, authentication.id.getValue()));
 
         emailService.sendEmailCertificationMessage(user);
 
         return OK(true);
+    }
+
+    @GetMapping(path = "user/me")
+    @ApiOperation(value = "내 정보")
+    public ApiResult<MeResponse> me(@AuthenticationPrincipal JwtAuthentication authentication) {
+        return OK(
+                convertMeResponse(
+                    userService.findById(authentication.id.getValue())
+                        .orElseThrow(() -> new NotFoundException(User.class, authentication.id))
+                )
+        );
+    }
+
+    @PutMapping(path = "user/profile")
+    @ApiOperation(value = "프로필 수정")
+    public ApiResult<MeResponse> updateProfile(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @Valid ProfileRequest profileRequest,
+            Errors errors
+    ) throws IOException {
+
+        if(errors.hasErrors()) {
+            String message = errors.getFieldError().getDefaultMessage();
+            throw new IllegalArgumentException(message == null ? "" : message);
+        }
+
+        return OK(convertMeResponse(userService.updateProfile(authentication.id.getValue(), profileRequest)));
+
+    }
+
+    @PutMapping(path = "user/profile-image")
+    @ApiOperation(value = "프로필 이미지 수정",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResult<MeResponse> updateProfileImage(
+            @RequestPart MultipartFile file,
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            MultipartHttpServletRequest request
+    ) throws IOException {
+
+        return OK(convertMeResponse(userService.updateProfileImage(authentication.id.getValue(), file, request.getServletContext().getRealPath("/"))));
+
+    }
+
+    @GetMapping(path = "user/{id}")
+    @ApiOperation(value = "다른 사람 정보")
+    public ApiResult<UserResponse> findUser(@PathVariable("id") User user) {
+        UserResponse userResponse = new UserResponse();
+        modelMapper.map(user,userResponse);
+
+        return OK(userResponse);
+    }
+
+    @PostMapping(path = "user/{userId}/follow")
+    @ApiOperation(value = "팔로우")
+    public ApiResult<MeResponse> follow(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable Long userId
+    ) {
+
+        return OK(convertMeResponse(userService.addFollowing(authentication.id.getValue(), userId)));
+    }
+
+    @DeleteMapping(path = "user/{userId}/follow")
+    @ApiOperation(value = "언팔로우")
+    public ApiResult<Long> unfollow(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable Long userId
+    ) {
+        return OK(userService.removeFollowing(authentication.id.getValue(),userId));
+    }
+
+    @DeleteMapping(path = "user/{userId}/follower")
+    @ApiOperation(value = "팔로워 삭제제")
+    public ApiResult<Long> removeFollower(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable Long userId
+    ) {
+        return OK(userService.removeFollower(authentication.id.getValue(), userId));
     }
 
     // Subscribe 요청 처리.(카프카에게 Subscribe 정보 전송 후 응답 처리)
@@ -185,79 +267,9 @@ public class UserRestController {
         return OK(consumerRecord.value());
     }
 
-    @GetMapping(path = "user/me")
-    @ApiOperation(value = "내 정보")
-    public ApiResult<User> me(@AuthenticationPrincipal JwtAuthentication authentication) {
-        return OK(
-                userService.findById(authentication.id.getValue())
-                        .orElseThrow(() -> new NotFoundException(User.class, authentication.id))
-        );
-    }
-
-    @PutMapping(path = "user/profile")
-    @ApiOperation(value = "유저 정보 수정")
-    public ApiResult<User> updateProfile(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @Valid ProfileRequest profileRequest,
-            Errors errors
-    ) throws IOException {
-
-        if(errors.hasErrors()) {
-            String message = errors.getFieldError().getDefaultMessage();
-            throw new IllegalArgumentException(message == null ? "" : message);
-        }
-
-        return OK(userService.updateProfile(authentication.id.getValue(), profileRequest));
-
-    }
-
-    @PutMapping(path = "user/profile-image")
-    @ApiOperation(value = "유저 정보 수정",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResult<User> updateProfileImage(
-            @RequestPart MultipartFile file,
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            MultipartHttpServletRequest request
-    ) throws IOException {
-
-        return OK(userService.updateProfileImage(authentication.id.getValue(), file, request.getServletContext().getRealPath("/")));
-
-    }
-
-
-    @GetMapping(path = "user/{id}")
-    @ApiOperation(value = "다른 사람 정보")
-    public ApiResult<User> findUser(@PathVariable Long id) {
-
-        return OK(
-                userService.findById(id)
-                        .orElseThrow(() -> new NotFoundException(User.class, id))
-        );
-    }
-
-    @PostMapping(path = "user/{userId}/follow")
-    @ApiOperation(value = "팔로우")
-    public ApiResult<User> follow(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable Long userId
-    ) {
-        return OK(userService.addFollowing(authentication.id.getValue(), userId));
-    }
-
-    @DeleteMapping(path = "user/{userId}/follow")
-    @ApiOperation(value = "팔로우")
-    public ApiResult<Long> unfollow(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable Long userId
-    ) {
-        return OK(userService.removeFollowing(authentication.id.getValue(),userId));
-    }
-
-    @DeleteMapping(path = "user/{userId}/follower")
-    @ApiOperation(value = "팔로우")
-    public ApiResult<Long> removeFollower(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable Long userId
-    ) {
-        return OK(userService.removeFollower(authentication.id.getValue(), userId));
+    private MeResponse convertMeResponse(User user) {
+        MeResponse meResponse = new MeResponse();
+        modelMapper.map(user, meResponse);
+        return meResponse;
     }
 }
