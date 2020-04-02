@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.model.post;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -39,7 +38,6 @@ public class HashTag {
             joinColumns = @JoinColumn(name = "hashtag_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
     @Setter
-    @JsonManagedReference
     private Set<Post> posts = new HashSet<>();
 
     @Builder

@@ -304,7 +304,7 @@ class UserRestControllerTest {
 
         User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
 
-        mockMvc.perform(post("/api/user/" + user2.getId() + "/follow")
+        mockMvc.perform(post("/api/user/follow/" + user2.getId())
                         .header(tokenHeader, apiToken))
                         .andExpect(status().isOk())
                         .andDo(print());
@@ -329,7 +329,7 @@ class UserRestControllerTest {
         User beforeUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
         User beforeUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
-        mockMvc.perform(delete("/api/user/" + user2.getId() + "/follow")
+        mockMvc.perform(delete("/api/user/follow/" + user2.getId())
                 .header(tokenHeader, apiToken))
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -359,7 +359,7 @@ class UserRestControllerTest {
         User beforeUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
         User beforeUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
 
-        mockMvc.perform(delete("/api/user/" + user.getId() + "/follower")
+        mockMvc.perform(delete("/api/user/follower/" + user.getId())
                 .header(tokenHeader, user2apiToken))
                 .andExpect(status().isOk())
                 .andDo(print());

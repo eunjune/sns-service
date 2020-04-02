@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.model.post;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.prgrms.social.api.model.user.User;
 import lombok.Getter;
@@ -29,12 +28,11 @@ public class LikeInfo {
 
     @ManyToOne
     @Setter
-    @JsonManagedReference
     private User user;
 
     @ManyToOne
     @Setter
-    @JsonBackReference
+    @JsonManagedReference
     private Post post;
 
     public LikeInfo(Long id, LocalDateTime createAt) {

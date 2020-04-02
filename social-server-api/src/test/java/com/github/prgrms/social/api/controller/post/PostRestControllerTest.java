@@ -136,7 +136,7 @@ class PostRestControllerTest {
         assertNotEquals(beforeImageList.size(), afterImageList.size());
     }
 
-    @DisplayName("포스트 조회 - 처음 조회시")
+    @DisplayName("포스트 조회(로그인 안함) - 처음 조회시")
     @Test
     void findAllLastIdZero() throws Exception {
         Post post1 = Post.builder().content("post1").build();
@@ -151,17 +151,16 @@ class PostRestControllerTest {
 
         postService.like(writedPost.getId(),user.getId(),user.getId());
 
-        mockMvc.perform(get("/api/user/" + user.getId() +"/post/list?lastId=0&size=2")
+        mockMvc.perform(get("/api/user/post/list?lastId=0&size=2")
                 .header(tokenHeader,apiToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.size()").value(2))
-                .andExpect(jsonPath("$.response.[0].likesOfMe").value(true))
                 .andDo(print());
 
 
     }
 
-    @DisplayName("포스트 조회 - 인피니트 스크롤링 이후")
+    @DisplayName("포스트 조회(로그인 안함) - 인피니트 스크롤링 이후")
     @Test
     void findAllLastIdNotZero() throws Exception {
         Post post1 = Post.builder().content("post1").build();
@@ -176,11 +175,57 @@ class PostRestControllerTest {
 
         postService.like(writedPost.getId(),user.getId(),user.getId());
 
-        mockMvc.perform(get("/api/user/" + user.getId() +"/post/list?lastId=" + lastPost.getId() +"&size=2")
+        mockMvc.perform(get("/api/user/post/list?lastId=" + lastPost.getId() +"&size=2")
                 .header(tokenHeader,apiToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.size()").value(1))
-                .andExpect(jsonPath("$.response.[0].likesOfMe").value(true))
+                .andDo(print());
+    }
+
+    @DisplayName("포스트 조회(포스트 작성자가 비공개 유저) - 성공")
+    @Test
+    void findAllUserOk() throws Exception {
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
+        user2.setPrivate(true);
+        user.addFollowing(user2);
+        userRepository.save(user2);
+
+        Post post1 = Post.builder().content("post1").build();
+        Post post2 = Post.builder().content("post2").build();
+        Post post3 = Post.builder().content("post3").build();
+        Post post4 = Post.builder().content("post4").build();
+
+        postService.write(post1,user2.getId(),new ArrayList<>());
+        postService.write(post2,user2.getId(),new ArrayList<>());
+        postService.write(post3,user2.getId(),new ArrayList<>());
+        postService.write(post4, user2.getId(), new ArrayList<>());
+
+        mockMvc.perform(get("/api/user/" + user2.getId() + "/post/list?lastId=0&size=2")
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @DisplayName("포스트 조회(포스트 작성자가 비공개 유저) - 실패")
+    @Test
+    void findAllUserFail() throws Exception {
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
+        user2.setPrivate(true);
+        userRepository.save(user2);
+
+        Post post1 = Post.builder().content("post1").build();
+        Post post2 = Post.builder().content("post2").build();
+        Post post3 = Post.builder().content("post3").build();
+        Post post4 = Post.builder().content("post4").build();
+
+        postService.write(post1,user2.getId(),new ArrayList<>());
+        postService.write(post2,user2.getId(),new ArrayList<>());
+        postService.write(post3,user2.getId(),new ArrayList<>());
+        postService.write(post4, user2.getId(), new ArrayList<>());
+
+        mockMvc.perform(get("/api/user/" + user2.getId() + "/post/list?lastId=0&size=2")
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isForbidden())
                 .andDo(print());
     }
 

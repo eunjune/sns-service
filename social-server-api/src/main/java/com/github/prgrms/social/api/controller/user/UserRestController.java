@@ -88,6 +88,37 @@ public class UserRestController {
         webDataBinder.addValidators(checkProfileValidator);
     }
 
+    @GetMapping(path = "user/resend-email")
+    @ApiOperation(value = "회원가입 인증 메일 재전송")
+    public ApiResult<Boolean> resendEmail(@AuthenticationPrincipal JwtAuthentication authentication) {
+        User user = userService.findById(authentication.id.getValue())
+                .orElseThrow(() -> new NotFoundException(User.class, authentication.id.getValue()));
+
+        emailService.sendEmailCertificationMessage(user);
+
+        return OK(true);
+    }
+
+    @GetMapping(path = "user/me")
+    @ApiOperation(value = "내 정보")
+    public ApiResult<MeResponse> me(@AuthenticationPrincipal JwtAuthentication authentication) {
+        return OK(
+                convertMeResponse(
+                        userService.findById(authentication.id.getValue())
+                                .orElseThrow(() -> new NotFoundException(User.class, authentication.id))
+                )
+        );
+    }
+
+    @GetMapping(path = "user/{id}")
+    @ApiOperation(value = "다른 사람 정보")
+    public ApiResult<UserResponse> findUser(@PathVariable("id") User user) {
+        UserResponse userResponse = new UserResponse();
+        modelMapper.map(user,userResponse);
+
+        return OK(userResponse);
+    }
+
     @PostMapping(path = "user/exists/email")
     @ApiOperation(value = "이메일 중복확인 (API 토큰 필요없음)")
     public ApiResult<Boolean> checkEmail(
@@ -134,6 +165,7 @@ public class UserRestController {
 
         User user = userService.join(
                 joinRequest.getName(),
+
                 new Email(joinRequest.getAddress()),
                 joinRequest.getPassword()
         );
@@ -151,26 +183,14 @@ public class UserRestController {
         return OK(convertMeResponse(userService.certificateEmail(emailAuthenticationRequest.getEmailToken(), emailAuthenticationRequest.getEmail())));
     }
 
-    @GetMapping(path = "user/resend-email")
-    @ApiOperation(value = "회원가입 인증 메일 재전송")
-    public ApiResult<Boolean> resendEmail(@AuthenticationPrincipal JwtAuthentication authentication) {
-        User user = userService.findById(authentication.id.getValue())
-                .orElseThrow(() -> new NotFoundException(User.class, authentication.id.getValue()));
+    @PostMapping(path = "user/follow/{userId}")
+    @ApiOperation(value = "팔로우")
+    public ApiResult<MeResponse> follow(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable Long userId
+    ) {
 
-        emailService.sendEmailCertificationMessage(user);
-
-        return OK(true);
-    }
-
-    @GetMapping(path = "user/me")
-    @ApiOperation(value = "내 정보")
-    public ApiResult<MeResponse> me(@AuthenticationPrincipal JwtAuthentication authentication) {
-        return OK(
-                convertMeResponse(
-                    userService.findById(authentication.id.getValue())
-                        .orElseThrow(() -> new NotFoundException(User.class, authentication.id))
-                )
-        );
+        return OK(convertMeResponse(userService.addFollowing(authentication.id.getValue(), userId)));
     }
 
     @PutMapping(path = "user/profile")
@@ -202,26 +222,7 @@ public class UserRestController {
 
     }
 
-    @GetMapping(path = "user/{id}")
-    @ApiOperation(value = "다른 사람 정보")
-    public ApiResult<UserResponse> findUser(@PathVariable("id") User user) {
-        UserResponse userResponse = new UserResponse();
-        modelMapper.map(user,userResponse);
-
-        return OK(userResponse);
-    }
-
-    @PostMapping(path = "user/{userId}/follow")
-    @ApiOperation(value = "팔로우")
-    public ApiResult<MeResponse> follow(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable Long userId
-    ) {
-
-        return OK(convertMeResponse(userService.addFollowing(authentication.id.getValue(), userId)));
-    }
-
-    @DeleteMapping(path = "user/{userId}/follow")
+    @DeleteMapping(path = "user/follow/{userId}")
     @ApiOperation(value = "언팔로우")
     public ApiResult<Long> unfollow(
             @AuthenticationPrincipal JwtAuthentication authentication,
@@ -230,8 +231,8 @@ public class UserRestController {
         return OK(userService.removeFollowing(authentication.id.getValue(),userId));
     }
 
-    @DeleteMapping(path = "user/{userId}/follower")
-    @ApiOperation(value = "팔로워 삭제제")
+    @DeleteMapping(path = "user/follower/{userId}")
+    @ApiOperation(value = "팔로워 삭제")
     public ApiResult<Long> removeFollower(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable Long userId

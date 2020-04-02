@@ -30,8 +30,10 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
 
 
     @Transactional(readOnly = true)
-    List<Post> findAllByIdLessThanOrderByIdDesc(Long lastId, Pageable pageable);
+    @EntityGraph(attributePaths = {"likeInfos","images"})
+    List<Post> findAllByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(Long lastId, Pageable pageable);
 
     @Transactional(readOnly = true)
-    List<Post> findAllByOrderByIdDesc(Pageable pageable);
+    @EntityGraph(attributePaths = {"likeInfos","images"})
+    List<Post> findAllByUser_IsPrivateFalseOrderByIdDesc(Pageable pageable);
 }

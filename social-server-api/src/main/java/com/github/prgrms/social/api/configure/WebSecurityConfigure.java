@@ -110,12 +110,12 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .and()
             .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/user/join").permitAll()
-                .antMatchers("/api/post/{tag}/list").permitAll()
-                .antMatchers("/api/user/post/list").permitAll()
                 .antMatchers("/api/user/exists/**").permitAll()
-                .antMatchers("/api/_hcheck").permitAll()
+                .antMatchers("/api/user/join").permitAll()
                 .antMatchers("/api/check-email-token").permitAll()
+                .antMatchers("/api/user/post/list").permitAll()
+                .antMatchers("/api/post/{tag}/list").permitAll()
+                .antMatchers("/api/_hcheck").permitAll()
                 .antMatchers("/api/**").hasRole("USER")
                 .accessDecisionManager(accessDecisionManager())
                 .anyRequest().permitAll()
@@ -128,13 +128,10 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
     }
 
 
-
     @Override
     public void configure(WebSecurity web) {
-        /*
-        * "/swagger-resources", "/webjars/**", "/templates/**", "/h2/**"
-        * */
-        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                        .regexMatchers("/swagger-resources","/h2/*","/templates/*");
     }
 
 }

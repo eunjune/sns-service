@@ -157,10 +157,10 @@ public class PostService {
         checkNotNull(lastId, "lastId must be provided.");
 
         if(lastId == 0L) {
-            return postRepository.findAllByOrderByIdDesc(pageable);
+            return postRepository.findAllByUser_IsPrivateFalseOrderByIdDesc(pageable);
         }
 
-        return postRepository.findAllByIdLessThanOrderByIdDesc(lastId, pageable);
+        return postRepository.findAllByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(lastId, pageable);
     }
 
     @Transactional

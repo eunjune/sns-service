@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.model.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.prgrms.social.api.security.JWT;
 import io.swagger.annotations.ApiModelProperty;
@@ -44,14 +43,17 @@ public class User {
     private String name;
 
     @JsonIgnore
-    @ApiModelProperty(hidden = true)
+    @ApiModelProperty(value = "패스워드", hidden = true)
     @Column(nullable = false)
     private String password;
 
-    @JsonIgnore
+    @ApiModelProperty(value = "비공개 여부")
+    private boolean isPrivate;
+
+    @ApiModelProperty(value = "인증된 사용자")
     private boolean isEmailCertification;
 
-    @JsonIgnore
+    @ApiModelProperty(value = "인증 이메일 토큰")
     private String emailCertificationToken;
 
     @ApiModelProperty(value = "프로필 이미지 URL")
@@ -68,10 +70,8 @@ public class User {
     private LocalDateTime createAt;
 
     @ApiModelProperty(value = "팔로잉 목록")
-    @JsonBackReference
     @ManyToMany(mappedBy = "followers")
     private Set<User> followings = new HashSet<>();
-
 
     @ApiModelProperty(value = "팔로워 목록")
     @ManyToMany(cascade = CascadeType.ALL)

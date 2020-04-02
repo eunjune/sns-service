@@ -36,15 +36,6 @@ public class PostRestController {
     private final CommentService commentService;
 
 
-    @PostMapping(path = "post")
-    @ApiOperation(value = "포스트 작성")
-    public ApiResult<Post> posting(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @RequestBody PostingRequest request
-    ) {
-        return OK(postService.write(request.newPost(), authentication.id.getValue(), request.getImagePaths()));
-    }
-
     @GetMapping(path = "user/{userId}/post/list")
     @ApiOperation(value = "특정 유저 포스트 목록 조회")
     @ApiImplicitParams({
@@ -63,6 +54,7 @@ public class PostRestController {
         return OK(postService.findAll(authentication.id.getValue(), userId, lastId, pageable));
     }
 
+
     @GetMapping(path = "user/post/list")
     @ApiOperation(value = "전체 포스트 목록 조회")
     @ApiImplicitParams({
@@ -72,6 +64,7 @@ public class PostRestController {
     public ApiResult<List<Post>> postAll(Pageable pageable, @RequestParam Long lastId) {
         return OK(postService.findAll(lastId, pageable));
     }
+
 
     @GetMapping(path = "/post/{tag}/list")
     @ApiOperation(value = "특정 해시태그의 포스트 목록 조회")
@@ -90,6 +83,90 @@ public class PostRestController {
         return OK(hashTagService.findByHashTag(tag, lastId, pageable));
     }
 
+
+    @GetMapping(path = "user/{userId}/post/{postId}/comment/list")
+    @ApiOperation(value = "댓글 조회")
+    public ApiResult<List<Comment>> comments(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable
+            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
+                    Long userId,
+            @PathVariable
+            @ApiParam(value = "대상 포스트 PK", example = "1")
+                    Long postId
+    ) {
+        // TODO Comment 목록 조회 API를 구현하세요.
+        return OK(commentService.findAll(postId, authentication.id.getValue(), userId));
+    }
+
+
+    @PostMapping(path = "post")
+    @ApiOperation(value = "포스트 작성")
+    public ApiResult<Post> posting(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @RequestBody PostingRequest request
+    ) {
+        return OK(postService.write(request.newPost(), authentication.id.getValue(), request.getImagePaths()));
+    }
+
+
+    @PostMapping(path = "user/{userId}/post/{postId}/comment")
+    @ApiOperation(value = "댓글 작성")
+    public ApiResult<Comment> comment(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable
+            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
+                    Long userId,
+            @PathVariable
+            @ApiParam(value = "대상 포스트 PK", example = "1")
+                    Long postId,
+            @RequestBody CommentRequest request
+    ) {
+        Comment comment = request.newComment();
+
+        return OK(commentService.write(postId, authentication.id.getValue(), userId, comment));
+    }
+
+
+    @PostMapping(path = "post/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiOperation(value = "포스트 이미지 업로드")
+    public ApiResult<List<String>> images(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @RequestPart(required = false)  MultipartFile[] images,
+            MultipartHttpServletRequest request
+    ) throws IOException {
+
+
+        return OK(postService.uploadImage(images,request.getServletContext().getRealPath("/")));
+    }
+
+
+    @PostMapping(path = "post/{postId}/retweet")
+    @ApiOperation(value = "리트윗")
+    public ApiResult<Post> retweet(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable
+                    Long postId
+    ) {
+        return OK(postService.retweet(postId,authentication.id.getValue()));
+    }
+
+
+    @PatchMapping(path = "user/{userId}/post/{postId}/like")
+    @ApiOperation(value = "포스트 좋아요")
+    public ApiResult<Post> like(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable
+            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
+                    Long userId,
+            @PathVariable
+            @ApiParam(value = "대상 포스트 PK", example = "1")
+                    Long postId
+    ) {
+        return OK(postService.like(postId, authentication.id.getValue(),userId));
+    }
+
+
     @DeleteMapping(path = "/post/{postId}")
     @ApiOperation(value = "특정 포스트 삭제")
     public ApiResult<Long> removePost(
@@ -101,19 +178,6 @@ public class PostRestController {
         return OK(postService.removePost(authentication.id.getValue(), postId));
     }
 
-    @PatchMapping(path = "user/{userId}/post/{postId}/like")
-    @ApiOperation(value = "포스트 좋아요")
-    public ApiResult<Post> like(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable
-            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
-            Long userId,
-            @PathVariable
-            @ApiParam(value = "대상 포스트 PK", example = "1")
-            Long postId
-    ) {
-        return OK(postService.like(postId, authentication.id.getValue(),userId));
-    }
 
     @DeleteMapping(path = "user/{userId}/post/{postId}/unlike")
     @ApiOperation(value = "포스트 좋아요 취소")
@@ -129,57 +193,4 @@ public class PostRestController {
         return OK(postService.unlike(postId, authentication.id.getValue(),userId));
     }
 
-    @PostMapping(path = "user/{userId}/post/{postId}/comment")
-    @ApiOperation(value = "댓글 작성")
-    public ApiResult<Comment> comment(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable
-            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
-            Long userId,
-            @PathVariable
-            @ApiParam(value = "대상 포스트 PK", example = "1")
-            Long postId,
-            @RequestBody CommentRequest request
-    ) {
-        Comment comment = request.newComment();
-
-        return OK(commentService.write(postId, authentication.id.getValue(), userId, comment));
-    }
-
-    @GetMapping(path = "user/{userId}/post/{postId}/comment/list")
-    @ApiOperation(value = "댓글 조회")
-    public ApiResult<List<Comment>> comments(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable
-            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
-            Long userId,
-            @PathVariable
-            @ApiParam(value = "대상 포스트 PK", example = "1")
-            Long postId
-    ) {
-        // TODO Comment 목록 조회 API를 구현하세요.
-        return OK(commentService.findAll(postId, authentication.id.getValue(), userId));
-    }
-
-    @PostMapping(path = "post/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ApiOperation(value = "포스트 이미지 업로드")
-    public ApiResult<List<String>> images(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @RequestPart(required = false)  MultipartFile[] images,
-            MultipartHttpServletRequest request
-            ) throws IOException {
-
-
-        return OK(postService.uploadImage(images,request.getServletContext().getRealPath("/")));
-    }
-
-    @PostMapping(path = "post/{postId}/retweet")
-    @ApiOperation(value = "리트윗")
-    public ApiResult<Post> retweet(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable
-            Long postId
-    ) {
-        return OK(postService.retweet(postId,authentication.id.getValue()));
-    }
 }
