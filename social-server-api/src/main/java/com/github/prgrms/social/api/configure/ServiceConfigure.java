@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.github.prgrms.social.api.model.api.response.user.MeResponse;
+import com.github.prgrms.social.api.model.post.Post;
+import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.util.MessageUtils;
@@ -15,6 +17,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import net.sf.log4jdbc.Log4jdbcProxyDataSource;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.NameTokenizers;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.MessageSource;
@@ -108,10 +111,30 @@ public class ServiceConfigure {
             return definition;
         };
 
+        Converter<Set<Post>, Set<Long>> setPostToSetLong = context -> {
+            Set<Post> source = context.getSource();
+            Set<Long> definition = new HashSet<>();
+
+            for(Post item : source) {
+                definition.add(item.getId());
+            }
+
+            return definition;
+        };
+
+        Converter<Email, String> toEmail = context -> context.getSource().getAddress();
+
+        modelMapper.getConfiguration()
+                .setDestinationNameTokenizer(NameTokenizers.UNDERSCORE)
+                .setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
+
         modelMapper
                 .typeMap(User.class, MeResponse.class)
+                .addMappings(mapper -> mapper.using(toEmail).map(User::getEmail, MeResponse::setEmail))
                 .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowings, MeResponse::setFollowings))
-                .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowers, MeResponse::setFollowers));
+                .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowers, MeResponse::setFollowers))
+                .addMappings(mapping -> mapping.using(setPostToSetLong).map(User::getPosts, MeResponse::setPosts));
+
 
         return modelMapper;
     }

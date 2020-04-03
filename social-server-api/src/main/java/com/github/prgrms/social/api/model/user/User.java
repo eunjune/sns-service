@@ -1,6 +1,8 @@
 package com.github.prgrms.social.api.model.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.security.JWT;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -8,14 +10,12 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.time.LocalDateTime.now;
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -24,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Setter
 @EqualsAndHashCode(of = "id")
 @Entity(name = "users")
-@ToString(exclude = {"followings","followers"})
+@ToString(exclude = {"followings","followers","posts"})
 public class User {
 
     @ApiModelProperty(value = "PK", required = true)
@@ -47,6 +47,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @ApiModelProperty(value = "프로필 이미지 URL")
+    private String profileImageUrl;
+
     @ApiModelProperty(value = "비공개 여부")
     private boolean isPrivate;
 
@@ -55,9 +58,6 @@ public class User {
 
     @ApiModelProperty(value = "인증 이메일 토큰")
     private String emailCertificationToken;
-
-    @ApiModelProperty(value = "프로필 이미지 URL")
-    private String profileImageUrl;
 
     @ApiModelProperty(value = "로그인 횟수", required = true)
     private int loginCount;
@@ -80,21 +80,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "follower_id"))
     private Set<User> followers = new HashSet<>();
 
-
-    /*@ApiModelProperty(value = "사용자의 포스트")
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @ApiModelProperty(value = "포스트 목록")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @JsonBackReference
-    private List<Post> posts = new ArrayList<>();
-
-    @ApiModelProperty(value = "사용자의 댓글")
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonBackReference
-    private List<Comment> comments = new ArrayList<>();
-
-    @ApiModelProperty(value = "사용자의 좋아요")
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonBackReference
-    private List<Likes> likes = new ArrayList<>();*/
+    private Set<Post> posts = new HashSet<>();
 
     @Builder(toBuilder = true)
     private User(Long id, String name, Email email, String password, boolean isEmailCertification, String emailCertificationToken, String profileImageUrl, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
@@ -132,14 +121,6 @@ public class User {
         return jwt.newToken(claims);
     }
 
-    public Optional<String> getProfileImageUrl() {
-        return ofNullable(profileImageUrl);
-    }
-
-    public Optional<LocalDateTime> getLastLoginAt() {
-        return ofNullable(lastLoginAt);
-    }
-
     public void addFollowing(User targetUser) {
         followings.add(targetUser);
         targetUser.getFollowers().add(this);
@@ -150,18 +131,12 @@ public class User {
         targetUser.removeFollower(this);
     }
 
+    public void addPost(Post post) {
+        this.posts.add(post);
+        post.setUser(this);
+    }
+
     public void removeFollower(User targetUser) {
         followers.remove(targetUser);
     }
-
-/*
-    public void addComment(Comment comment) {
-        this.comments.add(comment);
-        comment.setUser(this);
-    }
-
-    public void addLike(Likes likes) {
-        this.likes.add(likes);
-        likes.setUser(this);
-    }*/
 }

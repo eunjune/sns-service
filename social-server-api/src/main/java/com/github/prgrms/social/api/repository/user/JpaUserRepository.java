@@ -33,6 +33,10 @@ public interface JpaUserRepository extends JpaRepository<User,Long>{
     boolean existsByName(String name);
 
     @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"followings"})
+    UserProjection findFollowingsById(Long id);
+
+    @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"followers"})
     UserProjection findFollowersById(Long id);
 

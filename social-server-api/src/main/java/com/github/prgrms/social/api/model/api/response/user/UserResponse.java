@@ -18,5 +18,4 @@ public class UserResponse {
     private LocalDateTime createAt;
 
     private LocalDateTime lastLoginAt;
-
 }

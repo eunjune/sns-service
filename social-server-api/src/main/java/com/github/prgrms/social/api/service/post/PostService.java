@@ -2,9 +2,15 @@ package com.github.prgrms.social.api.service.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.commons.AttachedFile;
-import com.github.prgrms.social.api.model.post.*;
+import com.github.prgrms.social.api.model.post.HashTag;
+import com.github.prgrms.social.api.model.post.Image;
+import com.github.prgrms.social.api.model.post.LikeInfo;
+import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.post.*;
+import com.github.prgrms.social.api.repository.post.JpaHashTagRepository;
+import com.github.prgrms.social.api.repository.post.JpaImageRepository;
+import com.github.prgrms.social.api.repository.post.JpaPostLikeRepository;
+import com.github.prgrms.social.api.repository.post.JpaPostRepository;
 import com.github.prgrms.social.api.repository.user.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,13 +40,13 @@ public class PostService {
     private final JpaImageRepository imageRepository;
 
     @Transactional
-    public Post write(Post post, Long userId, List<String> imagePaths) {
+    public Post write(Post post, Long userId, Set<String> imagePaths) {
         checkNotNull(post, "post must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
         return userRepository.findById(userId)
                 .map(user -> {
-                    post.setUser(user);
+                    user.addPost(post);
                     return postRepository.save(post);
                 })
                 .map(savedPost -> {
@@ -58,9 +62,10 @@ public class PostService {
 
                     for(String imagePath : imagePaths) {
                         Image image = Image.builder().path(imagePath).build();
-                        image.setPost(savedPost);
+                        savedPost.addImage(image);
                         imageRepository.save(image);
                     }
+
                     return savedPost;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, userId));
@@ -96,10 +101,10 @@ public class PostService {
         checkNotNull(userId, "userId must be provided.");
         checkNotNull(postWriterId, "postWriterId must be provided.");
 
-        return postLikeRepository.findByUser_IdAndPost_Id(userId, postId)
-                .map(likeInfo -> {
-                    Post post = likeInfo.getPost();
+        LikeInfo likeInfo = postLikeRepository.findByUser_IdAndPost_Id(userId,postId).orElseThrow(() -> new NotFoundException(LikeInfo.class,userId,postId));
 
+        return findById(postId, postWriterId, userId)
+                .map(post -> {
                     if (post.isLikesOfMe()) {
                         post.removeLikes(likeInfo);
                         postLikeRepository.deleteByUser_IdAndPost_Id(userId, postId);
@@ -108,6 +113,13 @@ public class PostService {
                     return post;
                 })
                 .orElseThrow(() -> new NotFoundException(Post.class, postId));
+    }
+
+    @Transactional(readOnly = true)
+    public long countByUserId(Long userId) {
+        checkNotNull(userId, "userId must be provided.");
+
+        return postRepository.countByUser_Id(userId);
     }
 
     @Transactional(readOnly = true)
@@ -133,7 +145,6 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<Post> findAll(Long userId, Long postWriterId, Long lastId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
-        checkNotNull(postWriterId, "postWriterId must be provided.");
         checkNotNull(lastId, "lastId must be provided.");
 
         userRepository.findById(postWriterId)

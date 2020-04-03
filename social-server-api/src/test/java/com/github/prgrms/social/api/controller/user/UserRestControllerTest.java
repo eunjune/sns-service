@@ -165,6 +165,7 @@ class UserRestControllerTest {
 
     }
 
+
     @DisplayName("인증 이메일 재전송")
     @Test
     void resendEmail() throws Exception {
@@ -211,7 +212,6 @@ class UserRestControllerTest {
 
         mockMvc.perform(get("/api/user/me").header(tokenHeader, apiToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.id").value(user.getId()))
                 .andDo(print());
 
     }
@@ -274,7 +274,8 @@ class UserRestControllerTest {
         mockMvc.perform(put("/api/user/profile")
                         .header(tokenHeader, apiToken)
                         .param("name","testupdate")
-                        .param("password","87654321"))
+                        .param("password","87654321")
+                        .param("profileImageUrl","1234"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.name").value("testupdate"))
                 .andDo(print());
@@ -373,7 +374,29 @@ class UserRestControllerTest {
         assertNotNull(afterUser2);
         assertEquals(beforeUser1.getFollowings().size() - 1, afterUser1.getFollowings().size());
         assertEquals(beforeUser2.getFollowers().size() - 1, afterUser2.getFollowers().size());
+    }
 
+    @DisplayName("팔로잉 목록")
+    @Test
+    public void followings() throws Exception {
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
+        User user3 = userService.join("test3", new Email("test3@gmail.com"), "12345678");
+        User user4 = userService.join("test4", new Email("test4@gmail.com"), "12345678");
+        User user5 = userService.join("test5", new Email("test5@gmail.com"), "12345678");
+        User user6 = userService.join("test6", new Email("test6@gmail.com"), "12345678");
+        User user7 = userService.join("test7", new Email("test7@gmail.com"), "12345678");
 
+        userService.addFollowing(user.getId(), user2.getId());
+        userService.addFollowing(user.getId(), user3.getId());
+        userService.addFollowing(user.getId(), user4.getId());
+        userService.addFollowing(user.getId(), user5.getId());
+        userService.addFollowing(user.getId(), user6.getId());
+        userService.addFollowing(user.getId(), user7.getId());
+
+        mockMvc.perform(get("/api/user/followings?page=0&size=3")
+                .header(tokenHeader, apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.size()").value("3"))
+                .andDo(print());
     }
 }

@@ -12,6 +12,7 @@ import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -53,6 +56,59 @@ public class UserService {
         checkNotNull(email, "email must be provided.");
 
         return userRepository.findByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> findUserWithUserById(Long userId) {
+        checkNotNull(userId, "userId must be provided.");
+
+        return userRepository.findUserWithUserById(userId);
+    }
+
+    private List<User> getPageSizeList(List<User> list, Pageable pageable) {
+        /*// TODO: 쿼리로 처리하는 방법?
+        list.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
+        if(lastId == 0L) {
+            return list.subList(0,Math.min(pageable.getPageSize(), list.size()));
+        }
+
+        int startIndex = 0;
+        for(int i=0; i<list.size(); ++i) {
+            if(list.get(i).getId().equals(lastId)) {
+                startIndex = i + 1;
+                break;
+            }
+        }
+
+        int size = list.size() - startIndex < pageable.getPageSize() ?
+                list.size() :
+                pageable.getPageSize() + startIndex;
+
+        return list.subList(startIndex, size);*/
+        return null;
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findFollowingsById(Long userId,Pageable pageable) {
+        checkNotNull(userId, "userId must be provided.");
+
+        List<User> followings = new ArrayList<>(userRepository.findFollowingsById(userId).getFollowings());
+
+        /*long start = pageable.getOffset() * pageable.getPageSize();
+        long end = start + pageable.getPageSize();
+        followings.subList(start,end);*/
+
+        return null;
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findFollowersById(Long userId,Pageable pageable) {
+        checkNotNull(userId, "userId must be provided.");
+
+        // TODO: 쿼리로 처리하는 방법?
+
+        List<User> followers = new ArrayList<>(userRepository.findFollowersById(userId).getFollowers());
+        return null;
     }
 
     @Transactional
@@ -116,16 +172,6 @@ public class UserService {
 
                 }).orElseThrow(() -> new NotFoundException("이메일이 존재하지 않습니다"));
     }
-
-
-
-    @Transactional(readOnly = true)
-    public Optional<User> findUserWithUserById(Long userId) {
-        checkNotNull(userId, "userId must be provided.");
-
-        return userRepository.findUserWithUserById(userId);
-    }
-
 
 
     @Transactional

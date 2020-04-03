@@ -27,6 +27,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
@@ -40,7 +41,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 
@@ -119,6 +122,31 @@ public class UserRestController {
         return OK(userResponse);
     }
 
+    @GetMapping(path = "user/followings")
+    @ApiOperation(value = "팔로잉 리스트")
+    public ApiResult<List<UserResponse>> followings(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            Pageable pageable
+    ) {
+
+        return OK(userService.findFollowingsById(authentication.id.getValue(), pageable)
+                            .stream()
+                            .map(this::convertUserResponse)
+                            .collect(Collectors.toList()));
+    }
+
+    @GetMapping(path = "user/followers")
+    @ApiOperation(value = "팔로워 리스트")
+    public ApiResult<List<UserResponse>> followers(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            Pageable pageable
+    ) {
+        return OK(userService.findFollowersById(authentication.id.getValue(),pageable)
+                            .stream()
+                            .map(this::convertUserResponse)
+                            .collect(Collectors.toList()));
+    }
+
     @PostMapping(path = "user/exists/email")
     @ApiOperation(value = "이메일 중복확인 (API 토큰 필요없음)")
     public ApiResult<Boolean> checkEmail(
@@ -165,7 +193,6 @@ public class UserRestController {
 
         User user = userService.join(
                 joinRequest.getName(),
-
                 new Email(joinRequest.getAddress()),
                 joinRequest.getPassword()
         );
@@ -271,6 +298,14 @@ public class UserRestController {
     private MeResponse convertMeResponse(User user) {
         MeResponse meResponse = new MeResponse();
         modelMapper.map(user, meResponse);
+
         return meResponse;
+    }
+
+    private UserResponse convertUserResponse(User user) {
+        UserResponse userResponse = new UserResponse();
+        modelMapper.map(user, userResponse);
+
+        return userResponse;
     }
 }

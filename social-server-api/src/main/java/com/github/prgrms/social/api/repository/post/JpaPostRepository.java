@@ -14,6 +14,9 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
     Post save(Post post);
 
     @Transactional(readOnly = true)
+    long countByUser_Id(Long id);
+
+    @Transactional(readOnly = true)
     Optional<Post> findById(Long id);
 
     @Transactional(readOnly = true)

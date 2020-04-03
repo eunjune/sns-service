@@ -51,17 +51,18 @@ public class Post {
 
     @ApiModelProperty(value = "작성자")
     @ManyToOne
+    @JsonManagedReference
     private User user;
 
     @ApiModelProperty(value = "이미지 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonManagedReference
     private Set<Image> images = new HashSet<>();
 
     @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @Setter
-    @JsonBackReference
+    @JsonManagedReference
     private Set<LikeInfo> likeInfos = new HashSet<>();
 
     @ApiModelProperty(value = "리트윗한 포스트")
@@ -127,6 +128,11 @@ public class Post {
     public void addRetweet(Post post) {
         retweetPost = post;
         post.getPostsRetweetedMe().add(this);
+    }
+
+    public void addImage(Image image) {
+        this.images.add(image);
+        image.setPost(this);
     }
 
 /*

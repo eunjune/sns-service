@@ -35,7 +35,6 @@ public class PostRestController {
 
     private final CommentService commentService;
 
-
     @GetMapping(path = "user/{userId}/post/list")
     @ApiOperation(value = "특정 유저 포스트 목록 조회")
     @ApiImplicitParams({
@@ -52,6 +51,22 @@ public class PostRestController {
             Pageable pageable
     ) {
         return OK(postService.findAll(authentication.id.getValue(), userId, lastId, pageable));
+    }
+
+
+    @GetMapping(path = "user/me/post/list")
+    @ApiOperation(value = "내 포스트 목록 조회")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "lastId", dataType = "integer", paramType = "query", defaultValue = "0", value = "마지막 포스트의 아이디"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
+    })
+    public ApiResult<List<Post>> myPosts(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @RequestParam
+            Long lastId,
+            Pageable pageable
+    ) {
+        return OK(postService.findAll(authentication.id.getValue(), authentication.id.getValue(), lastId, pageable));
     }
 
 
@@ -192,5 +207,6 @@ public class PostRestController {
     ) {
         return OK(postService.unlike(postId, authentication.id.getValue(),userId));
     }
+
 
 }

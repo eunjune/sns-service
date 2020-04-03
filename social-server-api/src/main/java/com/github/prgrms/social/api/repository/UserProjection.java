@@ -8,6 +8,8 @@ public interface UserProjection {
 
     Set<User> getFollowers();
 
+    Set<User> getFollowings();
+
     Boolean getIsEmailCertification();
 
     Boolean getIsPrivate();

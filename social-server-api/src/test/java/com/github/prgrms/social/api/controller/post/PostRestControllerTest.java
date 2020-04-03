@@ -29,8 +29,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -109,7 +110,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 작성")
     @Test
     void posting() throws Exception {
-        List<String> imagePaths = new ArrayList<>();
+        Set<String> imagePaths = new HashSet<>();
         imagePaths.add("image1.png");
         imagePaths.add("image2.png");
         String content = "content testsets #abc #hash sdfsdfsdfds";
@@ -144,10 +145,10 @@ class PostRestControllerTest {
         Post post3 = Post.builder().content("post3").build();
         Post post4 = Post.builder().content("post4").build();
 
-        postService.write(post1,user.getId(),new ArrayList<>());
-        postService.write(post2,user.getId(),new ArrayList<>());
-        postService.write(post3,user.getId(),new ArrayList<>());
-        Post writedPost = postService.write(post4, user.getId(), new ArrayList<>());
+        postService.write(post1,user.getId(),new HashSet<>());
+        postService.write(post2,user.getId(),new HashSet<>());
+        postService.write(post3,user.getId(),new HashSet<>());
+        Post writedPost = postService.write(post4, user.getId(), new HashSet<>());
 
         postService.like(writedPost.getId(),user.getId(),user.getId());
 
@@ -168,10 +169,10 @@ class PostRestControllerTest {
         Post post3 = Post.builder().content("post3").build();
         Post post4 = Post.builder().content("post4").build();
 
-        Post writedPost = postService.write(post1, user.getId(), new ArrayList<>());
-        Post lastPost = postService.write(post2, user.getId(), new ArrayList<>());
-        postService.write(post3,user.getId(),new ArrayList<>());
-        postService.write(post4, user.getId(), new ArrayList<>());
+        Post writedPost = postService.write(post1, user.getId(), new HashSet<>());
+        Post lastPost = postService.write(post2, user.getId(), new HashSet<>());
+        postService.write(post3,user.getId(),new HashSet<>());
+        postService.write(post4, user.getId(), new HashSet<>());
 
         postService.like(writedPost.getId(),user.getId(),user.getId());
 
@@ -195,10 +196,10 @@ class PostRestControllerTest {
         Post post3 = Post.builder().content("post3").build();
         Post post4 = Post.builder().content("post4").build();
 
-        postService.write(post1,user2.getId(),new ArrayList<>());
-        postService.write(post2,user2.getId(),new ArrayList<>());
-        postService.write(post3,user2.getId(),new ArrayList<>());
-        postService.write(post4, user2.getId(), new ArrayList<>());
+        postService.write(post1,user2.getId(),new HashSet<>());
+        postService.write(post2,user2.getId(),new HashSet<>());
+        postService.write(post3,user2.getId(),new HashSet<>());
+        postService.write(post4, user2.getId(), new HashSet<>());
 
         mockMvc.perform(get("/api/user/" + user2.getId() + "/post/list?lastId=0&size=2")
                 .header(tokenHeader,apiToken))
@@ -218,10 +219,10 @@ class PostRestControllerTest {
         Post post3 = Post.builder().content("post3").build();
         Post post4 = Post.builder().content("post4").build();
 
-        postService.write(post1,user2.getId(),new ArrayList<>());
-        postService.write(post2,user2.getId(),new ArrayList<>());
-        postService.write(post3,user2.getId(),new ArrayList<>());
-        postService.write(post4, user2.getId(), new ArrayList<>());
+        postService.write(post1,user2.getId(),new HashSet<>());
+        postService.write(post2,user2.getId(),new HashSet<>());
+        postService.write(post3,user2.getId(),new HashSet<>());
+        postService.write(post4, user2.getId(), new HashSet<>());
 
         mockMvc.perform(get("/api/user/" + user2.getId() + "/post/list?lastId=0&size=2")
                 .header(tokenHeader,apiToken))
@@ -237,10 +238,10 @@ class PostRestControllerTest {
         Post post3 = Post.builder().content("#hashtag").build();
         Post post4 = Post.builder().content("#hashtag").build();
 
-        postService.write(post1,user.getId(),new ArrayList<>());
-        postService.write(post2,user.getId(),new ArrayList<>());
-        postService.write(post3,user.getId(),new ArrayList<>());
-        postService.write(post4,user.getId(),new ArrayList<>());
+        postService.write(post1,user.getId(),new HashSet<>());
+        postService.write(post2,user.getId(),new HashSet<>());
+        postService.write(post3,user.getId(),new HashSet<>());
+        postService.write(post4,user.getId(),new HashSet<>());
 
         mockMvc.perform(get("/api/post/hashtag/list?lastId=3&size=2"))
                 .andExpect(status().isOk())
@@ -253,7 +254,7 @@ class PostRestControllerTest {
     @Test
     void removePost() throws Exception {
         Post post1 = Post.builder().content("post1").build();
-        Post savedPost = postService.write(post1, user.getId(), new ArrayList<>());
+        Post savedPost = postService.write(post1, user.getId(), new HashSet<>());
 
         mockMvc.perform(delete("/api/post/" + savedPost.getId())
                 .header(tokenHeader,apiToken))
@@ -270,7 +271,7 @@ class PostRestControllerTest {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
 
         Post post1 = Post.builder().content("post1").build();
-        Post savedPost = postService.write(post1, user2.getId(), new ArrayList<>());
+        Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
 
         mockMvc.perform(patch("/api/user/" + user2.getId() + "/post/" + savedPost.getId() +"/like")
                 .header(tokenHeader,apiToken))
@@ -286,7 +287,7 @@ class PostRestControllerTest {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
 
         Post post1 = Post.builder().content("post1").build();
-        Post savedPost = postService.write(post1, user2.getId(), new ArrayList<>());
+        Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
         postService.like(savedPost.getId(),user.getId(),user2.getId());
 
         mockMvc.perform(delete("/api/user/" + user2.getId() + "/post/" + savedPost.getId() +"/unlike")
@@ -303,7 +304,7 @@ class PostRestControllerTest {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
 
         Post post1 = Post.builder().content("post1").build();
-        Post savedPost = postService.write(post1, user2.getId(), new ArrayList<>());
+        Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
         CommentRequest commentRequest = new CommentRequest("comment1");
 
         mockMvc.perform(post("/api/user/" + user2.getId() + "/post/" + savedPost.getId() +"/comment")
@@ -326,7 +327,7 @@ class PostRestControllerTest {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
 
         Post post1 = Post.builder().content("post1").build();
-        Post savedPost = postService.write(post1, user2.getId(), new ArrayList<>());
+        Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
 
         mockMvc.perform(post("/api/post/" + savedPost.getId() +"/retweet")
                 .header(tokenHeader,apiToken))
