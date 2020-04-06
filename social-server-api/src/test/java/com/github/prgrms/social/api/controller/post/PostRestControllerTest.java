@@ -1,9 +1,7 @@
 package com.github.prgrms.social.api.controller.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.prgrms.social.api.model.api.request.post.CommentRequest;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
-import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.Post;
@@ -33,7 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -388,29 +387,7 @@ class PostRestControllerTest {
 
     }
 
-    @DisplayName("댓글 작성")
-    @Test
-    void comment() throws Exception {
-        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
 
-        Post post1 = Post.builder().content("post1").build();
-        Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
-        CommentRequest commentRequest = new CommentRequest("comment1");
-
-        mockMvc.perform(post("/api/user/" + user2.getId() + "/post/" + savedPost.getId() +"/comment")
-                .header(tokenHeader,apiToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(commentRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.content").value(commentRequest.getContent()))
-                .andExpect(jsonPath("$.response.user").isNotEmpty())
-                .andDo(print());
-
-        List<Comment> comments = commentService.findAll(savedPost.getId(),user.getId(),null);
-        assertNotNull(comments);
-        assertEquals(comments.size(),1);
-
-    }
 
     @DisplayName("리트윗")
     @Test

@@ -24,6 +24,8 @@ public class PostResponse {
 
     private LocalDateTime createAt;
 
+    private Integer commentCount;
+
     private Integer likeCount;
 
     private Set<String> images = new HashSet<>();

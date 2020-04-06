@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.model.api.response.user.MeResponse;
+import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.LikeInfo;
 import com.github.prgrms.social.api.model.post.Post;
@@ -129,6 +130,7 @@ public class ServiceConfigure {
         };
 
         Converter<Set<LikeInfo>, Integer> setLikeInfoToSetLikeCount = context -> context.getSource().size();
+        Converter<Set<Comment>, Integer> setCommentToSetComment = context -> context.getSource().size();
         Converter<Set<Image>, Set<String>> setImages = context -> {
             Set<Image> source = context.getSource();
             Set<String> definition = new HashSet<>();
@@ -163,6 +165,7 @@ public class ServiceConfigure {
         modelMapper
                 .typeMap(Post.class, PostResponse.class)
                 .addMappings(mapper -> mapper.using(setLikeInfoToSetLikeCount).map(Post::getLikeInfos, PostResponse::setLikeCount))
+                .addMappings(mapper -> mapper.using(setCommentToSetComment).map(Post::getComments, PostResponse::setCommentCount))
                 .addMappings(mapper -> mapper.skip(PostResponse::setUser))
                 .addMappings(mapper -> mapper.skip(PostResponse::setRetweetPost))
                 .addMappings(mapping -> mapping.using(setImages).map(Post::getImages, PostResponse::setImages));

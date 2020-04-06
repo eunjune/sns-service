@@ -184,7 +184,7 @@ const Profile = () => {
                                             'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
                     >
                         {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
-                        {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>이미지 업로드</Button>}
+                        {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>프로필 이미지 변경</Button>}
                         <Card.Meta avatar={<Avatar>{me && me.name[0]}</Avatar>}
                                    title={me && me.name} onClick={clickProfile}
                                    style={{cursor: 'pointer'}}

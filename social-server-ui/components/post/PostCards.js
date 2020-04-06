@@ -1,7 +1,7 @@
 import React, {useState, useCallback, useEffect, memo} from 'react';
 import cookie from 'react-cookies';
 import PropTypes from 'prop-types';
-import {Button, Card, Icon, Avatar, Form, List, Comment, Input, Popover, Modal} from 'antd';
+import {Button, Card, Icon, Avatar, Tooltip, List, Comment, Input, Popover, Modal} from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     ADD_COMMENT_REQUEST,
@@ -22,10 +22,11 @@ import CommentForm from "./CommentForm";
 import FollowButton from "./FollowButton";
 import PostForm from "./PostForm";
 import PostEditForm from "./PostEditForm";
+import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
 moment.locale('ko');
 
 const CardWrapper = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 100px;
 `;
 
 const PostCards = memo(({post}) => {
@@ -150,12 +151,19 @@ const PostCards = memo(({post}) => {
   return (
         <CardWrapper>
             <Card
+                type="inner"
                 cover={post.images[0] && <PostImages images={post.images}/>}
                 actions={[
                     <Icon type="retweet" key="retweet" onClick={onRetweet}/>,
-                    <Icon type="heart" key="heart" theme={post.likesOfMe ? 'twoTone' : 'outlined'}
-                          twoToneColor="#eb2f96" onClick={onToggleLike}/>,
-                    <Icon type="message" key="message" onClick={onToggleComment}/>,
+                    <div>
+                        <Icon type="heart" key="heart" theme={post.likesOfMe ? 'twoTone' : 'outlined'} twoToneColor="#eb2f96" onClick={onToggleLike}/>
+                        <span style={{marginLeft: 10}}>{post.likeCount}</span>
+                    </div>,
+
+                    <div>
+                        <Icon type="message" key="message" onClick={onToggleComment}/>
+                        <span style={{marginLeft: 10}}>0</span>
+                    </div>,
 
                     <Popover
                         key="ellipsis"
@@ -178,16 +186,21 @@ const PostCards = memo(({post}) => {
                 title={post.isRetweet ? `${post.user.name}님이 리트윗 하셨습니다.` : null}
                 extra={<FollowButton post={post} onUnfollow={onUnfollow} onFollow={onFollow}/>}
             >
-                <div style={{float: 'right'}}>{moment(post.createAt).format('YYYY.MM.DD')}</div>
+                <div style={{float: 'right'}}>{moment(post.createAt).fromNow()}</div>
                 {post.isRetweet ?
                     <Card
                         cover={post.retweetPost.images[0] && <PostImages images={post.retweetPost.images}/>}
                     >
                         <Card.Meta
 
-                            avatar={<Link href={{pathname: '/user', query: {id: post.retweetPost.user.id}}}
-                                          as={`/user/${post.retweetPost.user.id}`}>
-                                <a><Avatar>{post.retweetPost.user.name[0]}</Avatar></a></Link>}
+                            avatar={
+                                <Link href={{pathname: '/user', query: {id: post.retweetPost.user.id}}} as={`/user/${post.retweetPost.user.id}`}>
+                                    <a>
+                                        <Avatar shape="circle" icon={post.retweetPost.user.profileImageUrl && <img src={`http://localhost:8080/image/profile/${post.retweetPost.user.profileImageUrl}`} alt=""/>}>
+                                            {post.retweetPost.user.name[0]}
+                                        </Avatar>
+                                    </a>
+                                </Link>}
                             title={post.retweetPost.user.name}
                             description={<PostCardContent postData={post.retweetPost.content}/>}
                         />
@@ -195,8 +208,14 @@ const PostCards = memo(({post}) => {
                     :
                     (
                         <Card.Meta
-                            avatar={<Link href={{pathname: '/user', query: {id: post.user.id}}}
-                                          as={`/user/${post.user.id}`}><a><Avatar>{post.user.name[0]}</Avatar></a></Link>}
+                            avatar={
+                                <Link href={{pathname: '/user', query: {id: post.user.id}}} as={`/user/${post.user.id}`}>
+                                    <a>
+                                        <Avatar shape="circle" icon={post.user.profileImageUrl && <img src={`http://localhost:8080/image/profile/${post.user.profileImageUrl}`} alt=""/>}>
+                                            {post.user.name[0]}
+                                        </Avatar>
+                                    </a>
+                                </Link>}
                             title={post.user.name}
                             description={isEditPost === true && editPostId === post.id ?
                                             <PostEditForm key={post.id} post={post} /> :<
@@ -218,13 +237,25 @@ const PostCards = memo(({post}) => {
                     itemLayout = "horizontal"
                     dataSource={post.comments || []}
                     renderItem={ item => (
-                      <li>
-                        <Comment
-                          author={item.user.name}
-                          avatar={<Link href={{pathname: '/user', query: {id : post.user.id}}} as={`/user/${post.user.id}`}><a><Avatar>{post.user.name[0]}</Avatar></a></Link> }
-                          content={item.content}
-                        />
-                      </li>
+
+                      <Comment
+                        author={item.user.name}
+                        avatar={
+                            <Link href={{pathname: '/user', query: {id : post.user.id}}} as={`/user/${post.user.id}`}>
+                                <a>
+                                    <Avatar shape="circle" icon={post.user.profileImageUrl && <img src={`http://localhost:8080/image/profile/${post.user.profileImageUrl}`} alt=""/>}>
+                                        {post.user.name[0]}
+                                    </Avatar>
+                                </a>
+                            </Link>
+                        }
+                        content={item.content}
+                        datetime={
+                            <Tooltip title={moment().format('YYYY-MM-DD HH:mm:ss')}>
+                                <span>{moment(item.createAt).fromNow()}</span>
+                            </Tooltip>
+                        }
+                      />
                     )}
                 />
             </>

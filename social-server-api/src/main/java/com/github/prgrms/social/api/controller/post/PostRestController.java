@@ -1,13 +1,9 @@
 package com.github.prgrms.social.api.controller.post;
 
-import com.github.prgrms.social.api.model.api.request.post.CommentRequest;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
-import com.github.prgrms.social.api.model.api.response.post.CommentResponse;
 import com.github.prgrms.social.api.model.api.response.post.PostResponse;
-import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.security.JwtAuthentication;
-import com.github.prgrms.social.api.service.post.CommentService;
 import com.github.prgrms.social.api.service.post.HashTagService;
 import com.github.prgrms.social.api.service.post.PostService;
 import com.github.prgrms.social.api.util.DtoUtils;
@@ -37,8 +33,6 @@ public class PostRestController {
     private final PostService postService;
 
     private final HashTagService hashTagService;
-
-    private final CommentService commentService;
 
     @GetMapping(path = "user/{userId}/post/list")
     @ApiOperation(value = "특정 유저 포스트 목록 조회")
@@ -128,24 +122,7 @@ public class PostRestController {
     }
 
 
-    @GetMapping(path = "user/{userId}/post/{postId}/comment/list")
-    @ApiOperation(value = "댓글 조회")
-    public ApiResult<List<CommentResponse>> comments(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable
-            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
-                    Long userId,
-            @PathVariable
-            @ApiParam(value = "대상 포스트 PK", example = "1")
-                    Long postId
-    ) {
-        return OK(
-                commentService.findAll(postId, authentication.id.getValue(), userId)
-                            .stream()
-                            .map(dtoUtils::convertCommentResponse)
-                            .collect(Collectors.toList())
-        );
-    }
+
 
 
     @PostMapping(path = "post")
@@ -168,22 +145,6 @@ public class PostRestController {
     }
 
 
-    @PostMapping(path = "user/{userId}/post/{postId}/comment")
-    @ApiOperation(value = "댓글 작성")
-    public ApiResult<CommentResponse> comment(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable
-            @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
-                    Long userId,
-            @PathVariable
-            @ApiParam(value = "대상 포스트 PK", example = "1")
-                    Long postId,
-            @RequestBody CommentRequest request
-    ) {
-        Comment comment = request.newComment();
-
-        return OK(dtoUtils.convertCommentResponse(commentService.write(postId, authentication.id.getValue(), userId, comment)));
-    }
 
 
     @PostMapping(path = "post/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
