@@ -125,6 +125,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case EMAIL_CERTIFICATION_SUCCESS: {
+                console.log(action.data);
                 draft.me = action.data;
                 break;
             }
@@ -254,6 +255,8 @@ const reducer = (state = initialState, action) => {
             }
     
             case LOAD_ME_SUCCESS: {
+                console.log('me success');
+                console.log(action.data);
                 draft.me = action.data;
                 break;
             }
@@ -354,6 +357,7 @@ const reducer = (state = initialState, action) => {
             }
     
             case EDIT_PROFILE_SUCCESS: {
+                alert('수정 완료');
                 draft.me = action.data;
                 draft.isEditing = false;
                 break;

@@ -157,6 +157,16 @@ public class PostRestController {
         return OK(dtoUtils.convertPostResponse(postService.write(request.newPost(), authentication.id.getValue(), request.getImagePaths())));
     }
 
+    @PutMapping(path = "post/{postId}")
+    @ApiOperation(value = "포스트 수정")
+    public ApiResult<PostResponse> editPost(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @PathVariable Long postId,
+            @RequestBody PostingRequest request
+    ) {
+        return OK(dtoUtils.convertPostResponse(postService.updatePost(postId,request)));
+    }
+
 
     @PostMapping(path = "user/{userId}/post/{postId}/comment")
     @ApiOperation(value = "댓글 작성")

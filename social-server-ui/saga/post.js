@@ -5,7 +5,10 @@ import {
     ADD_COMMENT_SUCCESS,
     ADD_POST_FAILURE,
     ADD_POST_REQUEST,
-    ADD_POST_SUCCESS, LOAD_COMMENTS_FAILURE, LOAD_COMMENTS_REQUEST, LOAD_COMMENTS_SUCCESS,
+    ADD_POST_SUCCESS,
+    LOAD_COMMENTS_FAILURE,
+    LOAD_COMMENTS_REQUEST,
+    LOAD_COMMENTS_SUCCESS,
     LOAD_HASHTAG_POSTS_FAILURE,
     LOAD_HASHTAG_POSTS_REQUEST,
     LOAD_HASHTAG_POSTS_SUCCESS,
@@ -14,7 +17,29 @@ import {
     LOAD_MAIN_POSTS_SUCCESS,
     LOAD_USER_POSTS_FAILURE,
     LOAD_USER_POSTS_REQUEST,
-    LOAD_USER_POSTS_SUCCESS, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS, LIKE_POST_SUCCESS, LIKE_POST_FAILURE, LIKE_POST_REQUEST, UNLIKE_POST_FAILURE, UNLIKE_POST_SUCCESS, UNLIKE_POST_REQUEST, RETWEET_SUCCESS, RETWEET_FAILURE, RETWEET_REQUEST, REMOVE_POST_REQUEST, REMOVE_POST_SUCCESS, REMOVE_POST_FAILURE
+    LOAD_USER_POSTS_SUCCESS,
+    UPLOAD_IMAGES_FAILURE,
+    UPLOAD_IMAGES_REQUEST,
+    UPLOAD_IMAGES_SUCCESS,
+    LIKE_POST_SUCCESS,
+    LIKE_POST_FAILURE,
+    LIKE_POST_REQUEST,
+    UNLIKE_POST_FAILURE,
+    UNLIKE_POST_SUCCESS,
+    UNLIKE_POST_REQUEST,
+    RETWEET_SUCCESS,
+    RETWEET_FAILURE,
+    RETWEET_REQUEST,
+    REMOVE_POST_REQUEST,
+    REMOVE_POST_SUCCESS,
+    REMOVE_POST_FAILURE,
+    LOAD_MY_POSTS_REQUEST,
+    LOAD_MY_POSTS_SUCCESS,
+    LOAD_MY_POSTS_FAILURE,
+    SIZE,
+    EDIT_POST_REQUEST,
+    EDIT_POST_SUCCESS,
+    EDIT_POST_FAILURE
 } from '../reducers/post';
 import axios from 'axios';
 import { UNFOLLOW_me_SUCCESS } from '../reducers/user';
@@ -48,10 +73,39 @@ function* watchAddPost() {
     yield takeLatest(ADD_POST_REQUEST, addPost);
 }
 
+function editPostAPI({postId, postRequest, token}) {
+    return axios.put(`post/${postId}`, postRequest, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* editPost(action) {
+    try {
+        const result = yield call(editPostAPI, action.data);
+        yield put({
+            type: EDIT_POST_SUCCESS,
+            data : result.data.response,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: EDIT_POST_FAILURE,
+            error: e,
+        })
+    }
+}
+
+function* watchEditPost() {
+
+    yield takeLatest(EDIT_POST_REQUEST, editPost);
+}
+
 
 function loadPostAPI(lastId=0) {
 
-    return axios.get(`user/post/list?lastId=${lastId}&size=8`);
+    return axios.get(`user/post/list?lastId=${lastId}&size=${SIZE}`);
 }
 
 function* loadPost(action) {
@@ -104,7 +158,7 @@ function* watchRemovePost() {
 }
 
 function loadHashtagAPI({tag,lastId=0}) {
-    return axios.get(`/post/${encodeURIComponent(tag)}/list?lastId=${lastId}&size=6`);
+    return axios.get(`/post/${encodeURIComponent(tag)}/list?lastId=${lastId}&size=${SIZE}`);
 }
 
 
@@ -131,7 +185,7 @@ function* watchLoadHashtagPosts() {
 
 
 function loadUserPostAPI({userId,token,lastId=0}) {
-    return axios.get(`user/${userId || 0}/post/list?lastId=${lastId}&size=6`, {
+    return axios.get(`user/${userId || 0}/post/list?lastId=${lastId}&size=${SIZE}`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -156,6 +210,34 @@ function* loadUserPost(action) {
 
 function* watchLoadUserPosts() {
     yield takeLatest(LOAD_USER_POSTS_REQUEST,loadUserPost);
+}
+
+function loadMyPostAPI({token,lastId=0}) {
+    return axios.get(`user/me/post/list?lastId=${lastId}&size=${SIZE}`, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadMyPost(action) {
+    try {
+        const result = yield call(loadMyPostAPI, action.data);
+        yield put({
+            type: LOAD_MY_POSTS_SUCCESS,
+            data : result.data.response,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_MY_POSTS_FAILURE,
+            error: e,
+        })
+    }
+}
+
+function* watchLoadMyPosts() {
+    yield takeLatest(LOAD_MY_POSTS_REQUEST,loadMyPost);
 }
 
 function loadCommentsAPI({userId,postId,token}) {
@@ -337,11 +419,13 @@ function* watchRetweet() {
 export default function* postSaga() {
     yield all([
         fork(watchAddPost),
+        fork(watchEditPost),
         fork(watchRemovePost),
         fork(watchLoadPost),
         fork(watchAddComment),
         fork(watchLoadHashtagPosts),
         fork(watchLoadUserPosts),
+        fork(watchLoadMyPosts),
         fork(watchLoadComments),
         fork(watchUploadImages),
         fork(watchLikePost),

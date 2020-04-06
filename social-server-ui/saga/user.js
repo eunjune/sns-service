@@ -299,7 +299,7 @@ function* watchLoadMe() {
 function followAPI({userId,token}) {
     console.log('followAPI');
     console.log(token);
-    return axios.post(`user/${userId}/follow`,{},{
+    return axios.post(`user/follow/${userId}`,{},{
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -328,7 +328,7 @@ function* watchFollow() {
 }
 
 function unfollowAPI({userId,token}) {
-    return axios.delete(`user/${userId}/follow`,{
+    return axios.delete(`user/follow/${userId}`,{
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -415,7 +415,7 @@ function* watchLoadfollowing() {
 }
 
 function removeFollowerAPI({userId,token}) {
-    return axios.delete(`user/${userId}/follower`,{
+    return axios.delete(`user/follower/${userId}`,{
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -443,14 +443,9 @@ function* watchRemovefollower() {
     yield takeLatest(REMOVE_FOLLOWER_REQUEST,removeFollower);
 }
 
-function editProfileAPI({name=null,password=null,token}) {
-    const formData = new FormData();
+function editProfileAPI({profileRequest,token}) {
 
-    console.log(name,password);
-    formData.append('name', name);
-    formData.append('password', password);
-
-    return axios.put(`user/profile`, formData, {
+    return axios.put(`user/profile`, profileRequest, {
         headers: {
             'api_key': 'Bearer ' + token,
         },

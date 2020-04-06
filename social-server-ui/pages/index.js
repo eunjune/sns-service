@@ -1,6 +1,6 @@
 import React, {useEffect,useCallback,useRef} from 'react';
-import PostCards from "../components/PostCards";
-import PostForm from "../components/PostForm";
+import PostCards from "../components/post/PostCards";
+import PostForm from "../components/post/PostForm";
 import {useDispatch, useSelector} from "react-redux";
 import { LOAD_MAIN_POSTS_REQUEST } from '../reducers/post';
 import Login from "./login";
@@ -16,13 +16,19 @@ const Home = ({isEmailLogin}) => {
     const usedLastIds = useRef([]);
     const token = cookie.load('token');
 
-    console.log(me);
+    useEffect(() => {
+
+        window.addEventListener('scroll', onScroll);
+
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+        }
+    }, [posts,hasMorePost]);
+
     const onScroll = useCallback(() => {
-        
+
         if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 200 && hasMorePost) {
-            console.log('onScroll');
-            console.log(posts[posts.length-1].id);
-            
+
             const lastId = posts[posts.length-1].id;
             if(!usedLastIds.current.includes(lastId)) {
                 dispatch({
@@ -34,14 +40,6 @@ const Home = ({isEmailLogin}) => {
         }
 
     }, [posts.length, hasMorePost]);
-
-    useEffect(() => {
-
-        window.addEventListener('scroll', onScroll);
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-        }
-    }, [posts]);
 
     const onClickResendEmail = useCallback(() => {
         dispatch({
@@ -84,6 +82,7 @@ Home.getInitialProps = async (context) => {
 
     context.store.dispatch({
         type: LOAD_MAIN_POSTS_REQUEST,
+        lastId: 0
     });
 
     return {isEmailLogin};

@@ -1,6 +1,7 @@
 package com.github.prgrms.social.api.service.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
+import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
 import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
@@ -71,6 +72,40 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException(User.class, userId));
     }
 
+    @Transactional
+    public Post updatePost(Long postId, PostingRequest postingRequest) {
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(postingRequest, "postingRequest must be provided.");
+
+        return postRepository.findWithImageById(postId)
+                .map(post -> {
+                    post.setContent(postingRequest.getContent());
+
+                    Map<String,Image> removeImageMap = new HashMap();
+                    for(Image image : post.getImages()){
+                        removeImageMap.put(image.getPath(),image);
+                    }
+
+                    for(String key : removeImageMap.keySet()) {
+                        if(!postingRequest.getImagePaths().contains(key)) {
+                            post.removeImage(removeImageMap.get(key));
+                            imageRepository.deleteById(removeImageMap.get(key).getId());
+                        }
+                    }
+
+                    for(String path: postingRequest.getImagePaths()) {
+                        if(imageRepository.existsByPath(path)) {
+                            continue;
+                        }
+
+                        Image savedImage =  imageRepository.save(Image.builder().path(path).build());
+                        post.addImage(savedImage);
+                    }
+                    return post;
+                })
+                .orElseThrow(() -> new NotFoundException(Post.class, postId));
+    }
+
     // 좋아요 기능 처리
     @Transactional
     public Post like(Long postId, Long userId, Long postWriterId) {
@@ -107,7 +142,7 @@ public class PostService {
                 .map(post -> {
                     if (post.isLikesOfMe()) {
                         post.removeLikes(likeInfo);
-                        postLikeRepository.deleteByUser_IdAndPost_Id(userId, postId);
+                        //postLikeRepository.deleteByUser_IdAndPost_Id(userId, postId);
                     }
 
                     return post;

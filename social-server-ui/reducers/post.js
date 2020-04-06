@@ -12,6 +12,10 @@ export const initialState = {
     addCommentError: false,
     addCommentErrorReason: '',
     hasMorePost: false,
+    isEditPost: false,
+    editPostId:null,
+    isEditingPost: false,
+    editPostImages: []
 };
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
@@ -22,6 +26,10 @@ export const LOAD_MAIN_POSTS_REQUEST = 'LOAD_MAIN_POSTS_REQUEST';
 export const LOAD_MAIN_POSTS_SUCCESS = 'LOAD_MAIN_POSTS_SUCCESS';
 export const LOAD_MAIN_POSTS_FAILURE = 'LOAD_MAIN_POSTS_FAILURE';
 
+export const LOAD_MY_POSTS_REQUEST = 'LOAD_MY_POSTS_REQUEST';
+export const LOAD_MY_POSTS_SUCCESS = 'LOAD_MY_POSTS_SUCCESS';
+export const LOAD_MY_POSTS_FAILURE = 'LOAD_MY_POSTS_FAILURE';
+
 export const LOAD_HASHTAG_POSTS_REQUEST = 'LOAD_HASHTAG_POSTS_REQUEST';
 export const LOAD_HASHTAG_POSTS_SUCCESS = 'LOAD_HASHTAG_POSTS_SUCCESS';
 export const LOAD_HASHTAG_POSTS_FAILURE = 'LOAD_HASHTAG_POSTS_FAILURE';
@@ -29,6 +37,13 @@ export const LOAD_HASHTAG_POSTS_FAILURE = 'LOAD_HASHTAG_POSTS_FAILURE';
 export const LOAD_USER_POSTS_REQUEST = 'LOAD_USER_POSTS_REQUEST';
 export const LOAD_USER_POSTS_SUCCESS = 'LOAD_USER_POSTS_SUCCESS';
 export const LOAD_USER_POSTS_FAILURE = 'LOAD_USER_POSTS_FAILURE';
+
+export const SHOW_EDIT_POST = 'SHOW_EDIT_POST';
+export const CANCEL_EDIT_POST = 'CANCEL_EDIT_POST';
+
+export const EDIT_POST_REQUEST = 'EDIT_POST_REQUEST';
+export const EDIT_POST_SUCCESS = 'EDIT_POST_SUCCESS';
+export const EDIT_POST_FAILURE = 'EDIT_POST_FAILURE';
 
 export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
 export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
@@ -39,6 +54,7 @@ export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
 export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE';
 
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
+export const REMOVE_EDIT_IMAGE = 'REMOVE_EDIT_IMAGE';
 
 export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
@@ -60,58 +76,56 @@ export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST';
 export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS';
 export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
 
+export const SIZE = 4;
 
 const reducer = (state = initialState, action) => {
     return produce(state, (draft) => {
         switch (action.type) {
-            case ADD_POST_REQUEST: {
-                draft.isAddingPost =  true;
-                draft.addedPost = false,
-                draft.addPostErrorReason = '';
-                break;
-            }
 
-            case ADD_POST_SUCCESS: {
-                draft.isAddingPost = false;
-                draft.addedPost = true;
-                draft.posts.unshift(action.data);
-                draft.addedPost = true;
-                draft.imagePaths = [];
-                break;
-            }
-
-            case ADD_POST_FAILURE: {
-                draft.isAddingPost = false;
-                draft.addPostError = true;
-                draft.addPostErrorReason = action.error;
-                break;
-            }
     
             case LOAD_MAIN_POSTS_REQUEST: {
+                console.log('my posts');
                 draft.posts = action.lastId === 0 ? [] : draft.posts;
-                draft.hasMorePost = action.lastId ? draft.hasMorePost : true
+                draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
                 break;
             }
 
             case LOAD_MAIN_POSTS_SUCCESS: {
                 draft.posts = draft.posts.concat(action.data);
-                draft.hasMorePost = action.data.length === 8;
+                draft.hasMorePost = action.data.length === SIZE;
                 break;
             }
 
             case LOAD_MAIN_POSTS_FAILURE: {
                 break;
             }
+
+            case LOAD_MY_POSTS_REQUEST: {
+
+                draft.posts = action.data.lastId === 0 ? [] : draft.posts;
+                draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
+                break;
+            }
+
+            case LOAD_MY_POSTS_SUCCESS: {
+                draft.posts = draft.posts.concat(action.data);
+                draft.hasMorePost = action.data.length === SIZE;
+                break;
+            }
+
+            case LOAD_MY_POSTS_FAILURE: {
+                break;
+            }
     
             case LOAD_HASHTAG_POSTS_REQUEST: {
-                draft.posts = !action.lastId ? [] : draft.posts;
-                draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
+                draft.posts = !action.data.lastId ? [] : draft.posts;
+                draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
                 break;
             }
 
             case LOAD_HASHTAG_POSTS_SUCCESS: {
                 draft.posts = draft.posts.concat(action.data);
-                draft.hasMorePost = action.data.length === 8;
+                draft.hasMorePost = action.data.length === SIZE;
                 break;
             }
 
@@ -132,6 +146,67 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_USER_POSTS_FAILURE: {
+                break;
+            }
+
+            case ADD_POST_REQUEST: {
+                draft.isAddingPost =  true;
+                draft.addedPost = false;
+                draft.addPostErrorReason = '';
+                break;
+            }
+
+            case ADD_POST_SUCCESS: {
+                draft.isAddingPost = false;
+                draft.addedPost = true;
+                draft.posts.unshift(action.data);
+                draft.addedPost = true;
+                draft.imagePaths = [];
+                break;
+            }
+
+            case ADD_POST_FAILURE: {
+                draft.isAddingPost = false;
+                draft.addPostError = true;
+                draft.addPostErrorReason = action.error;
+                break;
+            }
+
+            case SHOW_EDIT_POST: {
+                draft.isEditPost = true;
+                draft.editPostId = action.postId;
+                draft.editPostImages = action.images;
+                break;
+            }
+
+            case CANCEL_EDIT_POST: {
+                draft.isEditPost = false;
+                draft.editPostId = null;
+                break;
+            }
+
+            case EDIT_POST_REQUEST: {
+                console.log(action.data.postId);
+                draft.isEditingPost = true;
+                break;
+            }
+
+            case EDIT_POST_SUCCESS: {
+                const postIndex = draft.posts.findIndex(p => p.id === action.data.id);
+                draft.posts[postIndex] = action.data;
+                draft.editPostImages = action.data.images;
+
+
+                draft.isEditPost = false;
+                draft.editPostId = null;
+                draft.isEditingPost = false;
+
+                break;
+            }
+
+            case EDIT_POST_FAILURE: {
+                draft.isEditingPost = false;
+
                 break;
             }
     
@@ -188,19 +263,33 @@ const reducer = (state = initialState, action) => {
             }
 
             case UPLOAD_IMAGES_SUCCESS: {
-                action.data.forEach(v => {
-                    draft.imagePaths.push(v)
-                });
+                if(draft.isEditPost === true) {
+                    action.data.forEach(v => {
+                        draft.editPostImages.push(v)
+                    });
+                } else {
+                    action.data.forEach(v => {
+                        draft.imagePaths.push(v)
+                    });
+                }
+
+
                 break;
             }
 
             case UPLOAD_IMAGES_FAILURE: {
                 break;
             }
+
     
             case REMOVE_IMAGE: {
-                const index = draft.imagePaths.findIndex((v,i) => i === action.index);
-                draft.imagePaths.splice(index,1);
+                if(draft.isEditPost === true) {
+                    const index = draft.editPostImages.findIndex((v,i) => i === action.index);
+                    draft.editPostImages.splice(index,1);
+                } else {
+                    const index = draft.imagePaths.findIndex((v,i) => i === action.index);
+                    draft.imagePaths.splice(index,1);
+                }
                 break;
             }
     

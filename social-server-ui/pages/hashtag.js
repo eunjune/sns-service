@@ -2,7 +2,7 @@ import React, { useEffect,useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { LOAD_HASHTAG_POSTS_REQUEST } from '../reducers/post';
-import PostCards from '../components/PostCards';
+import PostCards from '../components/post/PostCards';
 
 const Hashtag = ({ tag }) => {
   const dispatch = useDispatch();

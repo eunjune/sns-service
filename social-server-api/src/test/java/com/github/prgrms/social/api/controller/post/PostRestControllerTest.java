@@ -254,42 +254,83 @@ class PostRestControllerTest {
                 .andDo(print());
     }
 
-    // TODO
-    @DisplayName("포스트 수정")
+    @DisplayName("포스트 수정 - 성공")
     @Test
     void updatePost() throws Exception {
+        Set<String> images = new HashSet<>();
+        images.add("image1.png");
+        images.add("image2.png");
+        images.add("image3.png");
 
-        /*Post post1 = Post.builder().content("post1").build();
+        Post post1 = Post.builder().content("post1").build();
+        Post savedPost = postService.write(post1, user.getId(), images);
+
+        Set<String> newImages = new HashSet<>();
+        newImages.add("image1.png");
+        newImages.add("image4.png");
+        newImages.add("image3.png");
+
+        PostingRequest postingRequest = new PostingRequest("update", newImages);
+
+        mockMvc.perform(put("/api/post/" + savedPost.getId())
+                .header(tokenHeader,apiToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(postingRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.content").value(postingRequest.getContent()))
+                .andDo(print());
+
+        List<Image> all = imageRepository.findAll();
+        assertEquals(all.size(), 3);
+    }
+
+    @DisplayName("포스트 수정 - 실패")
+    @Test
+    void updatePostFail() throws Exception {
+        PostingRequest postingRequest = new PostingRequest("update", new HashSet<>());
+        Post post1 = Post.builder().content("post1").build();
 
         Post savedPost = postService.write(post1, user.getId(), new HashSet<>());
 
         mockMvc.perform(put("/api/post/" + savedPost.getId())
                 .header(tokenHeader,apiToken)
-                .param("content",""))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(postingRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response").value(savedPost.getId()))
+                .andExpect(jsonPath("$.response.content").value(postingRequest.getContent()))
                 .andDo(print());
 
-        Post afterPost = postService.findById(savedPost.getId()).orElse(null);
-        assertNull(afterPost);*/
     }
 
-    @DisplayName("포스트 삭제")
+    @DisplayName("포스트 삭제 - 성공")
     @Test
-    void deletePost() throws Exception {
+    void removePost() throws Exception {
+        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+
+        PostingRequest postingRequest = new PostingRequest("update", new HashSet<>());
+        Post post1 = Post.builder().content("post1").build();
+        Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
+
+        mockMvc.perform(put("/api/post/" + savedPost.getId())
+                .header(tokenHeader,apiToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(postingRequest)))
+                .andExpect(status().isForbidden())
+                .andDo(print());
+    }
+
+    @DisplayName("포스트 삭제 - 본인이 아닌 경우")
+    @Test
+    void removePostFail() throws Exception {
+        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
 
         Post post1 = Post.builder().content("post1").build();
-
-        Post savedPost = postService.write(post1, user.getId(), new HashSet<>());
+        Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
 
         mockMvc.perform(delete("/api/post/" + savedPost.getId())
                 .header(tokenHeader,apiToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response").value(savedPost.getId()))
+                .andExpect(status().isForbidden())
                 .andDo(print());
-
-        Post afterPost = postService.findById(savedPost.getId()).orElse(null);
-        assertNull(afterPost);
     }
 
     @DisplayName("해시태그 검색")
@@ -310,21 +351,6 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.size()").value(2))
                 .andExpect(jsonPath("$.response.[0].id").value(2))
                 .andDo(print());
-    }
-
-    @DisplayName("포스트 삭제")
-    @Test
-    void removePost() throws Exception {
-        Post post1 = Post.builder().content("post1").build();
-        Post savedPost = postService.write(post1, user.getId(), new HashSet<>());
-
-        mockMvc.perform(delete("/api/post/" + savedPost.getId())
-                .header(tokenHeader,apiToken))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response").value(savedPost.getId()))
-                .andDo(print());
-
-        assertNull(postService.findById(savedPost.getId()).orElse(null));
     }
 
     @DisplayName("좋아요")

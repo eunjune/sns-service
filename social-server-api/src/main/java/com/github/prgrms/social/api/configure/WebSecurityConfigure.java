@@ -3,6 +3,8 @@ package com.github.prgrms.social.api.configure;
 import com.github.prgrms.social.api.model.commons.Id;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.*;
+import com.github.prgrms.social.api.security.voter.ConnectionBasedVoter;
+import com.github.prgrms.social.api.security.voter.PostEditVoter;
 import com.github.prgrms.social.api.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -84,10 +86,23 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public PostEditVoter postEditVoter() {
+        Pattern pattern = Pattern.compile( "/api/post/(\\d+).*");
+        RequestMatcher requestMatcher = new RegexRequestMatcher(pattern.pattern(),null);
+
+        return new PostEditVoter(requestMatcher, (url) -> {
+            Matcher matcher = pattern.matcher(url);
+            long id = matcher.find() ? toLong(matcher.group(1), -1) : -1;
+            return Id.of(User.class, id);
+        });
+    }
+
+    @Bean
     public AccessDecisionManager accessDecisionManager() {
         List<AccessDecisionVoter<?>> decisionVoters = new ArrayList<>();
         decisionVoters.add(new WebExpressionVoter());
         decisionVoters.add(connectionBasedVoter());
+        decisionVoters.add(postEditVoter());
         // 모든 voter가 승인해야 해야한다.
         return new UnanimousBased(decisionVoters);
     }

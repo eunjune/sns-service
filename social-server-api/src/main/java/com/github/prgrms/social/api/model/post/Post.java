@@ -57,6 +57,10 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Image> images = new HashSet<>();
 
+    @ApiModelProperty(value = "댓글 리스트")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private Set<Comment> comments = new HashSet<>();
+
     // postCards.js
     @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -126,6 +130,11 @@ public class Post {
         likeInfo.setPost(null);
     }
 
+    public void removeImage(Image image) {
+        this.images.remove(image);
+        image.setPost(null);
+    }
+
     public void addRetweet(Post post) {
         retweetPost = post;
         post.getPostsRetweetedMe().add(this);
@@ -134,6 +143,11 @@ public class Post {
     public void addImage(Image image) {
         this.images.add(image);
         image.setPost(this);
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+        comment.setPost(this);
     }
 
 /*

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 // 포스트 작성 요청 데이터를 받는 DTO
@@ -18,7 +19,7 @@ public class PostingRequest {
     private String content;
 
     @ApiModelProperty(value = "포스트 이미지", required = true)
-    private Set<String> imagePaths;
+    private Set<String> imagePaths = new HashSet<>();
 
     public Post newPost() {
         return Post.builder()

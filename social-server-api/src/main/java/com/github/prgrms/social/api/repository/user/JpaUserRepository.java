@@ -2,7 +2,7 @@ package com.github.prgrms.social.api.repository.user;
 
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.UserProjection;
+import com.github.prgrms.social.api.repository.projection.UserProjection;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,4 +45,6 @@ public interface JpaUserRepository extends JpaRepository<User,Long>{
 
     @Transactional(readOnly = true)
     UserProjection findEmailCertificationById(Long Id);
+
+
 }

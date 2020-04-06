@@ -9,12 +9,14 @@ import {
     REMOVE_FOLLOWER_REQUEST,
     UPLOAD_IMAGE_REQUEST
 } from '../reducers/user';
-import {LOAD_USER_POSTS_REQUEST, LOAD_MAIN_POSTS_REQUEST, UPLOAD_IMAGES_REQUEST} from '../reducers/post';
-import PostCards from '../components/PostCards';
-import FollowList from "../components/FollowList";
+import {
+    LOAD_MY_POSTS_REQUEST
+} from '../reducers/post';
+import PostCards from '../components/post/PostCards';
+import FollowList from "../components/profile/FollowList";
 import CenterAlignment from "../components/CenterAlignment";
 import Router from "next/router";
-import ProfileEditForm from "../components/ProfileEditForm";
+import ProfileEditForm from "../components/profile/ProfileEditForm";
 
 
 const Profile = () => {
@@ -28,8 +30,9 @@ const Profile = () => {
     const updateProfileImage = useRef();
     const imageInput = useRef();
     const {me,followers, followings, hasMoreFollower, hasMoreFollowing} = useSelector(state => state.user);
-    const {posts} = useSelector(state => state.post);
+    const {posts, hasMorePost} = useSelector(state => state.post);
     const token = cookie.load('token');
+    const usedLastIds = useRef([]);
     let uploadImageFile = null;
 
     useEffect(() => {
@@ -37,11 +40,36 @@ const Profile = () => {
             Router.push("/");
         }
 
-        if(me.isEmailCertification === false) {
+        if(me && me.isEmailCertification === false) {
             alert('이메일 인증 후에 이용할 수 있습니다.');
             Router.push("/");
         }
+
+        window.addEventListener('scroll', onScroll);
+
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+        }
+
     },[me]);
+
+    const onScroll = useCallback(() => {
+
+        if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 200 && hasMorePost) {
+            const lastId = posts[posts.length-1].id;
+            if(!usedLastIds.current.includes(lastId)) {
+                dispatch({
+                    type: LOAD_MY_POSTS_REQUEST,
+                    data : {
+                        lastId: lastId,
+                        token: token,
+                    }
+                });
+                usedLastIds.current.push(lastId);
+            }
+        }
+
+    }, [posts.length, hasMorePost]);
 
     const onUnfollow = useCallback(userId => () => {
 
@@ -148,7 +176,7 @@ const Profile = () => {
                 <div style={{padding: 50}}>
                     <Card
                         actions={[
-                            <div onClick={clickPost}>게시글<br/>{posts.length}</div>,
+                            <div onClick={clickPost}>게시글<br/>{posts && posts.length}</div>,
                             <div onClick={clickFollow}>팔로윙<br/>{me && me.followings.length}</div>,
                             <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
                         ]}
@@ -158,11 +186,9 @@ const Profile = () => {
                         {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
                         {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>이미지 업로드</Button>}
                         <Card.Meta avatar={<Avatar>{me && me.name[0]}</Avatar>}
-                                   title={me && me.name}
+                                   title={me && me.name} onClick={clickProfile}
+                                   style={{cursor: 'pointer'}}
                         />
-
-
-                        <Button onClick={clickProfile}>프로필 수정</Button>
 
                     </Card>
                     {profileOn && uploadImageReady && <Button type="primary" style={{width: '100%'}} onClick={onClickUploadImage}>프로필 이미지 변경</Button>}
@@ -213,22 +239,24 @@ Profile.getInitialProps = async(context) => {
     const token = cookie.load('token') || (context.isServer && context.req.headers.cookie.includes('token')
         ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
 
+    console.log('profile');
+    console.log(token);
     if(token.length > 0) {
-        console.log('왜 실행됨');
-        context.store.dispatch({
+        /*context.store.dispatch({
             type: LOAD_FOLLOWER_REQUEST,
-            data: {token}
+            data: token
         });
 
         context.store.dispatch({
             type: LOAD_FOLLOWING_REQUEST,
-            data: {token}
-        });
+            data: token
+        });*/
 
+        console.log(token);
         context.store.dispatch({
-            type: LOAD_USER_POSTS_REQUEST,
+            type: LOAD_MY_POSTS_REQUEST,
             data: {
-                userId: 0,
+                lastId: 0,
                 token: token,
             }
         });

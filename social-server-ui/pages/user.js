@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { Avatar, Card } from 'antd';
 import { LOAD_USER_POSTS_REQUEST } from '../reducers/post';
-import PostCards from '../components/PostCards';
+import PostCards from '../components/post/PostCards';
 import { LOAD_USER_REQUEST } from '../reducers/user';
 
 const User = ({ id }) => {

@@ -1,6 +1,7 @@
 package com.github.prgrms.social.api.repository.post;
 
 import com.github.prgrms.social.api.model.post.Post;
+import com.github.prgrms.social.api.repository.projection.PostProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,10 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
 
     @Transactional(readOnly = true)
     Optional<Post> findById(Long id);
+
+    @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"images"})
+    Optional<Post> findWithImageById(Long id);
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})
@@ -47,4 +52,10 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})
     List<Post> findAllByUser_IsPrivateFalseOrderByIdDesc(Pageable pageable);
+
+    @Transactional(readOnly = true)
+    PostProjection findUserById(Long id);
+
+
+
 }
