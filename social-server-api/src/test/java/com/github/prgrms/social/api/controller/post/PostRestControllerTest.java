@@ -126,6 +126,8 @@ class PostRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(postingRequest)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.user").isNotEmpty())
+                .andExpect(jsonPath("$.response.images").isNotEmpty())
                 .andDo(print());
 
         List<Post> afterPosts = postService.findAll(0L,PageRequest.of(0,4));
@@ -152,8 +154,7 @@ class PostRestControllerTest {
 
         postService.like(writedPost.getId(),user.getId(),user.getId());
 
-        mockMvc.perform(get("/api/user/post/list?lastId=0&size=2")
-                .header(tokenHeader,apiToken))
+        mockMvc.perform(get("/api/user/post/list?lastId=0&size=2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.size()").value(2))
                 .andDo(print());
@@ -176,14 +177,37 @@ class PostRestControllerTest {
 
         postService.like(writedPost.getId(),user.getId(),user.getId());
 
-        mockMvc.perform(get("/api/user/post/list?lastId=" + lastPost.getId() +"&size=2")
-                .header(tokenHeader,apiToken))
+        mockMvc.perform(get("/api/user/post/list?lastId=" + lastPost.getId() +"&size=2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.size()").value(1))
                 .andDo(print());
     }
 
-    @DisplayName("포스트 조회(포스트 작성자가 비공개 유저) - 성공")
+    @DisplayName("포스트 조회(로그인)")
+    @Test
+    void findAllLoginLastIdZero() throws Exception {
+        Post post1 = Post.builder().content("post1").build();
+        Post post2 = Post.builder().content("post2").build();
+        Post post3 = Post.builder().content("post3").build();
+        Post post4 = Post.builder().content("post4").build();
+
+        postService.write(post1,user.getId(),new HashSet<>());
+        postService.write(post2,user.getId(),new HashSet<>());
+        postService.write(post3,user.getId(),new HashSet<>());
+        Post writedPost = postService.write(post4, user.getId(), new HashSet<>());
+
+        postService.like(writedPost.getId(),user.getId(),user.getId());
+
+        mockMvc.perform(get("/api/user/post/list?lastId=0&size=2")
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.size()").value(2))
+                .andDo(print());
+
+
+    }
+
+    @DisplayName("비공개인 특정 유저 포스트 조회  - 성공")
     @Test
     void findAllUserOk() throws Exception {
         User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
@@ -207,7 +231,7 @@ class PostRestControllerTest {
                 .andDo(print());
     }
 
-    @DisplayName("포스트 조회(포스트 작성자가 비공개 유저) - 실패")
+    @DisplayName("비공개인 특정 유저 포스트 조회 - 실패")
     @Test
     void findAllUserFail() throws Exception {
         User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
@@ -228,6 +252,44 @@ class PostRestControllerTest {
                 .header(tokenHeader,apiToken))
                 .andExpect(status().isForbidden())
                 .andDo(print());
+    }
+
+    // TODO
+    @DisplayName("포스트 수정")
+    @Test
+    void updatePost() throws Exception {
+
+        /*Post post1 = Post.builder().content("post1").build();
+
+        Post savedPost = postService.write(post1, user.getId(), new HashSet<>());
+
+        mockMvc.perform(put("/api/post/" + savedPost.getId())
+                .header(tokenHeader,apiToken)
+                .param("content",""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response").value(savedPost.getId()))
+                .andDo(print());
+
+        Post afterPost = postService.findById(savedPost.getId()).orElse(null);
+        assertNull(afterPost);*/
+    }
+
+    @DisplayName("포스트 삭제")
+    @Test
+    void deletePost() throws Exception {
+
+        Post post1 = Post.builder().content("post1").build();
+
+        Post savedPost = postService.write(post1, user.getId(), new HashSet<>());
+
+        mockMvc.perform(delete("/api/post/" + savedPost.getId())
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response").value(savedPost.getId()))
+                .andDo(print());
+
+        Post afterPost = postService.findById(savedPost.getId()).orElse(null);
+        assertNull(afterPost);
     }
 
     @DisplayName("해시태그 검색")
@@ -277,6 +339,7 @@ class PostRestControllerTest {
                 .header(tokenHeader,apiToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.likesOfMe").value(true))
+                .andExpect(jsonPath("$.response.likeCount").value(1))
                 .andDo(print());
 
     }
@@ -294,6 +357,7 @@ class PostRestControllerTest {
                 .header(tokenHeader,apiToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.likesOfMe").value(false))
+                .andExpect(jsonPath("$.response.likeCount").value(0))
                 .andDo(print());
 
     }
@@ -313,6 +377,7 @@ class PostRestControllerTest {
                 .content(objectMapper.writeValueAsString(commentRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.content").value(commentRequest.getContent()))
+                .andExpect(jsonPath("$.response.user").isNotEmpty())
                 .andDo(print());
 
         List<Comment> comments = commentService.findAll(savedPost.getId(),user.getId(),null);

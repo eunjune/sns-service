@@ -1,7 +1,5 @@
 package com.github.prgrms.social.api.model.post;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -49,34 +47,37 @@ public class Post {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createAt;
 
+    // postCards.js(id,name), FollowButton.js(id)
     @ApiModelProperty(value = "작성자")
     @ManyToOne
-    @JsonManagedReference
     private User user;
 
+    // postCards.js
     @ApiModelProperty(value = "이미지 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private Set<Image> images = new HashSet<>();
 
+    // postCards.js
     @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @Setter
-    @JsonManagedReference
     private Set<LikeInfo> likeInfos = new HashSet<>();
 
+    // postCards.js(user, 나머지)
     @ApiModelProperty(value = "리트윗한 포스트")
     @ManyToOne
     @JoinTable(name = "retweet",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "target_post_id"))
-    @JsonManagedReference
     private Post retweetPost;
 
     @ApiModelProperty(value = "내 글에 리트윗한 포스트 목록")
     @OneToMany(mappedBy = "retweetPost",cascade = CascadeType.ALL)
-    @JsonBackReference
     private Set<Post> postsRetweetedMe = new HashSet<>();
+
+    //postCards.js
+    // comments
+
 
     @Builder
     private Post(Long id, String content, boolean likesOfMe,boolean isRetweet, LocalDateTime createAt) {

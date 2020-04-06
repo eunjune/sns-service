@@ -32,7 +32,6 @@ public class LikeInfo {
 
     @ManyToOne
     @Setter
-    @JsonBackReference
     private Post post;
 
     public LikeInfo(Long id, LocalDateTime createAt) {

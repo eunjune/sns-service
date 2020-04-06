@@ -35,7 +35,6 @@ public class Image {
     @ApiModelProperty(value = "이미지를 갖고 있는 포스트")
     @ManyToOne
     @Setter
-    @JsonBackReference
     private Post post;
 
     @Builder

@@ -143,7 +143,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<Post> findAll(Long userId, Long postWriterId, Long lastId, Pageable pageable) {
+    public List<Post> findByUserId(Long userId, Long postWriterId, Long lastId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
         checkNotNull(lastId, "lastId must be provided.");
 
@@ -172,6 +172,31 @@ public class PostService {
         }
 
         return postRepository.findAllByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(lastId, pageable);
+    }
+
+    // !follwings && isPrivate
+    @Transactional(readOnly = true)
+    public List<Post> findAll(Long userId, Long lastId, Pageable pageable) {
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(lastId, "lastId must be provided.");
+
+        /*if(lastId == 0L) {
+
+        }
+
+
+        return userRepository.findById(userId)
+                .map(user -> {
+                    List<Post> list = lastId == 0L ? postRepository.findAllByOrderByIdDesc(pageable) :
+                            postRepository.findAllByIdLessThanOrderByIdDesc(lastId, pageable);
+                    return list.stream()
+                            .filter(post -> user.getFollowings().contains(post.getUser()) || !post.getUser().isPrivate())
+                            .collect(Collectors.toList());
+
+                })
+                .orElseThrow(() -> new NotFoundException(User.class, userId));*/
+        return null;
+
     }
 
     @Transactional

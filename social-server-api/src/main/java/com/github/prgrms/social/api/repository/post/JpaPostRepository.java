@@ -31,6 +31,14 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
     @EntityGraph(attributePaths = {"likeInfos","images"})
     List<Post> findAllByUser_IdOrderByIdDesc(Long postWriterId, Pageable pageable);
 
+    @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"likeInfos","images"})
+    List<Post> findAllByIdLessThanOrderByIdDesc(Long lastId, Pageable pageable);
+
+    @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"likeInfos","images"})
+    List<Post> findAllByOrderByIdDesc(Pageable pageable);
+
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})

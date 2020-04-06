@@ -2,6 +2,7 @@ package com.github.prgrms.social.api.controller.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prgrms.social.api.model.api.request.user.EmailAuthenticationRequest;
+import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
@@ -270,34 +271,18 @@ class UserRestControllerTest {
     @DisplayName("프로필 수정 - 성공")
     @Test
     void updateProfile() throws Exception {
+        ProfileRequest profileRequest = new ProfileRequest("",null,true);
 
         mockMvc.perform(put("/api/user/profile")
                         .header(tokenHeader, apiToken)
-                        .param("name","testupdate")
-                        .param("password","87654321")
-                        .param("profileImageUrl","1234"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(profileRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.name").value("testupdate"))
+                .andExpect(jsonPath("$.response.isPrivate").value("true"))
                 .andDo(print());
 
-
-        User updatedUser = userRepository.findById(user.getId()).orElse(null);
-        assertNotNull(updatedUser);
-        assertNotEquals(user.getName(), updatedUser.getName());
-        assertNotEquals(user.getPassword(), updatedUser.getPassword());
     }
 
-    @DisplayName("프로필 수정 - 실패")
-    @Test
-    void updateProfileFail() throws Exception {
-        mockMvc.perform(put("/api/user/profile")
-                   .header(tokenHeader, apiToken)
-                    .param("name","")
-//                   .param("password","")
-                )
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-    }
 
     @DisplayName("팔로우 추가")
     @Test

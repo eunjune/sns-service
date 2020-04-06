@@ -244,7 +244,9 @@ public class UserService {
 
         return findById(id)
                 .map(user -> {
-                    profileRequest.setPassword(passwordEncoder.encode(profileRequest.getPassword()));
+                    if(profileRequest.getPassword() != null && !profileRequest.getPassword().isEmpty()) {
+                        profileRequest.setPassword(passwordEncoder.encode(profileRequest.getPassword()));
+                    }
                     modelMapper.map(profileRequest,user);
                     return user;
                 })

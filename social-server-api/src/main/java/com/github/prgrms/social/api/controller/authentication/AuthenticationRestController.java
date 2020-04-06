@@ -2,6 +2,7 @@ package com.github.prgrms.social.api.controller.authentication;
 
 import com.github.prgrms.social.api.error.UnauthorizedException;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
+import com.github.prgrms.social.api.model.api.response.user.UserResponse;
 import com.github.prgrms.social.api.security.AuthenticationRequest;
 import com.github.prgrms.social.api.security.AuthenticationResult;
 import com.github.prgrms.social.api.security.JwtAuthenticationToken;
@@ -10,6 +11,7 @@ import com.github.prgrms.social.api.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,6 +25,8 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 @Api(tags = "인증 APIs")
 @RequiredArgsConstructor
 public class AuthenticationRestController {
+
+    private final ModelMapper modelMapper;
 
     private final AuthenticationManager authenticationManager;
 
@@ -52,6 +56,7 @@ public class AuthenticationRestController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             AuthenticationResult authenticationResult = (AuthenticationResult) authentication.getDetails();
+
             emailService.sendEmailLoginLinkMessage(authenticationResult.getUser(), authenticationResult.getToken());
             return OK(authenticationResult);
         } catch (AuthenticationException e) {

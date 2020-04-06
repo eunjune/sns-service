@@ -24,6 +24,8 @@ public class MeResponse {
 
     private boolean isEmailCertification;
 
+    private boolean isPrivate;
+
     private LocalDateTime createAt;
 
     private LocalDateTime lastLoginAt;

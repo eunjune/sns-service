@@ -69,10 +69,12 @@ public class User {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime createAt;
 
+    // profile.js, FollowButton.js
     @ApiModelProperty(value = "팔로잉 목록")
     @ManyToMany(mappedBy = "followers")
     private Set<User> followings = new HashSet<>();
 
+    // profile.js
     @ApiModelProperty(value = "팔로워 목록")
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "connected_user",
@@ -80,6 +82,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "follower_id"))
     private Set<User> followers = new HashSet<>();
 
+    //TODO: 삭제
     @ApiModelProperty(value = "포스트 목록")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @JsonBackReference

@@ -7,7 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
+import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.model.api.response.user.MeResponse;
+import com.github.prgrms.social.api.model.post.Image;
+import com.github.prgrms.social.api.model.post.LikeInfo;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
@@ -15,6 +19,7 @@ import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.util.MessageUtils;
 import com.zaxxer.hikari.HikariDataSource;
 import net.sf.log4jdbc.Log4jdbcProxyDataSource;
+import org.modelmapper.Condition;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.NameTokenizers;
@@ -100,6 +105,7 @@ public class ServiceConfigure {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
 
+        // TODO : 더 효율적인 방법
         Converter<Set<User>, Set<Long>> setUserToSetLong = context -> {
             Set<User> source = context.getSource();
             Set<Long> definition = new HashSet<>();
@@ -122,11 +128,30 @@ public class ServiceConfigure {
             return definition;
         };
 
+        Converter<Set<LikeInfo>, Integer> setLikeInfoToSetLikeCount = context -> context.getSource().size();
+        Converter<Set<Image>, Set<String>> setImages = context -> {
+            Set<Image> source = context.getSource();
+            Set<String> definition = new HashSet<>();
+
+            for(Image image : source) {
+                definition.add(image.getPath());
+            }
+
+            return definition;
+        };
+
         Converter<Email, String> toEmail = context -> context.getSource().getAddress();
+
+        Condition<String,String> notNullAndEmptyString = ctx -> ctx.getSource() != null && !ctx.getSource().isEmpty();
 
         modelMapper.getConfiguration()
                 .setDestinationNameTokenizer(NameTokenizers.UNDERSCORE)
                 .setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
+
+        modelMapper
+                .typeMap(ProfileRequest.class, User.class)
+                .addMappings(mapper -> mapper.when(notNullAndEmptyString).map(ProfileRequest::getName, User::setName))
+                .addMappings(mapper -> mapper.when(notNullAndEmptyString).map(ProfileRequest::getPassword, User::setPassword));
 
         modelMapper
                 .typeMap(User.class, MeResponse.class)
@@ -134,6 +159,13 @@ public class ServiceConfigure {
                 .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowings, MeResponse::setFollowings))
                 .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowers, MeResponse::setFollowers))
                 .addMappings(mapping -> mapping.using(setPostToSetLong).map(User::getPosts, MeResponse::setPosts));
+
+        modelMapper
+                .typeMap(Post.class, PostResponse.class)
+                .addMappings(mapper -> mapper.using(setLikeInfoToSetLikeCount).map(Post::getLikeInfos, PostResponse::setLikeCount))
+                .addMappings(mapper -> mapper.skip(PostResponse::setUser))
+                .addMappings(mapper -> mapper.skip(PostResponse::setRetweetPost))
+                .addMappings(mapping -> mapping.using(setImages).map(Post::getImages, PostResponse::setImages));
 
 
         return modelMapper;

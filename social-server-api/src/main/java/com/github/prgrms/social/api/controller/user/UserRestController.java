@@ -14,9 +14,9 @@ import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.user.EmailService;
 import com.github.prgrms.social.api.service.user.UserService;
+import com.github.prgrms.social.api.util.DtoUtils;
 import com.github.prgrms.social.api.validator.CheckEmailValidator;
 import com.github.prgrms.social.api.validator.CheckNameValidator;
-import com.github.prgrms.social.api.validator.CheckProfileValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -54,7 +53,7 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 @RequiredArgsConstructor
 public class UserRestController {
 
-    private final ModelMapper modelMapper;
+    private final DtoUtils dtoUtils;
 
     private final JWT jwt;
 
@@ -67,8 +66,6 @@ public class UserRestController {
     private final CheckEmailValidator checkEmailValidator;
 
     private final CheckNameValidator checkNameValidator;
-
-    private final CheckProfileValidator checkProfileValidator;
 
     @Value("${spring.kafka.topic.request}")
     private String requestTopic;
@@ -86,11 +83,6 @@ public class UserRestController {
         webDataBinder.addValidators(checkNameValidator);
     }
 
-    @InitBinder("profileRequest")
-    public void initProfileCheckBinder(WebDataBinder webDataBinder) {
-        webDataBinder.addValidators(checkProfileValidator);
-    }
-
     @GetMapping(path = "user/resend-email")
     @ApiOperation(value = "회원가입 인증 메일 재전송")
     public ApiResult<Boolean> resendEmail(@AuthenticationPrincipal JwtAuthentication authentication) {
@@ -106,7 +98,7 @@ public class UserRestController {
     @ApiOperation(value = "내 정보")
     public ApiResult<MeResponse> me(@AuthenticationPrincipal JwtAuthentication authentication) {
         return OK(
-                convertMeResponse(
+                dtoUtils.convertMeResponse(
                         userService.findById(authentication.id.getValue())
                                 .orElseThrow(() -> new NotFoundException(User.class, authentication.id))
                 )
@@ -116,10 +108,7 @@ public class UserRestController {
     @GetMapping(path = "user/{id}")
     @ApiOperation(value = "다른 사람 정보")
     public ApiResult<UserResponse> findUser(@PathVariable("id") User user) {
-        UserResponse userResponse = new UserResponse();
-        modelMapper.map(user,userResponse);
-
-        return OK(userResponse);
+        return OK(dtoUtils.convertUserResponse(user));
     }
 
     @GetMapping(path = "user/followings")
@@ -129,9 +118,10 @@ public class UserRestController {
             Pageable pageable
     ) {
 
+        //TODO : 수정 필요.
         return OK(userService.findFollowingsById(authentication.id.getValue(), pageable)
                             .stream()
-                            .map(this::convertUserResponse)
+                            .map(dtoUtils::convertUserResponse)
                             .collect(Collectors.toList()));
     }
 
@@ -143,7 +133,7 @@ public class UserRestController {
     ) {
         return OK(userService.findFollowersById(authentication.id.getValue(),pageable)
                             .stream()
-                            .map(this::convertUserResponse)
+                            .map(dtoUtils::convertUserResponse)
                             .collect(Collectors.toList()));
     }
 
@@ -207,7 +197,7 @@ public class UserRestController {
     @PostMapping("check-email-token")
     @ApiOperation(value = "회원가입 이메일 인증")
     public ApiResult<MeResponse> checkEmailToken(@RequestBody EmailAuthenticationRequest emailAuthenticationRequest) {
-        return OK(convertMeResponse(userService.certificateEmail(emailAuthenticationRequest.getEmailToken(), emailAuthenticationRequest.getEmail())));
+        return OK(dtoUtils.convertMeResponse(userService.certificateEmail(emailAuthenticationRequest.getEmailToken(), emailAuthenticationRequest.getEmail())));
     }
 
     @PostMapping(path = "user/follow/{userId}")
@@ -217,14 +207,14 @@ public class UserRestController {
             @PathVariable Long userId
     ) {
 
-        return OK(convertMeResponse(userService.addFollowing(authentication.id.getValue(), userId)));
+        return OK(dtoUtils.convertMeResponse(userService.addFollowing(authentication.id.getValue(), userId)));
     }
 
     @PutMapping(path = "user/profile")
     @ApiOperation(value = "프로필 수정")
     public ApiResult<MeResponse> updateProfile(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @Valid ProfileRequest profileRequest,
+            @Valid @RequestBody ProfileRequest profileRequest,
             Errors errors
     ) throws IOException {
 
@@ -233,7 +223,7 @@ public class UserRestController {
             throw new IllegalArgumentException(message == null ? "" : message);
         }
 
-        return OK(convertMeResponse(userService.updateProfile(authentication.id.getValue(), profileRequest)));
+        return OK(dtoUtils.convertMeResponse(userService.updateProfile(authentication.id.getValue(), profileRequest)));
 
     }
 
@@ -245,7 +235,7 @@ public class UserRestController {
             MultipartHttpServletRequest request
     ) throws IOException {
 
-        return OK(convertMeResponse(userService.updateProfileImage(authentication.id.getValue(), file, request.getServletContext().getRealPath("/"))));
+        return OK(dtoUtils.convertMeResponse(userService.updateProfileImage(authentication.id.getValue(), file, request.getServletContext().getRealPath("/"))));
 
     }
 
@@ -293,19 +283,5 @@ public class UserRestController {
         log.info("success to subscribe {}",consumerRecord.value());
 
         return OK(consumerRecord.value());
-    }
-
-    private MeResponse convertMeResponse(User user) {
-        MeResponse meResponse = new MeResponse();
-        modelMapper.map(user, meResponse);
-
-        return meResponse;
-    }
-
-    private UserResponse convertUserResponse(User user) {
-        UserResponse userResponse = new UserResponse();
-        modelMapper.map(user, userResponse);
-
-        return userResponse;
     }
 }

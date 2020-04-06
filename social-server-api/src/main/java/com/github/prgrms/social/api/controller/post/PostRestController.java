@@ -3,12 +3,14 @@ package com.github.prgrms.social.api.controller.post;
 import com.github.prgrms.social.api.model.api.request.post.CommentRequest;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
+import com.github.prgrms.social.api.model.api.response.post.CommentResponse;
+import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.model.post.Comment;
-import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.post.CommentService;
 import com.github.prgrms.social.api.service.post.HashTagService;
 import com.github.prgrms.social.api.service.post.PostService;
+import com.github.prgrms.social.api.util.DtoUtils;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 
@@ -28,6 +31,8 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 @RequiredArgsConstructor
 @Api(tags = "포스팅 APIs")
 public class PostRestController {
+
+    private final DtoUtils dtoUtils;
 
     private final PostService postService;
 
@@ -41,7 +46,7 @@ public class PostRestController {
             @ApiImplicitParam(name = "lastId", dataType = "integer", paramType = "query", defaultValue = "0", value = "마지막 포스트의 아이디"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
     })
-    public ApiResult<List<Post>> posts(
+    public ApiResult<List<PostResponse>> posts(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable(required = false)
             @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
@@ -50,7 +55,12 @@ public class PostRestController {
             Long lastId,
             Pageable pageable
     ) {
-        return OK(postService.findAll(authentication.id.getValue(), userId, lastId, pageable));
+        return OK(
+                postService.findByUserId(authentication.id.getValue(), userId, lastId, pageable)
+                        .stream()
+                        .map(dtoUtils::convertPostResponse)
+                        .collect(Collectors.toList())
+        );
     }
 
 
@@ -60,13 +70,18 @@ public class PostRestController {
             @ApiImplicitParam(name = "lastId", dataType = "integer", paramType = "query", defaultValue = "0", value = "마지막 포스트의 아이디"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
     })
-    public ApiResult<List<Post>> myPosts(
+    public ApiResult<List<PostResponse>> myPosts(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestParam
             Long lastId,
             Pageable pageable
     ) {
-        return OK(postService.findAll(authentication.id.getValue(), authentication.id.getValue(), lastId, pageable));
+        return OK(
+                postService.findByUserId(authentication.id.getValue(), authentication.id.getValue(), lastId, pageable)
+                        .stream()
+                        .map(dtoUtils::convertPostResponse)
+                        .collect(Collectors.toList())
+        );
     }
 
 
@@ -76,8 +91,18 @@ public class PostRestController {
             @ApiImplicitParam(name = "lastId", dataType = "integer", paramType = "query", defaultValue = "0", value = "마지막 포스트의 아이디"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "3", value = "최대 조회 갯수")
     })
-    public ApiResult<List<Post>> postAll(Pageable pageable, @RequestParam Long lastId) {
-        return OK(postService.findAll(lastId, pageable));
+    public ApiResult<List<PostResponse>> postAll(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            Pageable pageable,
+            @RequestParam Long lastId) {
+
+        // TODO : 로그인했을 경우 팔로잉 유저것도 가져올 것인지
+
+        return OK(postService.findAll(lastId, pageable)
+                .stream()
+                .map(dtoUtils::convertPostResponse)
+                .collect(Collectors.toList())
+        );
     }
 
 
@@ -87,7 +112,7 @@ public class PostRestController {
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "3", value = "최대 조회 갯수"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "20", value = "최대 조회 갯수")
     })
-    public ApiResult<List<Post>> postsOfHashTag(
+    public ApiResult<List<PostResponse>> postsOfHashTag(
             @PathVariable
             @ApiParam(value = "해시태그", example = "1")
             String tag,
@@ -95,13 +120,17 @@ public class PostRestController {
             Long lastId,
             Pageable pageable
     ) {
-        return OK(hashTagService.findByHashTag(tag, lastId, pageable));
+        return OK(hashTagService.findByHashTag(tag, lastId, pageable)
+                .stream()
+                .map(dtoUtils::convertPostResponse)
+                .collect(Collectors.toList())
+        );
     }
 
 
     @GetMapping(path = "user/{userId}/post/{postId}/comment/list")
     @ApiOperation(value = "댓글 조회")
-    public ApiResult<List<Comment>> comments(
+    public ApiResult<List<CommentResponse>> comments(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
             @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
@@ -110,24 +139,28 @@ public class PostRestController {
             @ApiParam(value = "대상 포스트 PK", example = "1")
                     Long postId
     ) {
-        // TODO Comment 목록 조회 API를 구현하세요.
-        return OK(commentService.findAll(postId, authentication.id.getValue(), userId));
+        return OK(
+                commentService.findAll(postId, authentication.id.getValue(), userId)
+                            .stream()
+                            .map(dtoUtils::convertCommentResponse)
+                            .collect(Collectors.toList())
+        );
     }
 
 
     @PostMapping(path = "post")
     @ApiOperation(value = "포스트 작성")
-    public ApiResult<Post> posting(
+    public ApiResult<PostResponse> posting(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestBody PostingRequest request
     ) {
-        return OK(postService.write(request.newPost(), authentication.id.getValue(), request.getImagePaths()));
+        return OK(dtoUtils.convertPostResponse(postService.write(request.newPost(), authentication.id.getValue(), request.getImagePaths())));
     }
 
 
     @PostMapping(path = "user/{userId}/post/{postId}/comment")
     @ApiOperation(value = "댓글 작성")
-    public ApiResult<Comment> comment(
+    public ApiResult<CommentResponse> comment(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
             @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
@@ -139,7 +172,7 @@ public class PostRestController {
     ) {
         Comment comment = request.newComment();
 
-        return OK(commentService.write(postId, authentication.id.getValue(), userId, comment));
+        return OK(dtoUtils.convertCommentResponse(commentService.write(postId, authentication.id.getValue(), userId, comment)));
     }
 
 
@@ -158,18 +191,18 @@ public class PostRestController {
 
     @PostMapping(path = "post/{postId}/retweet")
     @ApiOperation(value = "리트윗")
-    public ApiResult<Post> retweet(
+    public ApiResult<PostResponse> retweet(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
                     Long postId
     ) {
-        return OK(postService.retweet(postId,authentication.id.getValue()));
+        return OK(dtoUtils.convertPostResponse(postService.retweet(postId,authentication.id.getValue())));
     }
 
 
     @PatchMapping(path = "user/{userId}/post/{postId}/like")
     @ApiOperation(value = "포스트 좋아요")
-    public ApiResult<Post> like(
+    public ApiResult<PostResponse> like(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
             @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
@@ -178,7 +211,7 @@ public class PostRestController {
             @ApiParam(value = "대상 포스트 PK", example = "1")
                     Long postId
     ) {
-        return OK(postService.like(postId, authentication.id.getValue(),userId));
+        return OK(dtoUtils.convertPostResponse(postService.like(postId, authentication.id.getValue(),userId)));
     }
 
 
@@ -196,7 +229,7 @@ public class PostRestController {
 
     @DeleteMapping(path = "user/{userId}/post/{postId}/unlike")
     @ApiOperation(value = "포스트 좋아요 취소")
-    public ApiResult<Post> unlike(
+    public ApiResult<PostResponse> unlike(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
             @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
@@ -205,8 +238,7 @@ public class PostRestController {
             @ApiParam(value = "대상 포스트 PK", example = "1")
             Long postId
     ) {
-        return OK(postService.unlike(postId, authentication.id.getValue(),userId));
+        return OK(dtoUtils.convertPostResponse(postService.unlike(postId, authentication.id.getValue(),userId)));
     }
-
 
 }
