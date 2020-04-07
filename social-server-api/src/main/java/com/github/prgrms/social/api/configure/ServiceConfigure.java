@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.model.api.response.user.MeResponse;
+import com.github.prgrms.social.api.model.api.response.user.UserResponse;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.LikeInfo;
@@ -107,30 +108,10 @@ public class ServiceConfigure {
         ModelMapper modelMapper = new ModelMapper();
 
         // TODO : 더 효율적인 방법
-        Converter<Set<User>, Set<Long>> setUserToSetLong = context -> {
-            Set<User> source = context.getSource();
-            Set<Long> definition = new HashSet<>();
-
-            for(User item : source) {
-                definition.add(item.getId());
-            }
-
-            return definition;
-        };
-
-        Converter<Set<Post>, Set<Long>> setPostToSetLong = context -> {
-            Set<Post> source = context.getSource();
-            Set<Long> definition = new HashSet<>();
-
-            for(Post item : source) {
-                definition.add(item.getId());
-            }
-
-            return definition;
-        };
-
-        Converter<Set<LikeInfo>, Integer> setLikeInfoToSetLikeCount = context -> context.getSource().size();
-        Converter<Set<Comment>, Integer> setCommentToSetComment = context -> context.getSource().size();
+        Converter<Set<User>, Integer> toUserCount = context -> context.getSource().size();
+        Converter<Set<Post>, Integer> toPostCount = context -> context.getSource().size();
+        Converter<Set<LikeInfo>, Integer> toLikeCount = context -> context.getSource().size();
+        Converter<Set<Comment>, Integer> toCommentCount = context -> context.getSource().size();
         Converter<Set<Image>, Set<String>> setImages = context -> {
             Set<Image> source = context.getSource();
             Set<String> definition = new HashSet<>();
@@ -158,14 +139,19 @@ public class ServiceConfigure {
         modelMapper
                 .typeMap(User.class, MeResponse.class)
                 .addMappings(mapper -> mapper.using(toEmail).map(User::getEmail, MeResponse::setEmail))
-                .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowings, MeResponse::setFollowings))
-                .addMappings(mapper -> mapper.using(setUserToSetLong).map(User::getFollowers, MeResponse::setFollowers))
-                .addMappings(mapping -> mapping.using(setPostToSetLong).map(User::getPosts, MeResponse::setPosts));
+                .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowings, MeResponse::setFollowingCount))
+                .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowers, MeResponse::setFollowerCount));
+
+        modelMapper
+                .typeMap(User.class, UserResponse.class)
+                .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowings, UserResponse::setFollowingCount))
+                .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowers, UserResponse::setFollowerCount));
+
 
         modelMapper
                 .typeMap(Post.class, PostResponse.class)
-                .addMappings(mapper -> mapper.using(setLikeInfoToSetLikeCount).map(Post::getLikeInfos, PostResponse::setLikeCount))
-                .addMappings(mapper -> mapper.using(setCommentToSetComment).map(Post::getComments, PostResponse::setCommentCount))
+                .addMappings(mapper -> mapper.using(toLikeCount).map(Post::getLikeInfos, PostResponse::setLikeCount))
+                .addMappings(mapper -> mapper.using(toCommentCount).map(Post::getComments, PostResponse::setCommentCount))
                 .addMappings(mapper -> mapper.skip(PostResponse::setUser))
                 .addMappings(mapper -> mapper.skip(PostResponse::setRetweetPost))
                 .addMappings(mapping -> mapping.using(setImages).map(Post::getImages, PostResponse::setImages));

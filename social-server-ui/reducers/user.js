@@ -357,7 +357,7 @@ const reducer = (state = initialState, action) => {
             }
     
             case EDIT_PROFILE_SUCCESS: {
-                alert('수정 완료');
+                alert('수정완료');
                 draft.me = action.data;
                 draft.isEditing = false;
                 break;

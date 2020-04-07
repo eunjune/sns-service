@@ -23,6 +23,7 @@ import FollowButton from "./FollowButton";
 import PostForm from "./PostForm";
 import PostEditForm from "./PostEditForm";
 import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
+import AvartarCustom from "../profile/AvartarCustom";
 moment.locale('ko');
 
 const CardWrapper = styled.div`
@@ -196,9 +197,7 @@ const PostCards = memo(({post}) => {
                             avatar={
                                 <Link href={{pathname: '/user', query: {id: post.retweetPost.user.id}}} as={`/user/${post.retweetPost.user.id}`}>
                                     <a>
-                                        <Avatar shape="circle" icon={post.retweetPost.user.profileImageUrl && <img src={`http://localhost:8080/image/profile/${post.retweetPost.user.profileImageUrl}`} alt=""/>}>
-                                            {post.retweetPost.user.name[0]}
-                                        </Avatar>
+                                        <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={post.retweetPost.user.profileImageUrl} name={post.retweetPost.user.name}/>
                                     </a>
                                 </Link>}
                             title={post.retweetPost.user.name}
@@ -211,9 +210,7 @@ const PostCards = memo(({post}) => {
                             avatar={
                                 <Link href={{pathname: '/user', query: {id: post.user.id}}} as={`/user/${post.user.id}`}>
                                     <a>
-                                        <Avatar shape="circle" icon={post.user.profileImageUrl && <img src={`http://localhost:8080/image/profile/${post.user.profileImageUrl}`} alt=""/>}>
-                                            {post.user.name[0]}
-                                        </Avatar>
+                                        <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={post.user.profileImageUrl} name={post.user.name} />
                                     </a>
                                 </Link>}
                             title={post.user.name}

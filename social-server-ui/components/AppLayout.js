@@ -10,6 +10,7 @@ import {LOG_OUT} from "../reducers/user";
 import { DownOutlined,BellOutlined } from '@ant-design/icons';
 import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
 import {MenuItem} from "./styles/MenuItemStyle";
+import AvartarCustom from "./profile/AvartarCustom";
 
 const AppLayout = ({ children }) => {
     const { me } = useSelector((state) => state.user);
@@ -69,11 +70,8 @@ const AppLayout = ({ children }) => {
                   </Menu>
               } trigger={['click']}>
                   <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                      <Avatar shape="square" size="small" icon={me.profileImageUrl ?
-                          <img src={`http://localhost:8080/image/profile/${me.profileImageUrl}`} alt=""/> :
-                          <UserOutlined style={{marginRight: 0}} />} />
-                          <DownOutlined/>
-
+                      <AvartarCustom shape={"square"} size={"small"} profileImageUrl={me.profileImageUrl} name={null} />
+                      <DownOutlined/>
                   </a>
               </Dropdown>
           </MenuItem>

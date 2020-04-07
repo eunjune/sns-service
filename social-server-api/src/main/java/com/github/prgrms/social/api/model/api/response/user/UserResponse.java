@@ -9,13 +9,17 @@ public class UserResponse {
 
     private Long id;
 
-    private String email;
-
     private String name;
 
     private String profileImageUrl;
 
+    private boolean isPrivate;
+
     private LocalDateTime createAt;
 
     private LocalDateTime lastLoginAt;
+
+    private Integer followingCount;
+
+    private Integer followerCount;
 }

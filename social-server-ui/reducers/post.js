@@ -15,7 +15,8 @@ export const initialState = {
     isEditPost: false,
     editPostId:null,
     isEditingPost: false,
-    editPostImages: []
+    editPostImages: [],
+    loadUserError: null,
 };
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
@@ -134,8 +135,8 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_USER_POSTS_REQUEST: {
-                draft.posts = action.lastId === 0 ? [] : draft.posts;
-                draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
+                draft.posts = action.data.lastId === 0 ? [] : draft.posts;
+                draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
                 break;
             }
     
@@ -146,6 +147,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_USER_POSTS_FAILURE: {
+                draft.loadUserError = action.error;
                 break;
             }
 

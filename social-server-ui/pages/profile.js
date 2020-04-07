@@ -17,6 +17,7 @@ import FollowList from "../components/profile/FollowList";
 import CenterAlignment from "../components/CenterAlignment";
 import Router from "next/router";
 import ProfileEditForm from "../components/profile/ProfileEditForm";
+import AvartarCustom from "../components/profile/AvartarCustom";
 
 
 const Profile = () => {
@@ -177,18 +178,16 @@ const Profile = () => {
                     <Card
                         actions={[
                             <div onClick={clickPost}>게시글<br/>{posts && posts.length}</div>,
-                            <div onClick={clickFollow}>팔로윙<br/>{me && me.followings.length}</div>,
-                            <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
+                            <div onClick={clickFollow}>팔로윙<br/>{me && me.followingCount}</div>,
+                            <div onClick={clickFollow}>팔로워<br/>{me && me.followerCount}</div>
                         ]}
                         cover={<img ref={updateProfileImage} src={me && me.profileImageUrl ? `http://localhost:8080/image/profile/${me.profileImageUrl}` :
                                             'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
                     >
                         {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
                         {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>프로필 이미지 변경</Button>}
-                        <Card.Meta avatar={<Avatar>{me && me.name[0]}</Avatar>}
-                                   title={me && me.name} onClick={clickProfile}
-                                   style={{cursor: 'pointer'}}
-                        />
+                        <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={me.profileImageUrl} name={me.name} />}
+                                   title={me.name}/>
 
                     </Card>
                     {profileOn && uploadImageReady && <Button type="primary" style={{width: '100%'}} onClick={onClickUploadImage}>프로필 이미지 변경</Button>}

@@ -42,7 +42,7 @@ public class PostRestController {
     })
     public ApiResult<List<PostResponse>> posts(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable(required = false)
+            @PathVariable
             @ApiParam(value = "조회대상자 PK (본인 또는 친구)", example = "1")
             Long userId,
             @RequestParam

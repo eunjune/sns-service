@@ -185,7 +185,9 @@ function* watchLoadHashtagPosts() {
 
 
 function loadUserPostAPI({userId,token,lastId=0}) {
-    return axios.get(`user/${userId || 0}/post/list?lastId=${lastId}&size=${SIZE}`, {
+    console.log(`user/${userId}/post/list?lastId=${lastId}&size=${SIZE}d`);
+
+    return axios.get(`user/${userId}/post/list?lastId=${lastId}&size=${SIZE}`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -203,7 +205,10 @@ function* loadUserPost(action) {
         console.error(e);
         yield put({
             type: LOAD_USER_POSTS_FAILURE,
-            error: e,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            },
         })
     }
 }
