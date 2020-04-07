@@ -17,8 +17,8 @@ public interface JpaUserRepository extends JpaRepository<User,Long>{
     Optional<User> findById(Long id);
 
     @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"followings","followers"})
-    Optional<User> findUserWithUserById(Long id);
+    @EntityGraph(attributePaths = {"followings","followers","posts"})
+    Optional<User> findUserWithUserWithPostById(Long id);
 
     @Transactional(readOnly = true)
     Optional<User> findByEmail(Email email);

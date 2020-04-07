@@ -144,7 +144,7 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andDo(print());
 
-        User user2 = userService.findByEmail(new Email("test2@gmail.com")).orElse(null);
+        User user2 = userService.getUser(new Email("test2@gmail.com")).orElse(null);
         assertNotNull(user2);
         assertNotEquals(user2.getPassword(), "12345678");
         assertNotNull(user2.getEmailCertificationToken());
@@ -295,8 +295,8 @@ class UserRestControllerTest {
                         .andExpect(status().isOk())
                         .andDo(print());
 
-        User resultUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
-        User resultUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
+        User resultUser1 = userService.getUserWithConnectedUserAndPost(user.getId()).orElse(null);
+        User resultUser2 = userService.getUserWithConnectedUserAndPost(user2.getId()).orElse(null);
 
         assertNotNull(resultUser1);
         assertNotNull(resultUser2);
@@ -312,16 +312,16 @@ class UserRestControllerTest {
 
         userService.addFollowing(user.getId(), user2.getId());
 
-        User beforeUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
-        User beforeUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
+        User beforeUser1 = userService.getUserWithConnectedUserAndPost(user.getId()).orElse(null);
+        User beforeUser2 = userService.getUserWithConnectedUserAndPost(user2.getId()).orElse(null);
 
         mockMvc.perform(delete("/api/user/follow/" + user2.getId())
                 .header(tokenHeader, apiToken))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        User afterUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
-        User afterUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
+        User afterUser1 = userService.getUserWithConnectedUserAndPost(user.getId()).orElse(null);
+        User afterUser2 = userService.getUserWithConnectedUserAndPost(user2.getId()).orElse(null);
 
         assertNotNull(beforeUser1);
         assertNotNull(beforeUser2);
@@ -342,16 +342,16 @@ class UserRestControllerTest {
 
         userService.addFollowing(user.getId(), user2.getId());
 
-        User beforeUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
-        User beforeUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
+        User beforeUser1 = userService.getUserWithConnectedUserAndPost(user.getId()).orElse(null);
+        User beforeUser2 = userService.getUserWithConnectedUserAndPost(user2.getId()).orElse(null);
 
         mockMvc.perform(delete("/api/user/follower/" + user.getId())
                 .header(tokenHeader, user2apiToken))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        User afterUser1 = userService.findUserWithUserById(user.getId()).orElse(null);
-        User afterUser2 = userService.findUserWithUserById(user2.getId()).orElse(null);
+        User afterUser1 = userService.getUserWithConnectedUserAndPost(user.getId()).orElse(null);
+        User afterUser2 = userService.getUserWithConnectedUserAndPost(user2.getId()).orElse(null);
 
         assertNotNull(beforeUser1);
         assertNotNull(beforeUser2);

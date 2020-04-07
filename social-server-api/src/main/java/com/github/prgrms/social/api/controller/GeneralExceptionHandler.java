@@ -28,8 +28,6 @@ public class GeneralExceptionHandler {
         return new ResponseEntity<>(ERROR(throwable, status), headers, status);
     }
 
-    // TODO REST API 처리 중 발생한 예외를 catch 하고, 로그를 남기고, ApiResult를 사용해 오류 응답을 전달
-
     @ExceptionHandler(value = {
             IllegalStateException.class,
             IllegalArgumentException.class,

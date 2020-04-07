@@ -17,9 +17,7 @@ import com.github.prgrms.social.api.service.user.UserService;
 import com.github.prgrms.social.api.util.DtoUtils;
 import com.github.prgrms.social.api.validator.CheckEmailValidator;
 import com.github.prgrms.social.api.validator.CheckNameValidator;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -37,6 +35,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -86,7 +85,7 @@ public class UserRestController {
     @GetMapping(path = "user/resend-email")
     @ApiOperation(value = "회원가입 인증 메일 재전송")
     public ApiResult<Boolean> resendEmail(@AuthenticationPrincipal JwtAuthentication authentication) {
-        User user = userService.findById(authentication.id.getValue())
+        User user = userService.getUser(authentication.id.getValue())
                 .orElseThrow(() -> new NotFoundException(User.class, authentication.id.getValue()));
 
         emailService.sendEmailCertificationMessage(user);
@@ -99,7 +98,7 @@ public class UserRestController {
     public ApiResult<MeResponse> me(@AuthenticationPrincipal JwtAuthentication authentication) {
         return OK(
                 dtoUtils.convertMeResponse(
-                        userService.findById(authentication.id.getValue())
+                        userService.getUserWithConnectedUserAndPost(authentication.id.getValue())
                                 .orElseThrow(() -> new NotFoundException(User.class, authentication.id))
                 )
         );
@@ -107,7 +106,9 @@ public class UserRestController {
 
     @GetMapping(path = "user/{id}")
     @ApiOperation(value = "다른 사람 정보")
-    public ApiResult<UserResponse> findUser(@PathVariable("id") User user) {
+    public ApiResult<UserResponse> findUser(
+            @ApiParam(value = "유저 PK", example = "1", required = true, type = "integer") @PathVariable("id") User user
+    ) {
         return OK(dtoUtils.convertUserResponse(user));
     }
 
@@ -115,11 +116,11 @@ public class UserRestController {
     @ApiOperation(value = "팔로잉 리스트")
     public ApiResult<List<UserResponse>> followings(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            Pageable pageable
+            @ApiIgnore Pageable pageable
     ) {
 
         //TODO : 수정 필요.
-        return OK(userService.findFollowingsById(authentication.id.getValue(), pageable)
+        return OK(userService.getFollowings(authentication.id.getValue(), pageable)
                             .stream()
                             .map(dtoUtils::convertUserResponse)
                             .collect(Collectors.toList()));
@@ -129,9 +130,9 @@ public class UserRestController {
     @ApiOperation(value = "팔로워 리스트")
     public ApiResult<List<UserResponse>> followers(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            Pageable pageable
+            @ApiIgnore Pageable pageable
     ) {
-        return OK(userService.findFollowersById(authentication.id.getValue(),pageable)
+        return OK(userService.getFollowers(authentication.id.getValue(),pageable)
                             .stream()
                             .map(dtoUtils::convertUserResponse)
                             .collect(Collectors.toList()));
@@ -139,10 +140,12 @@ public class UserRestController {
 
     @PostMapping(path = "user/exists/email")
     @ApiOperation(value = "이메일 중복확인 (API 토큰 필요없음)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "address", dataType = "string", paramType = "form", defaultValue = "", value = "이메일",required = true),
+    })
     public ApiResult<Boolean> checkEmail(
-            @ApiParam(value = "example: {\"address\": \"test00@gmail.com\"}")
-            @Valid CheckEmailRequest checkEmailRequest,
-            Errors errors
+            @ApiParam(value = "example: {\"address\": \"test00@gmail.com\"}") @Valid CheckEmailRequest checkEmailRequest,
+            @ApiIgnore Errors errors
     ) {
 
         if(errors.hasErrors()) {
@@ -155,10 +158,12 @@ public class UserRestController {
 
     @PostMapping(path = "user/exists/name")
     @ApiOperation(value = "이름 중복확인 (API 토큰 필요없음)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", defaultValue = "", value = "이름",required = true),
+    })
     public ApiResult<Boolean> checkName(
-            @ApiParam(value = "example: {\"name\": \"test00\"}")
             @Valid CheckNameRequest checkNameRequest,
-            Errors errors
+            @ApiIgnore Errors errors
     ) {
 
         if(errors.hasErrors()) {
@@ -171,9 +176,15 @@ public class UserRestController {
 
     @PostMapping(path = "user/join", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "회원가입 (API 토큰 필요없음)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", defaultValue = "", value = "이름",required = true),
+            @ApiImplicitParam(name = "address", dataType = "string", paramType = "form", defaultValue = "", value = "이메일",required = true),
+            @ApiImplicitParam(name = "password", dataType = "string", paramType = "form", defaultValue = "", value = "비밀번호",required = true),
+            @ApiImplicitParam(name = "profileImageUrl", dataType = "string", paramType = "form", defaultValue = "", value = "프로필 이미지 URL"),
+    })
     public ApiResult<JoinResponse> join(
             @Valid JoinRequest joinRequest,
-            Errors errors
+            @ApiIgnore Errors errors
     ) throws IOException {
 
         if(errors.hasErrors()) {
@@ -196,7 +207,9 @@ public class UserRestController {
 
     @PostMapping("check-email-token")
     @ApiOperation(value = "회원가입 이메일 인증")
-    public ApiResult<MeResponse> checkEmailToken(@RequestBody EmailAuthenticationRequest emailAuthenticationRequest) {
+    public ApiResult<MeResponse> checkEmailToken(
+            @RequestBody EmailAuthenticationRequest emailAuthenticationRequest
+    ) {
         return OK(dtoUtils.convertMeResponse(userService.certificateEmail(emailAuthenticationRequest.getEmailToken(), emailAuthenticationRequest.getEmail())));
     }
 
@@ -204,7 +217,7 @@ public class UserRestController {
     @ApiOperation(value = "팔로우")
     public ApiResult<MeResponse> follow(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable Long userId
+            @ApiParam(value = "유저 PK", example = "1", required = true) @PathVariable Long userId
     ) {
 
         return OK(dtoUtils.convertMeResponse(userService.addFollowing(authentication.id.getValue(), userId)));
@@ -215,7 +228,7 @@ public class UserRestController {
     public ApiResult<MeResponse> updateProfile(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @Valid @RequestBody ProfileRequest profileRequest,
-            Errors errors
+            @ApiIgnore Errors errors
     ) throws IOException {
 
         if(errors.hasErrors()) {
@@ -232,7 +245,7 @@ public class UserRestController {
     public ApiResult<MeResponse> updateProfileImage(
             @RequestPart MultipartFile file,
             @AuthenticationPrincipal JwtAuthentication authentication,
-            MultipartHttpServletRequest request
+            @ApiIgnore MultipartHttpServletRequest request
     ) throws IOException {
 
         return OK(dtoUtils.convertMeResponse(userService.updateProfileImage(authentication.id.getValue(), file, request.getServletContext().getRealPath("/"))));
@@ -243,7 +256,7 @@ public class UserRestController {
     @ApiOperation(value = "언팔로우")
     public ApiResult<Long> unfollow(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable Long userId
+            @ApiParam(value = "유저 PK", example = "1", required = true) @PathVariable Long userId
     ) {
         return OK(userService.removeFollowing(authentication.id.getValue(),userId));
     }
@@ -252,7 +265,7 @@ public class UserRestController {
     @ApiOperation(value = "팔로워 삭제")
     public ApiResult<Long> removeFollower(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @PathVariable Long userId
+            @ApiParam(value = "유저 PK", example = "1", required = true) @PathVariable Long userId
     ) {
         return OK(userService.removeFollower(authentication.id.getValue(), userId));
     }

@@ -15,10 +15,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class PostingRequest {
 
-    @ApiModelProperty(value = "포스트 내용", required = true)
     private String content;
 
-    @ApiModelProperty(value = "포스트 이미지", required = true)
     private Set<String> imagePaths = new HashSet<>();
 
     public Post newPost() {

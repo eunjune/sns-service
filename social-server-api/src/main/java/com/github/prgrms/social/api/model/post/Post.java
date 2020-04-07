@@ -50,16 +50,13 @@ public class Post {
     private User user;
 
     // postCards.js
-    @ApiModelProperty(value = "이미지 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Image> images = new HashSet<>();
 
-    @ApiModelProperty(value = "댓글 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Comment> comments = new HashSet<>();
 
     // postCards.js
-    @ApiModelProperty(value = "좋아요 리스트")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @Setter
     private Set<LikeInfo> likeInfos = new HashSet<>();
@@ -72,7 +69,6 @@ public class Post {
             inverseJoinColumns = @JoinColumn(name = "target_post_id"))
     private Post retweetPost;
 
-    @ApiModelProperty(value = "내 글에 리트윗한 포스트 목록")
     @OneToMany(mappedBy = "retweetPost",cascade = CascadeType.ALL)
     private Set<Post> postsRetweetedMe = new HashSet<>();
 

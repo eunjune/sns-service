@@ -50,19 +50,19 @@ public class User {
     @ApiModelProperty(value = "프로필 이미지 URL")
     private String profileImageUrl;
 
-    @ApiModelProperty(value = "비공개 여부")
+    @ApiModelProperty(value = "비공개 여부", required = true)
     private boolean isPrivate;
 
-    @ApiModelProperty(value = "인증된 사용자")
+    @ApiModelProperty(value = "인증된 사용자", required = true)
     private boolean isEmailCertification;
 
-    @ApiModelProperty(value = "인증 이메일 토큰")
+    @ApiModelProperty(value = "인증 이메일 토큰", required = true)
     private String emailCertificationToken;
 
     @ApiModelProperty(value = "로그인 횟수", required = true)
     private int loginCount;
 
-    @ApiModelProperty(value = "최종로그인일시")
+    @ApiModelProperty(value = "최종 로그인 일시")
     private LocalDateTime lastLoginAt;
 
     @ApiModelProperty(value = "생성일시", required = true)
@@ -83,7 +83,6 @@ public class User {
     private Set<User> followers = new HashSet<>();
 
     //TODO: 삭제
-    @ApiModelProperty(value = "포스트 목록")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @JsonBackReference
     private Set<Post> posts = new HashSet<>();

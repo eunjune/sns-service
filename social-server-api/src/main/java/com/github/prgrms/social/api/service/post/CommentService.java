@@ -29,6 +29,11 @@ public class CommentService {
 
     private final EventBus eventBus;
 
+    // TODO : postWriterId 삭제해도 무방할듯
+    @Transactional(readOnly = true)
+    public List<Comment> findAll(Long postId, Long userId, Long postWriterId) {
+        return commentRepository.findByPost_IdAndUser_IdOrderByIdDesc(postId, userId);
+    }
 
     @Transactional
     public Comment write(Long postId, Long userId, Long postWriterId, Comment comment) {
@@ -37,7 +42,7 @@ public class CommentService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(User.class,userId));
 
-        return postRepository.findByIdAndUser_Id(postId, postWriterId)
+        return postRepository.findWithLikeAndImageByIdAndUser_Id(postId, postWriterId)
             .map(post -> {
                 System.out.println("write 테스트");
                 post.addComment(comment);
@@ -48,9 +53,5 @@ public class CommentService {
             }).orElseThrow(() -> new NotFoundException(Post.class, postId, userId));
     }
 
-    // TODO : postWriterId 삭제해도 무방할듯
-    @Transactional(readOnly = true)
-    public List<Comment> findAll(Long postId, Long userId, Long postWriterId) {
-        return commentRepository.findByPost_IdAndUser_IdOrderByIdDesc(postId, userId);
-    }
+
 }

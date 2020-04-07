@@ -8,8 +8,7 @@ import com.github.prgrms.social.api.security.AuthenticationResult;
 import com.github.prgrms.social.api.security.JwtAuthenticationToken;
 import com.github.prgrms.social.api.service.user.EmailService;
 import com.github.prgrms.social.api.util.DtoUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -47,7 +46,9 @@ public class AuthenticationRestController {
 
     @GetMapping("{address}")
     @ApiOperation(value = "사용자 이메일 로그인 (API 토큰 필요없음)")
-    public ApiResult<AuthenticationResponse> emailAuthentication(@PathVariable String address) throws UnauthorizedException {
+    public ApiResult<AuthenticationResponse> emailAuthentication(
+            @ApiParam(value = "이메일", example = "test00@gmail.com", required = true) @PathVariable String address
+    ) throws UnauthorizedException {
         try {
             JwtAuthenticationToken authToken = new JwtAuthenticationToken(address);
             Authentication authentication = authenticationManager.authenticate(authToken);

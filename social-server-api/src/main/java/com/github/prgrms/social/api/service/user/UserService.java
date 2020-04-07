@@ -45,24 +45,24 @@ public class UserService {
     private final EventBus eventBus;
 
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long userId) {
+    public Optional<User> getUser(Long userId) {
         checkNotNull(userId, "userId must be provided.");
 
         return userRepository.findById(userId);
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> findByEmail(Email email) {
+    public Optional<User> getUser(Email email) {
         checkNotNull(email, "email must be provided.");
 
         return userRepository.findByEmail(email);
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> findUserWithUserById(Long userId) {
+    public Optional<User> getUserWithConnectedUserAndPost(Long userId) {
         checkNotNull(userId, "userId must be provided.");
 
-        return userRepository.findUserWithUserById(userId);
+        return userRepository.findUserWithUserWithPostById(userId);
     }
 
     private List<User> getPageSizeList(List<User> list, Pageable pageable) {
@@ -89,7 +89,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findFollowingsById(Long userId,Pageable pageable) {
+    public List<User> getFollowings(Long userId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
 
         List<User> followings = new ArrayList<>(userRepository.findFollowingsById(userId).getFollowings());
@@ -102,7 +102,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findFollowersById(Long userId,Pageable pageable) {
+    public List<User> getFollowers(Long userId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
 
         // TODO: 쿼리로 처리하는 방법?
@@ -143,7 +143,7 @@ public class UserService {
         checkNotNull(email, "email must be provided.");
         checkArgument(isNotEmpty(password), "password must be provided.");
 
-        return findByEmail(email)
+        return getUser(email)
                 .map(user -> {
 
                     if (!passwordEncoder.matches(password, user.getPassword())){
@@ -162,7 +162,7 @@ public class UserService {
     public User login(Email email) {
         checkNotNull(email, "email must be provided.");
 
-        return findByEmail(email)
+        return getUser(email)
                 .map(user -> {
 
                     user.afterLoginSuccess();
@@ -179,7 +179,7 @@ public class UserService {
         checkArgument(isNotEmpty(token), "token must be provided.");
         checkArgument(isNotEmpty(email), "email must be provided.");
 
-        return findByEmail(new Email(email))
+        return getUser(new Email(email))
                 .map(user -> {
                     if(!user.getEmailCertificationToken().equals(token)) {
                         throw new IllegalArgumentException("유효하지 않은 접근 입니다.");
@@ -197,9 +197,9 @@ public class UserService {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
-        User targetUser = findById(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
+        User targetUser = getUser(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
 
-        return userRepository.findUserWithUserById(meId)
+        return userRepository.findUserWithUserWithPostById(meId)
                 .map(user -> {
                     user.addFollowing(targetUser);
                    return user;
@@ -207,42 +207,13 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(User.class, meId));
     }
 
-    @Transactional
-    public Long removeFollowing(Long meId, Long userId) {
-        checkNotNull(meId, "meId must be provided.");
-        checkNotNull(userId, "userId must be provided.");
-
-        User targetUser = findById(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
-
-        return userRepository.findUserWithUserById(meId)
-                .map(user -> {
-                    user.removeFollowing(targetUser);
-                    return userId;
-                })
-                .orElseThrow(() -> new NotFoundException(User.class, meId));
-    }
-
-    @Transactional
-    public Long removeFollower(Long meId, Long userId) {
-        checkNotNull(meId, "meId must be provided.");
-        checkNotNull(userId, "userId must be provided.");
-
-        User me = findById(meId).orElseThrow(() -> new NotFoundException(User.class, meId));
-
-        return userRepository.findUserWithUserById(userId)
-                .map(targetUser -> {
-                    targetUser.removeFollowing(me);
-                    return userId;
-                })
-                .orElseThrow(() -> new NotFoundException(User.class, userId));
-    }
 
     @Transactional
     public User updateProfile(Long id, ProfileRequest profileRequest){
         checkNotNull(id, "id must be provided.");
         checkNotNull(profileRequest, "profileRequest must be provided.");
 
-        return findById(id)
+        return getUser(id)
                 .map(user -> {
                     if(profileRequest.getPassword() != null && !profileRequest.getPassword().isEmpty()) {
                         profileRequest.setPassword(passwordEncoder.encode(profileRequest.getPassword()));
@@ -269,12 +240,42 @@ public class UserService {
         file.transferTo(new File(randomName));
         String newProfileImageUrl = randomName.substring(realPath.length()+1);
 
-        return findById(id)
+        return getUser(id)
                 .map(user -> {
                     user.setProfileImageUrl(newProfileImageUrl);
                     return user;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, id));
+    }
+
+    @Transactional
+    public Long removeFollowing(Long meId, Long userId) {
+        checkNotNull(meId, "meId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+
+        User targetUser = getUser(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
+
+        return userRepository.findUserWithUserWithPostById(meId)
+                .map(user -> {
+                    user.removeFollowing(targetUser);
+                    return userId;
+                })
+                .orElseThrow(() -> new NotFoundException(User.class, meId));
+    }
+
+    @Transactional
+    public Long removeFollower(Long meId, Long userId) {
+        checkNotNull(meId, "meId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+
+        User me = getUser(meId).orElseThrow(() -> new NotFoundException(User.class, meId));
+
+        return userRepository.findUserWithUserWithPostById(userId)
+                .map(targetUser -> {
+                    targetUser.removeFollowing(me);
+                    return userId;
+                })
+                .orElseThrow(() -> new NotFoundException(User.class, userId));
     }
 
     // S3에 이미지 업로드

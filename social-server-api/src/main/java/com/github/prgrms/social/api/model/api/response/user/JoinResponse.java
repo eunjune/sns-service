@@ -13,10 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JoinResponse {
 
-    @ApiModelProperty(value = "API 토큰", required = true)
     private final String token;
 
-    @ApiModelProperty(value = "사용자 정보", required = true)
     private final User user;
 
 }

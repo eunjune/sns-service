@@ -1,6 +1,5 @@
 package com.github.prgrms.social.api.model.post;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -32,7 +31,6 @@ public class Image {
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createAt;
 
-    @ApiModelProperty(value = "이미지를 갖고 있는 포스트")
     @ManyToOne
     @Setter
     private Post post;

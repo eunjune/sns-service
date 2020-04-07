@@ -115,7 +115,7 @@ class PostRestControllerTest {
         String content = "content testsets #abc #hash sdfsdfsdfds";
         PostingRequest postingRequest = new PostingRequest(content,imagePaths);
 
-        List<Post> beforePosts = postService.findAll(0L,PageRequest.of(0,4));
+        List<Post> beforePosts = postService.getPostsWithImageAndLike(0L,PageRequest.of(0,4));
         List<HashTag> beforeHashTagList = hashTagRepository.findAll();
         List<Image> beforeImageList = imageRepository.findAll();
 
@@ -129,7 +129,7 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.images").isNotEmpty())
                 .andDo(print());
 
-        List<Post> afterPosts = postService.findAll(0L,PageRequest.of(0,4));
+        List<Post> afterPosts = postService.getPostsWithImageAndLike(0L,PageRequest.of(0,4));
         List<HashTag> afterHashTagList = hashTagRepository.findAll();
         List<Image> afterImageList = imageRepository.findAll();
 

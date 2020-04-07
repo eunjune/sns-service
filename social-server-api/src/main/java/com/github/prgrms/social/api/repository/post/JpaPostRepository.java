@@ -1,6 +1,7 @@
 package com.github.prgrms.social.api.repository.post;
 
 import com.github.prgrms.social.api.model.post.Post;
+import com.github.prgrms.social.api.repository.post.extension.PostRepositoryExtension;
 import com.github.prgrms.social.api.repository.projection.PostProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -10,12 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-public interface JpaPostRepository extends JpaRepository<Post,Long> {
+public interface JpaPostRepository extends JpaRepository<Post,Long>, PostRepositoryExtension {
 
     Post save(Post post);
-
-    @Transactional(readOnly = true)
-    long countByUser_Id(Long id);
 
     @Transactional(readOnly = true)
     Optional<Post> findById(Long id);
@@ -30,15 +28,15 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})
-    Optional<Post> findByIdAndUser_Id(Long id, Long userId);
+    Optional<Post> findWithLikeAndImageByIdAndUser_Id(Long id, Long userId);
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})
-    List<Post> findAllByUser_IdAndIdLessThanOrderByIdDesc(Long postWriterId, Long lastId, Pageable pageable);
+    List<Post> findWithLikeAndImageByUser_IdAndIdLessThanOrderByIdDesc(Long postWriterId, Long lastId, Pageable pageable);
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})
-    List<Post> findAllByUser_IdOrderByIdDesc(Long postWriterId, Pageable pageable);
+    List<Post> findWithLikeAndImageByUser_IdOrderByIdDesc(Long postWriterId, Pageable pageable);
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})
@@ -51,11 +49,11 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})
-    List<Post> findAllByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(Long lastId, Pageable pageable);
+    List<Post> findWithLikeAndImageByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(Long lastId, Pageable pageable);
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images"})
-    List<Post> findAllByUser_IsPrivateFalseOrderByIdDesc(Pageable pageable);
+    List<Post> findWithLikeAndImageByUser_IsPrivateFalseOrderByIdDesc(Pageable pageable);
 
     @Transactional(readOnly = true)
     PostProjection findUserById(Long id);

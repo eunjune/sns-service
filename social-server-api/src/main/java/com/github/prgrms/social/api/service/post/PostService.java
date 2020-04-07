@@ -40,6 +40,84 @@ public class PostService {
 
     private final JpaImageRepository imageRepository;
 
+
+    @Transactional(readOnly = true)
+    public Optional<Post> getPost(Long postId) {
+        checkNotNull(postId, "postId must be provided.");
+
+        return postRepository.findById(postId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Post> getPost(Long postId, Long postWriterId, Long userId) {
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postWriterId, "writerId must be provided.");
+
+        return postRepository.findWithLikeAndImageByIdAndUser_Id(postId, postWriterId)
+                .map(post -> {
+                    post.setLikesOfMe(userId);
+                    return post;
+                });
+    }
+
+    @Transactional(readOnly = true)
+    public List<Post> getPostsWithImageAndLike(Long userId, Long postWriterId, Long lastId, Pageable pageable) {
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(lastId, "lastId must be provided.");
+
+        userRepository.findById(postWriterId)
+                .orElseThrow(() -> new NotFoundException(User.class, postWriterId));
+
+        if(lastId == 0L) {
+            return postRepository.findWithLikeAndImageByUser_IdOrderByIdDesc(postWriterId, pageable)
+                    .stream()
+                    .peek(post -> post.setLikesOfMe(userId))
+                    .collect(Collectors.toList());
+        }
+
+        return postRepository.findWithLikeAndImageByUser_IdAndIdLessThanOrderByIdDesc(postWriterId, lastId, pageable)
+                .stream()
+                .peek(post -> post.setLikesOfMe(userId))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Post> getPostsWithImageAndLike(Long lastId, Pageable pageable) {
+        checkNotNull(lastId, "lastId must be provided.");
+
+        if(lastId == 0L) {
+            return postRepository.findWithLikeAndImageByUser_IsPrivateFalseOrderByIdDesc(pageable);
+        }
+
+        return postRepository.findWithLikeAndImageByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(lastId, pageable);
+    }
+
+    // !follwings && isPrivate
+    @Transactional(readOnly = true)
+    public List<Post> getPostsWithImageAndLike(Long userId, Long lastId, Pageable pageable) {
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(lastId, "lastId must be provided.");
+
+        /*if(lastId == 0L) {
+
+        }
+
+
+        return userRepository.findById(userId)
+                .map(user -> {
+                    List<Post> list = lastId == 0L ? postRepository.findAllByOrderByIdDesc(pageable) :
+                            postRepository.findAllByIdLessThanOrderByIdDesc(lastId, pageable);
+                    return list.stream()
+                            .filter(post -> user.getFollowings().contains(post.getUser()) || !post.getUser().isPrivate())
+                            .collect(Collectors.toList());
+
+                })
+                .orElseThrow(() -> new NotFoundException(User.class, userId));*/
+        return null;
+
+    }
+
     @Transactional
     public Post write(Post post, Long userId, Set<String> imagePaths) {
         checkNotNull(post, "post must be provided.");
@@ -70,6 +148,86 @@ public class PostService {
                     return savedPost;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, userId));
+    }
+
+
+
+    // 좋아요 기능 처리
+    @Transactional
+    public Post like(Long postId, Long userId, Long postWriterId) {
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postWriterId, "postWriterId must be provided.");
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(Long.class,userId));
+
+        return postRepository.findWithLikeAndImageByIdAndUser_Id(postId, postWriterId)
+            .map(post -> {
+                if (!post.isLikesOfMe()) {
+                    LikeInfo likeInfo = new LikeInfo(null,null);
+                    post.incrementAndGetLikes(likeInfo);
+                    likeInfo.setUser(user);
+                    postLikeRepository.save(likeInfo);
+                }
+                return post;
+            })
+            .orElseThrow(() -> new NotFoundException(Post.class, postId));
+    }
+
+    // TODO : postWriterId 삭제
+    @Transactional
+    public Post unlike(Long postId, Long userId, Long postWriterId) {
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postWriterId, "postWriterId must be provided.");
+
+        LikeInfo likeInfo = postLikeRepository.findByUser_IdAndPost_Id(userId,postId).orElseThrow(() -> new NotFoundException(LikeInfo.class,userId,postId));
+
+        return getPost(postId, postWriterId, userId)
+                .map(post -> {
+                    if (post.isLikesOfMe()) {
+                        post.removeLikes(likeInfo);
+                        //postLikeRepository.deleteByUser_IdAndPost_Id(userId, postId);
+                    }
+
+                    return post;
+                })
+                .orElseThrow(() -> new NotFoundException(Post.class, postId));
+    }
+
+
+
+
+    @Transactional
+    public Post retweet(Long postId, Long userId) {
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(User.class, userId));
+
+        return postRepository.findById(postId)
+                .map(post -> {
+
+                    if(post.getRetweetPost() != null) {
+                        throw new IllegalArgumentException("이미 리트윗 했습니다.");
+                    }
+
+                    if(post.getUser().getId().equals(userId)) {
+                        throw new IllegalArgumentException("자신의 글은 리트윗 할 수 없습니다.");
+                    }
+
+                    Post retweetPost = postRepository.save(Post.builder()
+                            .content("retweet")
+                            .build());
+
+                    retweetPost.setUser(user);
+                    retweetPost.addRetweet(post);
+
+                    return retweetPost;
+                })
+                .orElseThrow(() -> new NotFoundException(Post.class, postId));
     }
 
     @Transactional
@@ -106,135 +264,22 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException(Post.class, postId));
     }
 
-    // 좋아요 기능 처리
     @Transactional
-    public Post like(Long postId, Long userId, Long postWriterId) {
-        checkNotNull(postId, "postId must be provided.");
+    public Long removePost(Long userId, Long postId) {
         checkNotNull(userId, "userId must be provided.");
-        checkNotNull(postWriterId, "postWriterId must be provided.");
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(Long.class,userId));
-
-        return postRepository.findByIdAndUser_Id(postId, postWriterId)
-            .map(post -> {
-                if (!post.isLikesOfMe()) {
-                    LikeInfo likeInfo = new LikeInfo(null,null);
-                    post.incrementAndGetLikes(likeInfo);
-                    likeInfo.setUser(user);
-                    postLikeRepository.save(likeInfo);
-                }
-                return post;
-            })
-            .orElseThrow(() -> new NotFoundException(Post.class, postId));
-    }
-
-    // TODO : postWriterId 삭제
-    @Transactional
-    public Post unlike(Long postId, Long userId, Long postWriterId) {
         checkNotNull(postId, "postId must be provided.");
-        checkNotNull(userId, "userId must be provided.");
-        checkNotNull(postWriterId, "postWriterId must be provided.");
 
-        LikeInfo likeInfo = postLikeRepository.findByUser_IdAndPost_Id(userId,postId).orElseThrow(() -> new NotFoundException(LikeInfo.class,userId,postId));
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(User.class, userId));
 
-        return findById(postId, postWriterId, userId)
+        return postRepository.findById(postId)
                 .map(post -> {
-                    if (post.isLikesOfMe()) {
-                        post.removeLikes(likeInfo);
-                        //postLikeRepository.deleteByUser_IdAndPost_Id(userId, postId);
-                    }
-
-                    return post;
+                    postRepository.deleteById(postId);
+                    return post.getId();
                 })
                 .orElseThrow(() -> new NotFoundException(Post.class, postId));
     }
 
-    @Transactional(readOnly = true)
-    public long countByUserId(Long userId) {
-        checkNotNull(userId, "userId must be provided.");
-
-        return postRepository.countByUser_Id(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Post> findById(Long postId) {
-        checkNotNull(postId, "postId must be provided.");
-
-        return postRepository.findById(postId);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Post> findById(Long postId, Long postWriterId, Long userId) {
-        checkNotNull(postId, "postId must be provided.");
-        checkNotNull(userId, "userId must be provided.");
-        checkNotNull(postWriterId, "writerId must be provided.");
-
-        return postRepository.findByIdAndUser_Id(postId, postWriterId)
-                .map(post -> {
-                    post.setLikesOfMe(userId);
-                    return post;
-                });
-    }
-
-    @Transactional(readOnly = true)
-    public List<Post> findByUserId(Long userId, Long postWriterId, Long lastId, Pageable pageable) {
-        checkNotNull(userId, "userId must be provided.");
-        checkNotNull(lastId, "lastId must be provided.");
-
-        userRepository.findById(postWriterId)
-                .orElseThrow(() -> new NotFoundException(User.class, postWriterId));
-
-        if(lastId == 0L) {
-            return postRepository.findAllByUser_IdOrderByIdDesc(postWriterId, pageable)
-                    .stream()
-                    .peek(post -> post.setLikesOfMe(userId))
-                    .collect(Collectors.toList());
-        }
-
-        return postRepository.findAllByUser_IdAndIdLessThanOrderByIdDesc(postWriterId, lastId, pageable)
-                .stream()
-                .peek(post -> post.setLikesOfMe(userId))
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<Post> findAll(Long lastId, Pageable pageable) {
-        checkNotNull(lastId, "lastId must be provided.");
-
-        if(lastId == 0L) {
-            return postRepository.findAllByUser_IsPrivateFalseOrderByIdDesc(pageable);
-        }
-
-        return postRepository.findAllByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(lastId, pageable);
-    }
-
-    // !follwings && isPrivate
-    @Transactional(readOnly = true)
-    public List<Post> findAll(Long userId, Long lastId, Pageable pageable) {
-        checkNotNull(userId, "userId must be provided.");
-        checkNotNull(lastId, "lastId must be provided.");
-
-        /*if(lastId == 0L) {
-
-        }
-
-
-        return userRepository.findById(userId)
-                .map(user -> {
-                    List<Post> list = lastId == 0L ? postRepository.findAllByOrderByIdDesc(pageable) :
-                            postRepository.findAllByIdLessThanOrderByIdDesc(lastId, pageable);
-                    return list.stream()
-                            .filter(post -> user.getFollowings().contains(post.getUser()) || !post.getUser().isPrivate())
-                            .collect(Collectors.toList());
-
-                })
-                .orElseThrow(() -> new NotFoundException(User.class, userId));*/
-        return null;
-
-    }
-
-    @Transactional
     public List<String> uploadImage(MultipartFile[] files, String realPath) throws IOException {
         // 20 * 1024 * 1024
         checkNotNull(files, "files must be provided.");
@@ -254,52 +299,5 @@ public class PostService {
         }
 
         return result;
-    }
-
-    @Transactional
-    public Post retweet(Long postId, Long userId) {
-        checkNotNull(postId, "postId must be provided.");
-        checkNotNull(userId, "userId must be provided.");
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(User.class, userId));
-
-        return postRepository.findById(postId)
-                .map(post -> {
-
-                    if(post.getRetweetPost() != null) {
-                        throw new IllegalArgumentException("이미 리트윗 했습니다.");
-                    }
-
-                    if(post.getUser().getId().equals(userId)) {
-                        throw new IllegalArgumentException("자신의 글은 리트윗 할 수 없습니다.");
-                    }
-
-                    Post retweetPost = postRepository.save(Post.builder()
-                            .content("retweet")
-                            .build());
-
-                    retweetPost.setUser(user);
-                    retweetPost.addRetweet(post);
-
-                    return retweetPost;
-                })
-                .orElseThrow(() -> new NotFoundException(Post.class, postId));
-    }
-
-    @Transactional
-    public Long removePost(Long userId, Long postId) {
-        checkNotNull(userId, "userId must be provided.");
-        checkNotNull(postId, "postId must be provided.");
-
-        userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(User.class, userId));
-
-        return postRepository.findById(postId)
-                .map(post -> {
-                    postRepository.deleteById(postId);
-                    return post.getId();
-                })
-                .orElseThrow(() -> new NotFoundException(Post.class, postId));
     }
 }
