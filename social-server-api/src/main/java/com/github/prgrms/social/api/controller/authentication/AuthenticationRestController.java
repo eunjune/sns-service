@@ -2,16 +2,15 @@ package com.github.prgrms.social.api.controller.authentication;
 
 import com.github.prgrms.social.api.error.UnauthorizedException;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
-import com.github.prgrms.social.api.model.api.response.user.UserResponse;
+import com.github.prgrms.social.api.model.api.response.user.AuthenticationResponse;
 import com.github.prgrms.social.api.security.AuthenticationRequest;
 import com.github.prgrms.social.api.security.AuthenticationResult;
 import com.github.prgrms.social.api.security.JwtAuthenticationToken;
 import com.github.prgrms.social.api.service.user.EmailService;
-import com.github.prgrms.social.api.service.user.UserService;
+import com.github.prgrms.social.api.util.DtoUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -26,22 +25,21 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 @RequiredArgsConstructor
 public class AuthenticationRestController {
 
-    private final ModelMapper modelMapper;
-
     private final AuthenticationManager authenticationManager;
 
-    private final UserService userService;
+    private final DtoUtils dtoUtils;
 
     private final EmailService emailService;
 
     @PostMapping
     @ApiOperation(value = "사용자 로그인 (API 토큰 필요없음)")
-    public ApiResult<AuthenticationResult> authentication(@RequestBody AuthenticationRequest authRequest) throws UnauthorizedException {
+    public ApiResult<AuthenticationResponse> authentication(@RequestBody AuthenticationRequest authRequest) throws UnauthorizedException {
         try {
             JwtAuthenticationToken authToken = new JwtAuthenticationToken(authRequest.getAddress(), authRequest.getPassword());
             Authentication authentication = authenticationManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return OK((AuthenticationResult) authentication.getDetails());
+            AuthenticationResult authenticationResult = (AuthenticationResult) authentication.getDetails();
+            return OK(dtoUtils.convertAuthenticationResponse(authenticationResult));
         } catch (AuthenticationException e) {
             throw new UnauthorizedException(e.getMessage());
         }
@@ -49,7 +47,7 @@ public class AuthenticationRestController {
 
     @GetMapping("{address}")
     @ApiOperation(value = "사용자 이메일 로그인 (API 토큰 필요없음)")
-    public ApiResult<AuthenticationResult> emailAuthentication(@PathVariable String address) throws UnauthorizedException {
+    public ApiResult<AuthenticationResponse> emailAuthentication(@PathVariable String address) throws UnauthorizedException {
         try {
             JwtAuthenticationToken authToken = new JwtAuthenticationToken(address);
             Authentication authentication = authenticationManager.authenticate(authToken);
@@ -58,7 +56,9 @@ public class AuthenticationRestController {
             AuthenticationResult authenticationResult = (AuthenticationResult) authentication.getDetails();
 
             emailService.sendEmailLoginLinkMessage(authenticationResult.getUser(), authenticationResult.getToken());
-            return OK(authenticationResult);
+
+
+            return OK(dtoUtils.convertAuthenticationResponse(authenticationResult));
         } catch (AuthenticationException e) {
             throw new UnauthorizedException(e.getMessage());
         }

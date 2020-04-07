@@ -393,7 +393,7 @@ function* watchUnLikePost() {
 }
 
 function retweetAPI({postId,token}) {
-    return axios.post(`/post/${postId}/retweet`,{}, {
+    return axios.post(`/retweet/post/${postId}`,{}, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -408,10 +408,12 @@ function* retweet(action) {
             data : result.data.response
         });
     } catch (e) {
-        alert(e.response.data.error.message);
         yield put({
             type: RETWEET_FAILURE,
-            error: e,
+            error: {
+                status : e.response.data.error.status,
+                message : e.response.data.error.message
+            },
         });
         //console.log(e.response);
     }

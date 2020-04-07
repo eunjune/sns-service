@@ -20,7 +20,7 @@ public class PostResponse {
 
     private boolean likesOfMe;
 
-    private boolean isRetweet;
+    private Boolean isRetweet;
 
     private LocalDateTime createAt;
 

@@ -2,11 +2,13 @@ package com.github.prgrms.social.api.util;
 
 import com.github.prgrms.social.api.model.api.response.post.CommentResponse;
 import com.github.prgrms.social.api.model.api.response.post.PostResponse;
+import com.github.prgrms.social.api.model.api.response.user.AuthenticationResponse;
 import com.github.prgrms.social.api.model.api.response.user.MeResponse;
 import com.github.prgrms.social.api.model.api.response.user.UserResponse;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.User;
+import com.github.prgrms.social.api.security.AuthenticationResult;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -29,6 +31,10 @@ public class DtoUtils {
         modelMapper.map(user, meResponse);
 
         return meResponse;
+    }
+
+    public AuthenticationResponse convertAuthenticationResponse(AuthenticationResult authenticationResult) {
+        return new AuthenticationResponse(authenticationResult.getToken(), convertMeResponse(authenticationResult.getUser()));
     }
 
     public PostResponse convertPostResponse(Post post) {

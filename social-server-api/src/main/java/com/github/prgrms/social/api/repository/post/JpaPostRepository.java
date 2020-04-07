@@ -20,6 +20,10 @@ public interface JpaPostRepository extends JpaRepository<Post,Long> {
     @Transactional(readOnly = true)
     Optional<Post> findById(Long id);
 
+    /*@Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"postsRetweetedMe"})
+    Optional<Post> findWithRetweetById(Long id);
+*/
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"images"})
     Optional<Post> findWithImageById(Long id);

@@ -141,11 +141,14 @@ const PostCards = memo(({post}) => {
     },[]);
 
     const showEditPost = useCallback(() => {
-        dispatch({
-            type: SHOW_EDIT_POST,
-            postId: post.id,
-            images: post.images,
-        });
+        if(!post.isRetweet) {
+            dispatch({
+                type: SHOW_EDIT_POST,
+                postId: post.id,
+                images: post.images,
+            });
+        }
+
     },[post]);
 
 

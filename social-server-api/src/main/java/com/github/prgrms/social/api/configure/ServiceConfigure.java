@@ -108,8 +108,8 @@ public class ServiceConfigure {
         ModelMapper modelMapper = new ModelMapper();
 
         // TODO : 더 효율적인 방법
+        Converter<Post, Boolean> toIsRetweet = context -> context.getSource() != null;
         Converter<Set<User>, Integer> toUserCount = context -> context.getSource().size();
-        Converter<Set<Post>, Integer> toPostCount = context -> context.getSource().size();
         Converter<Set<LikeInfo>, Integer> toLikeCount = context -> context.getSource().size();
         Converter<Set<Comment>, Integer> toCommentCount = context -> context.getSource().size();
         Converter<Set<Image>, Set<String>> setImages = context -> {
@@ -154,7 +154,8 @@ public class ServiceConfigure {
                 .addMappings(mapper -> mapper.using(toCommentCount).map(Post::getComments, PostResponse::setCommentCount))
                 .addMappings(mapper -> mapper.skip(PostResponse::setUser))
                 .addMappings(mapper -> mapper.skip(PostResponse::setRetweetPost))
-                .addMappings(mapping -> mapping.using(setImages).map(Post::getImages, PostResponse::setImages));
+                .addMappings(mapping -> mapping.using(setImages).map(Post::getImages, PostResponse::setImages))
+                .addMappings(mapping -> mapping.using(toIsRetweet).map(Post::getRetweetPost, PostResponse::setIsRetweet));
 
 
         return modelMapper;

@@ -397,10 +397,26 @@ class PostRestControllerTest {
         Post post1 = Post.builder().content("post1").build();
         Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
 
-        mockMvc.perform(post("/api/post/" + savedPost.getId() +"/retweet")
+        mockMvc.perform(post("/api/retweet/post/" + savedPost.getId() +"")
                 .header(tokenHeader,apiToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.isRetweet").value(true))
+                .andExpect(jsonPath("$.response.retweetPost.id").value(savedPost.getId()))
+                .andDo(print());
+    }
+
+    @DisplayName("리트윗 - 이미 리트윗한 포스트")
+    @Test
+    void retweetFail() throws Exception {
+        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+
+        Post post1 = Post.builder().content("post1").build();
+        Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
+        Post retweet = postService.retweet(savedPost.getId(), user.getId());
+
+        mockMvc.perform(post("/api/retweet/post/" + retweet.getId())
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 }

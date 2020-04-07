@@ -53,7 +53,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JwtAuthenticationProvider jwtAuthenticationProvider(JWT jwt, UserService userService) {
+    public JwtAuthenticationProvider jwtAuthenticationProvider(JWT jwt,UserService userService) {
         return new JwtAuthenticationProvider(jwt, userService);
     }
 

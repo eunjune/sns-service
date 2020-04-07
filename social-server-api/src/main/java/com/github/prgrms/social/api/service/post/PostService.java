@@ -261,23 +261,28 @@ public class PostService {
         checkNotNull(postId, "postId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(User.class, userId));
+
         return postRepository.findById(postId)
                 .map(post -> {
+
+                    if(post.getRetweetPost() != null) {
+                        throw new IllegalArgumentException("이미 리트윗 했습니다.");
+                    }
+
                     if(post.getUser().getId().equals(userId)) {
                         throw new IllegalArgumentException("자신의 글은 리트윗 할 수 없습니다.");
                     }
 
-                    if(post.isRetweet()) {
-                        throw new IllegalArgumentException("이미 리트윗 했습니다.");
-                    }
-
-                    Post retweetPost = Post.builder()
+                    Post retweetPost = postRepository.save(Post.builder()
                             .content("retweet")
-                            .isRetweet(true)
-                            .build();
+                            .build());
+
+                    retweetPost.setUser(user);
                     retweetPost.addRetweet(post);
 
-                    return postRepository.save(retweetPost);
+                    return retweetPost;
                 })
                 .orElseThrow(() -> new NotFoundException(Post.class, postId));
     }

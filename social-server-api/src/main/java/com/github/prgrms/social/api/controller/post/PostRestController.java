@@ -122,9 +122,6 @@ public class PostRestController {
     }
 
 
-
-
-
     @PostMapping(path = "post")
     @ApiOperation(value = "포스트 작성")
     public ApiResult<PostResponse> posting(
@@ -160,12 +157,12 @@ public class PostRestController {
     }
 
 
-    @PostMapping(path = "post/{postId}/retweet")
+    @PostMapping(path = "retweet/post/{postId}")
     @ApiOperation(value = "리트윗")
     public ApiResult<PostResponse> retweet(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @PathVariable
-                    Long postId
+            Long postId
     ) {
         return OK(dtoUtils.convertPostResponse(postService.retweet(postId,authentication.id.getValue())));
     }

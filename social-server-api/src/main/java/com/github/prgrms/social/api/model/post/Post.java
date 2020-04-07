@@ -40,9 +40,6 @@ public class Post {
     @Transient
     private boolean likesOfMe;
 
-    @ApiModelProperty(value = "리트윗 여부", required = true)
-    private boolean isRetweet;
-
     @ApiModelProperty(value = "작성일시", required = true)
     @Column(nullable = false, columnDefinition = "TIMESTAMP")
     private final LocalDateTime createAt;
@@ -84,7 +81,7 @@ public class Post {
 
 
     @Builder
-    private Post(Long id, String content, boolean likesOfMe,boolean isRetweet, LocalDateTime createAt) {
+    private Post(Long id, String content, boolean likesOfMe, LocalDateTime createAt) {
         checkArgument(isNotEmpty(content), "contents must be provided.");
         checkArgument(
                 content.length() >= 4 && content.length() <= 500,
@@ -94,7 +91,7 @@ public class Post {
         this.id = id;
         this.content = content;
         this.likesOfMe = likesOfMe;
-        this.isRetweet = isRetweet;
+//        this.isRetweet = isRetweet;
         this.createAt = defaultIfNull(createAt, now());
     }
 

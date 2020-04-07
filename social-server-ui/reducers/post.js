@@ -331,11 +331,13 @@ const reducer = (state = initialState, action) => {
             }
 
             case RETWEET_SUCCESS: {
+                alert('리트윗 하셨습니다.');
                 draft.posts.unshift(action.data);
                 
                 break;
             }
             case RETWEET_FAILURE: {
+                alert(action.error.message);
                 break;
             }
     
