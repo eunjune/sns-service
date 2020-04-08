@@ -104,14 +104,17 @@ public class UserRestController {
         );
     }
 
+    // TODO: 팔로우, 게시글 데이터 확인
     @GetMapping(path = "user/{id}")
     @ApiOperation(value = "다른 사람 정보")
     public ApiResult<UserResponse> findUser(
             @ApiParam(value = "유저 PK", example = "1", required = true, type = "integer") @PathVariable("id") User user
     ) {
+
         return OK(dtoUtils.convertUserResponse(user));
     }
 
+    // TODO : LONG으로 바꿀 수 있음
     @GetMapping(path = "user/followings")
     @ApiOperation(value = "팔로잉 리스트")
     public ApiResult<List<UserResponse>> followings(
@@ -119,13 +122,13 @@ public class UserRestController {
             @ApiIgnore Pageable pageable
     ) {
 
-        //TODO : 수정 필요.
         return OK(userService.getFollowings(authentication.id.getValue(), pageable)
                             .stream()
                             .map(dtoUtils::convertUserResponse)
                             .collect(Collectors.toList()));
     }
 
+    // TODO : LONG으로 바꿀 수 있음
     @GetMapping(path = "user/followers")
     @ApiOperation(value = "팔로워 리스트")
     public ApiResult<List<UserResponse>> followers(

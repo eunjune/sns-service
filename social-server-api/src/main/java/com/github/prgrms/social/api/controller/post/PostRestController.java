@@ -48,7 +48,7 @@ public class PostRestController {
             @ApiIgnore Pageable pageable
     ) {
         return OK(
-                postService.getPostsWithImageAndLike(authentication.id.getValue(), userId, lastId, pageable)
+                postService.getPostsWithImageAndLikeWithComment(authentication.id.getValue(), userId, lastId, pageable)
                         .stream()
                         .map(dtoUtils::convertPostResponse)
                         .collect(Collectors.toList())
@@ -68,7 +68,7 @@ public class PostRestController {
             @ApiIgnore Pageable pageable
     ) {
         return OK(
-                postService.getPostsWithImageAndLike(authentication.id.getValue(), authentication.id.getValue(), lastId, pageable)
+                postService.getPostsWithImageAndLikeWithComment(authentication.id.getValue(), authentication.id.getValue(), lastId, pageable)
                         .stream()
                         .map(dtoUtils::convertPostResponse)
                         .collect(Collectors.toList())
@@ -90,7 +90,7 @@ public class PostRestController {
 
         // TODO : 로그인했을 경우 팔로잉 유저것도 가져올 것인지
 
-        return OK(postService.getPostsWithImageAndLike(lastId, pageable)
+        return OK(postService.getPostsWithImageAndLikeWithComment(lastId, pageable)
                 .stream()
                 .map(dtoUtils::convertPostResponse)
                 .collect(Collectors.toList())

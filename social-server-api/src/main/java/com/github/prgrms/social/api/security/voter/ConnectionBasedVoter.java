@@ -2,7 +2,7 @@ package com.github.prgrms.social.api.security.voter;
 
 import com.github.prgrms.social.api.model.commons.Id;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.security.JwtAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
     private final Function<String, Id<User, Long>> idExtractor;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     public ConnectionBasedVoter(RequestMatcher requiresAuthorizationRequestMatcher, Function<String, Id<User, Long>> idExtractor) {
         checkNotNull(requiresAuthorizationRequestMatcher, "requiresAuthorizationRequestMatcher must be provided.");
@@ -92,7 +92,7 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
     }
 
     @Autowired
-    public void setUserService(JpaUserRepository userRepository) {
+    public void setUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

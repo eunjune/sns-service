@@ -110,6 +110,7 @@ public class ServiceConfigure {
         // TODO : 더 효율적인 방법
         Converter<Post, Boolean> toIsRetweet = context -> context.getSource() != null;
         Converter<Set<User>, Integer> toUserCount = context -> context.getSource().size();
+        Converter<Set<Post>, Integer> toPostCount = context -> context.getSource().size();
         Converter<Set<LikeInfo>, Integer> toLikeCount = context -> context.getSource().size();
         Converter<Set<Comment>, Integer> toCommentCount = context -> context.getSource().size();
         Converter<Set<Image>, Set<String>> setImages = context -> {
@@ -140,12 +141,14 @@ public class ServiceConfigure {
                 .typeMap(User.class, MeResponse.class)
                 .addMappings(mapper -> mapper.using(toEmail).map(User::getEmail, MeResponse::setEmail))
                 .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowings, MeResponse::setFollowingCount))
-                .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowers, MeResponse::setFollowerCount));
+                .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowers, MeResponse::setFollowerCount))
+                .addMappings(mapper -> mapper.using(toPostCount).map(User::getPosts, MeResponse::setPostCount));
 
         modelMapper
                 .typeMap(User.class, UserResponse.class)
                 .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowings, UserResponse::setFollowingCount))
-                .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowers, UserResponse::setFollowerCount));
+                .addMappings(mapper -> mapper.using(toUserCount).map(User::getFollowers, UserResponse::setFollowerCount))
+                .addMappings(mapper -> mapper.using(toPostCount).map(User::getPosts, UserResponse::setPostCount));
 
 
         modelMapper

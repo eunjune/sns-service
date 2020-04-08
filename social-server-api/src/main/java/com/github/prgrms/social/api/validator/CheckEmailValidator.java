@@ -3,7 +3,7 @@ package com.github.prgrms.social.api.validator;
 
 import com.github.prgrms.social.api.model.api.request.user.CheckEmailRequest;
 import com.github.prgrms.social.api.model.user.Email;
-import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -13,7 +13,7 @@ import org.springframework.validation.Validator;
 @RequiredArgsConstructor
 public class CheckEmailValidator implements Validator {
 
-    private final JpaUserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public boolean supports(Class<?> clazz) {

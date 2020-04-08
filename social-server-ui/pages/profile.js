@@ -177,7 +177,7 @@ const Profile = () => {
                 <div style={{padding: 50}}>
                     <Card
                         actions={[
-                            <div onClick={clickPost}>게시글<br/>{posts && posts.length}</div>,
+                            <div onClick={clickPost}>게시글<br/>{me && me.postCount}</div>,
                             <div onClick={clickFollow}>팔로윙<br/>{me && me.followingCount}</div>,
                             <div onClick={clickFollow}>팔로워<br/>{me && me.followerCount}</div>
                         ]}

@@ -28,4 +28,6 @@ public class MeResponse {
     private Integer followingCount;
 
     private Integer followerCount;
+
+    private Integer postCount;
 }

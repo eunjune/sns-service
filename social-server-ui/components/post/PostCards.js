@@ -166,7 +166,7 @@ const PostCards = memo(({post}) => {
 
                     <div>
                         <Icon type="message" key="message" onClick={onToggleComment}/>
-                        <span style={{marginLeft: 10}}>0</span>
+                        <span style={{marginLeft: 10}}>{post.commentCount}</span>
                     </div>,
 
                     <Popover

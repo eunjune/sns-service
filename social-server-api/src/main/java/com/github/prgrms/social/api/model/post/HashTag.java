@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @NoArgsConstructor(force = true)
 @Getter
+@Setter
 @Entity
 @ToString(exclude = {"posts"})
 @EqualsAndHashCode(of = "id")
@@ -37,7 +38,6 @@ public class HashTag {
             name = "post_hashtag",
             joinColumns = @JoinColumn(name = "hashtag_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
-    @Setter
     private Set<Post> posts = new HashSet<>();
 
     @Builder

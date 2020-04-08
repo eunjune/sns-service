@@ -8,11 +8,11 @@ import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.LikeInfo;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.post.JpaHashTagRepository;
-import com.github.prgrms.social.api.repository.post.JpaImageRepository;
-import com.github.prgrms.social.api.repository.post.JpaPostLikeRepository;
-import com.github.prgrms.social.api.repository.post.JpaPostRepository;
-import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.post.HashTagRepository;
+import com.github.prgrms.social.api.repository.post.ImageRepository;
+import com.github.prgrms.social.api.repository.post.PostLikeRepository;
+import com.github.prgrms.social.api.repository.post.PostRepository;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,15 +30,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final JpaUserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private final JpaPostRepository postRepository;
+    private final PostRepository postRepository;
 
-    private final JpaPostLikeRepository postLikeRepository;
+    private final PostLikeRepository postLikeRepository;
 
-    private final JpaHashTagRepository hashTagRepository;
+    private final HashTagRepository hashTagRepository;
 
-    private final JpaImageRepository imageRepository;
+    private final ImageRepository imageRepository;
 
 
     @Transactional(readOnly = true)
@@ -54,7 +54,16 @@ public class PostService {
         checkNotNull(userId, "userId must be provided.");
         checkNotNull(postWriterId, "writerId must be provided.");
 
-        return postRepository.findWithLikeAndImageByIdAndUser_Id(postId, postWriterId)
+        return postRepository.findByIdAndUser_Id(postId, postWriterId);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Post> getPostWithLike(Long postId, Long postWriterId, Long userId) {
+        checkNotNull(postId, "postId must be provided.");
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(postWriterId, "writerId must be provided.");
+
+        return postRepository.findWithLikeByIdAndUser_Id(postId, postWriterId)
                 .map(post -> {
                     post.setLikesOfMe(userId);
                     return post;
@@ -62,7 +71,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getPostsWithImageAndLike(Long userId, Long postWriterId, Long lastId, Pageable pageable) {
+    public List<Post> getPostsWithImageAndLikeWithComment(Long userId, Long postWriterId, Long lastId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
         checkNotNull(lastId, "lastId must be provided.");
 
@@ -70,32 +79,32 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException(User.class, postWriterId));
 
         if(lastId == 0L) {
-            return postRepository.findWithLikeAndImageByUser_IdOrderByIdDesc(postWriterId, pageable)
+            return postRepository.findWithLikeAndImageWithCommentByUser_IdOrderByIdDesc(postWriterId, pageable)
                     .stream()
                     .peek(post -> post.setLikesOfMe(userId))
                     .collect(Collectors.toList());
         }
 
-        return postRepository.findWithLikeAndImageByUser_IdAndIdLessThanOrderByIdDesc(postWriterId, lastId, pageable)
+        return postRepository.findWithLikeAndImageWithCommentByUser_IdAndIdLessThanOrderByIdDesc(postWriterId, lastId, pageable)
                 .stream()
                 .peek(post -> post.setLikesOfMe(userId))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getPostsWithImageAndLike(Long lastId, Pageable pageable) {
+    public List<Post> getPostsWithImageAndLikeWithComment(Long lastId, Pageable pageable) {
         checkNotNull(lastId, "lastId must be provided.");
 
         if(lastId == 0L) {
-            return postRepository.findWithLikeAndImageByUser_IsPrivateFalseOrderByIdDesc(pageable);
+            return postRepository.findWithLikeAndImageWithCommentByUser_IsPrivateFalseOrderByIdDesc(pageable);
         }
 
-        return postRepository.findWithLikeAndImageByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(lastId, pageable);
+        return postRepository.findWithLikeAndImageWithCommentByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(lastId, pageable);
     }
 
     // !follwings && isPrivate
     @Transactional(readOnly = true)
-    public List<Post> getPostsWithImageAndLike(Long userId, Long lastId, Pageable pageable) {
+    public List<Post> getPostsWithImageAndLikeWithComment(Long userId, Long lastId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
         checkNotNull(lastId, "lastId must be provided.");
 
@@ -162,13 +171,13 @@ public class PostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(Long.class,userId));
 
-        return postRepository.findWithLikeAndImageByIdAndUser_Id(postId, postWriterId)
+        return postRepository.findWithLikeByIdAndUser_Id(postId, postWriterId)
             .map(post -> {
                 if (!post.isLikesOfMe()) {
-                    LikeInfo likeInfo = new LikeInfo(null,null);
+
+                    LikeInfo likeInfo = LikeInfo.builder().build();
                     post.incrementAndGetLikes(likeInfo);
                     likeInfo.setUser(user);
-                    postLikeRepository.save(likeInfo);
                 }
                 return post;
             })
@@ -184,11 +193,11 @@ public class PostService {
 
         LikeInfo likeInfo = postLikeRepository.findByUser_IdAndPost_Id(userId,postId).orElseThrow(() -> new NotFoundException(LikeInfo.class,userId,postId));
 
-        return getPost(postId, postWriterId, userId)
+        return getPostWithLike(postId, postWriterId,userId)
                 .map(post -> {
                     if (post.isLikesOfMe()) {
+                        likeInfo.setUser(null);
                         post.removeLikes(likeInfo);
-                        //postLikeRepository.deleteByUser_IdAndPost_Id(userId, postId);
                     }
 
                     return post;
@@ -218,9 +227,7 @@ public class PostService {
                         throw new IllegalArgumentException("자신의 글은 리트윗 할 수 없습니다.");
                     }
 
-                    Post retweetPost = postRepository.save(Post.builder()
-                            .content("retweet")
-                            .build());
+                    Post retweetPost = postRepository.save(Post.builder().content("retweet").build());
 
                     retweetPost.setUser(user);
                     retweetPost.addRetweet(post);

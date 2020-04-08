@@ -2,10 +2,7 @@ package com.github.prgrms.social.api.model.post;
 
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 @Entity
 @NoArgsConstructor(force = true)
 @Getter
+@Setter
 @ToString(exclude = {"user","post"})
 public class LikeInfo {
 
@@ -29,14 +27,13 @@ public class LikeInfo {
     private final LocalDateTime createAt;
 
     @ManyToOne
-    @Setter
     private User user;
 
     @ManyToOne
-    @Setter
     private Post post;
 
-    public LikeInfo(Long id, LocalDateTime createAt) {
+    @Builder
+    private LikeInfo(Long id, LocalDateTime createAt) {
         this.id = id;
         this.createAt = defaultIfNull(createAt, now());
     }

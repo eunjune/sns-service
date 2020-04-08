@@ -94,7 +94,7 @@ const User = ({ id }) => {
               <div style={{padding: 50}}>
                   <Card
                       actions={[
-                          <div onClick={clickPost}>게시글<br/>{posts && posts.length}</div>,
+                          <div onClick={clickPost}>게시글<br/>{user && user.postCount}</div>,
                           <div onClick={clickFollow}>팔로윙<br/>{user && user.followingCount}</div>,
                           <div onClick={clickFollow}>팔로워<br/>{user && user.followerCount}</div>
                       ]}

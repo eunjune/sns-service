@@ -1,25 +1,47 @@
 package com.github.prgrms.social.api.repository.user;
 
-import com.github.prgrms.social.api.model.commons.Id;
-import com.github.prgrms.social.api.model.user.ConnectedUser;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
+import com.github.prgrms.social.api.repository.projection.UserProjection;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User,Long>{
 
     User save(User user);
 
-    void update(User user);
+    @Transactional(readOnly = true)
+    Optional<User> findById(Long id);
 
-    Optional<User> findById(Id<User, Long> userId);
+    @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"followings","followers","posts"})
+    Optional<User> findUserWithUserWithPostById(Long id);
 
+    @Transactional(readOnly = true)
     Optional<User> findByEmail(Email email);
 
-    List<ConnectedUser> findAllConnectedUser(Id<User, Long> userId);
+    @Transactional(readOnly = true)
+    Optional<User> findByName(String name);
 
-    List<Id<User, Long>> findConnectedIds(Id<User, Long> userId);
+    @Transactional(readOnly = true)
+    boolean existsByEmail(Email email);
 
+    @Transactional(readOnly = true)
+    boolean existsByName(String name);
+
+    // TODO
+    @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"followings"})
+    UserProjection findFollowingsById(Long id);
+
+    // TODO
+    @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"followers"})
+    UserProjection findFollowersById(Long id);
+
+    @Transactional(readOnly = true)
+    UserProjection findPrivateById(Long id);
 }

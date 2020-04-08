@@ -2,6 +2,7 @@ package com.github.prgrms.social.api.controller.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
+import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.Post;
@@ -9,7 +10,7 @@ import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.*;
-import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.post.CommentService;
 import com.github.prgrms.social.api.service.post.PostService;
@@ -59,22 +60,22 @@ class PostRestControllerTest {
     CommentService commentService;
 
     @Autowired
-    JpaUserRepository userRepository;
+    UserRepository userRepository;
 
     @Autowired
-    JpaPostRepository postRepository;
+    PostRepository postRepository;
 
     @Autowired
-    JpaCommentRepository commentRepository;
+    CommentRepository commentRepository;
 
     @Autowired
-    JpaPostLikeRepository postLikeRepository;
+    PostLikeRepository postLikeRepository;
 
     @Autowired
-    JpaHashTagRepository hashTagRepository;
+    HashTagRepository hashTagRepository;
 
     @Autowired
-    JpaImageRepository imageRepository;
+    ImageRepository imageRepository;
 
     @Value("${jwt.token.issuer}") String issuer;
 
@@ -115,7 +116,7 @@ class PostRestControllerTest {
         String content = "content testsets #abc #hash sdfsdfsdfds";
         PostingRequest postingRequest = new PostingRequest(content,imagePaths);
 
-        List<Post> beforePosts = postService.getPostsWithImageAndLike(0L,PageRequest.of(0,4));
+        List<Post> beforePosts = postService.getPostsWithImageAndLikeWithComment(0L,PageRequest.of(0,4));
         List<HashTag> beforeHashTagList = hashTagRepository.findAll();
         List<Image> beforeImageList = imageRepository.findAll();
 
@@ -129,7 +130,7 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.images").isNotEmpty())
                 .andDo(print());
 
-        List<Post> afterPosts = postService.getPostsWithImageAndLike(0L,PageRequest.of(0,4));
+        List<Post> afterPosts = postService.getPostsWithImageAndLikeWithComment(0L,PageRequest.of(0,4));
         List<HashTag> afterHashTagList = hashTagRepository.findAll();
         List<Image> afterImageList = imageRepository.findAll();
 
@@ -152,6 +153,8 @@ class PostRestControllerTest {
         Post writedPost = postService.write(post4, user.getId(), new HashSet<>());
 
         postService.like(writedPost.getId(),user.getId(),user.getId());
+        commentService.write(writedPost.getId(),user.getId(),user.getId(), Comment.builder().content("comment1").build());
+
 
         mockMvc.perform(get("/api/user/post/list?lastId=0&size=2"))
                 .andExpect(status().isOk())

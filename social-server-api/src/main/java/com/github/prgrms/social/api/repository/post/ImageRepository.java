@@ -1,19 +1,22 @@
 package com.github.prgrms.social.api.repository.post;
 
-import com.github.prgrms.social.api.model.post.Comment;
+import com.github.prgrms.social.api.model.post.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface CommentRepository extends JpaRepository<Comment,Long> {
+public interface ImageRepository extends JpaRepository<Image,Long> {
 
-    Comment save(Comment comment);
-
-    @Transactional(readOnly = true)
-    Optional<Comment> findById(Long id);
+    Image save(Image image);
 
     @Transactional(readOnly = true)
-    List<Comment> findByPost_IdAndUser_IdOrderByIdDesc(Long postId,Long userId);
+    List<Image> findAll();
+
+    @Transactional(readOnly = true)
+    Optional<Image> findByPath(String path);
+
+    @Transactional(readOnly = true)
+    boolean existsByPath(String path);
 }

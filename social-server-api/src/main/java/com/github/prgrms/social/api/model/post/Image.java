@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Entity
 @NoArgsConstructor(force = true)
 @Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 @ToString(exclude = {"post"})
 public class Image {
@@ -32,7 +33,6 @@ public class Image {
     private final LocalDateTime createAt;
 
     @ManyToOne
-    @Setter
     private Post post;
 
     @Builder

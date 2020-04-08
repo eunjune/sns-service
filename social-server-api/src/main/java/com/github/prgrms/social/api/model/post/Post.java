@@ -58,7 +58,6 @@ public class Post {
 
     // postCards.js
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @Setter
     private Set<LikeInfo> likeInfos = new HashSet<>();
 
     // postCards.js(user, 나머지)
@@ -72,10 +71,6 @@ public class Post {
     @OneToMany(mappedBy = "retweetPost",cascade = CascadeType.ALL)
     private Set<Post> postsRetweetedMe = new HashSet<>();
 
-    //postCards.js
-    // comments
-
-
     @Builder
     private Post(Long id, String content, boolean likesOfMe, LocalDateTime createAt) {
         checkArgument(isNotEmpty(content), "contents must be provided.");
@@ -87,18 +82,7 @@ public class Post {
         this.id = id;
         this.content = content;
         this.likesOfMe = likesOfMe;
-//        this.isRetweet = isRetweet;
         this.createAt = defaultIfNull(createAt, now());
-    }
-
-    public void modify(String contents) {
-        checkArgument(isNotEmpty(contents), "contents must be provided.");
-        checkArgument(
-                contents.length() >= 4 && contents.length() <= 500,
-                "post contents length must be between 4 and 500 characters."
-        );
-
-        this.content = contents;
     }
 
     public void setLikesOfMe(Long userId) {
@@ -143,11 +127,6 @@ public class Post {
         comment.setPost(this);
     }
 
-/*
-    public void setIsRetweet() {
-        this.isRetweet = this.retweet != null;
-    }*/
-
     public List<HashTag> findHashTag() {
         Pattern pattern = Pattern.compile("#[^\\s!@#$%^&*()+-=`~.;'\"?<>,./]+");
         Matcher matcher = pattern.matcher(content);
@@ -159,14 +138,5 @@ public class Post {
 
         return hashTags;
     }
-/*
-    public void addHashTag(HashTag hashTag) {
-        this.hashTags.add(hashTag);
-        hashTag.getPosts().add(this);
-    }
 
-    public void addImage(Image image) {
-        this.images.add(image);
-        image.setPost(this);
-    }*/
 }

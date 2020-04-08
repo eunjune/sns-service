@@ -14,6 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(force = true)
 @ToString(exclude = {"post","user"})
 @EqualsAndHashCode(of = "id")
@@ -33,11 +34,9 @@ public class Comment {
     private final LocalDateTime createAt;
 
     @ManyToOne
-    @Setter
     private Post post;
 
     @ManyToOne
-    @Setter
     private User user;
 
     @Builder
@@ -51,15 +50,5 @@ public class Comment {
         this.id = id;
         this.content = content;
         this.createAt = defaultIfNull(createAt, now());
-    }
-
-    public void modify(String contents) {
-        checkArgument(isNotEmpty(contents), "contents must be provided.");
-        checkArgument(
-                contents.length() >= 4 && contents.length() <= 500,
-                "post contents length must be between 4 and 500 characters."
-        );
-
-        this.content = contents;
     }
 }

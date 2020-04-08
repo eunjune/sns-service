@@ -1,7 +1,5 @@
 package com.github.prgrms.social.api.model.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.security.JWT;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,7 +40,6 @@ public class User {
     @Column(unique = true)
     private String name;
 
-    @JsonIgnore
     @ApiModelProperty(value = "패스워드", hidden = true)
     @Column(nullable = false)
     private String password;
@@ -82,13 +79,11 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "follower_id"))
     private Set<User> followers = new HashSet<>();
 
-    //TODO: 삭제
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    @JsonBackReference
     private Set<Post> posts = new HashSet<>();
 
     @Builder(toBuilder = true)
-    private User(Long id, String name, Email email, String password, boolean isEmailCertification, String emailCertificationToken, String profileImageUrl, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
+    private User(Long id, String name, Email email, String password, String profileImageUrl, boolean isPrivate, boolean isEmailCertification, String emailCertificationToken, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
         checkArgument(isNotEmpty(name), "name must be provided.");
         checkArgument(
                 name.length() >= 1 && name.length() <= 10,
@@ -101,13 +96,15 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profileImageUrl = profileImageUrl;
+        this.isPrivate = isPrivate;
         this.isEmailCertification = isEmailCertification;
         this.emailCertificationToken = emailCertificationToken;
-        this.profileImageUrl = profileImageUrl;
         this.loginCount = loginCount;
         this.lastLoginAt = lastLoginAt;
         this.createAt = defaultIfNull(createAt, now());
     }
+
 
     public void afterLoginSuccess() {
         loginCount++;

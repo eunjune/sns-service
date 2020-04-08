@@ -8,7 +8,7 @@ import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.*;
-import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.post.CommentService;
 import com.github.prgrms.social.api.service.post.PostService;
@@ -72,22 +72,22 @@ class CommentRestControllerTest {
     String apiToken;
 
     @Autowired
-    JpaUserRepository userRepository;
+    UserRepository userRepository;
 
     @Autowired
-    JpaPostRepository postRepository;
+    PostRepository postRepository;
 
     @Autowired
-    JpaCommentRepository commentRepository;
+    CommentRepository commentRepository;
 
     @Autowired
-    JpaPostLikeRepository postLikeRepository;
+    PostLikeRepository postLikeRepository;
 
     @Autowired
-    JpaHashTagRepository hashTagRepository;
+    HashTagRepository hashTagRepository;
 
     @Autowired
-    JpaImageRepository imageRepository;
+    ImageRepository imageRepository;
 
     @BeforeEach
     void setup() {

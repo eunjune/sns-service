@@ -7,7 +7,7 @@ import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final JpaUserRepository userRepository;
+    private final UserRepository userRepository;
 
     private final ModelMapper modelMapper;
 
@@ -88,6 +88,7 @@ public class UserService {
         return null;
     }
 
+    // TODO
     @Transactional(readOnly = true)
     public List<User> getFollowings(Long userId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
@@ -101,6 +102,7 @@ public class UserService {
         return null;
     }
 
+    // TODO
     @Transactional(readOnly = true)
     public List<User> getFollowers(Long userId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
@@ -151,8 +153,6 @@ public class UserService {
                     }
 
                     user.afterLoginSuccess();
-                    userRepository.save(user);
-
                     return user;
 
         }).orElseThrow(() -> new NotFoundException("이메일이 존재하지 않습니다"));
@@ -164,10 +164,7 @@ public class UserService {
 
         return getUser(email)
                 .map(user -> {
-
                     user.afterLoginSuccess();
-                    userRepository.save(user);
-
                     return user;
 
                 }).orElseThrow(() -> new NotFoundException("이메일이 존재하지 않습니다"));

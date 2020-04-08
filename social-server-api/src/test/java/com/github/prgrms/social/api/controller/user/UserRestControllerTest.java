@@ -6,7 +6,7 @@ import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.user.EmailService;
 import com.github.prgrms.social.api.service.user.UserService;
@@ -50,7 +50,7 @@ class UserRestControllerTest {
     EmailService emailService;
 
     @Autowired
-    JpaUserRepository userRepository;
+    UserRepository userRepository;
 
     @Value("${jwt.token.issuer}") String issuer;
 
@@ -221,6 +221,9 @@ class UserRestControllerTest {
     @DisplayName("로그인 성공")
     @Test
     void login() throws Exception {
+
+        User beforeUser = userService.getUser(new Email("test1@gmail.com")).orElse(null);
+
         mockMvc.perform(post("/api/auth")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("{\"address\" : \"test1@gmail.com\", \"password\" : \"12345678\"}"))
@@ -229,6 +232,11 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$.response.user").isNotEmpty())
                 .andDo(print());
 
+        User afterUser = userService.getUser(new Email("test1@gmail.com")).orElse(null);
+
+        assertNotNull(beforeUser);
+        assertNotNull(afterUser);
+        assertNotEquals(beforeUser.getLastLoginAt(), afterUser.getLastLoginAt());
     }
 
     @DisplayName("로그인 실패 - 이메일 존재하지 않음")

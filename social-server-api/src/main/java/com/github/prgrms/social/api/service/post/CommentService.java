@@ -5,9 +5,9 @@ import com.github.prgrms.social.api.event.CommentCreatedEvent;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.post.JpaCommentRepository;
-import com.github.prgrms.social.api.repository.post.JpaPostRepository;
-import com.github.prgrms.social.api.repository.user.JpaUserRepository;
+import com.github.prgrms.social.api.repository.post.CommentRepository;
+import com.github.prgrms.social.api.repository.post.PostRepository;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,11 +21,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final JpaUserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private final JpaPostRepository postRepository;
+    private final PostRepository postRepository;
 
-    private final JpaCommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
     private final EventBus eventBus;
 
@@ -42,7 +42,7 @@ public class CommentService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(User.class,userId));
 
-        return postRepository.findWithLikeAndImageByIdAndUser_Id(postId, postWriterId)
+        return postRepository.findWithCommentByIdAndUser_Id(postId, postWriterId)
             .map(post -> {
                 System.out.println("write 테스트");
                 post.addComment(comment);

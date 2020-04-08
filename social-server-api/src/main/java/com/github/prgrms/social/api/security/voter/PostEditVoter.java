@@ -2,7 +2,7 @@ package com.github.prgrms.social.api.security.voter;
 
 import com.github.prgrms.social.api.model.commons.Id;
 import com.github.prgrms.social.api.model.user.User;
-import com.github.prgrms.social.api.repository.post.JpaPostRepository;
+import com.github.prgrms.social.api.repository.post.PostRepository;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.security.JwtAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import static org.apache.commons.lang3.ClassUtils.isAssignable;
 
 public class PostEditVoter implements AccessDecisionVoter<FilterInvocation> {
 
-    private JpaPostRepository postRepository;
+    private PostRepository postRepository;
 
     private final RequestMatcher requiresAuthorizationRequestMatcher;
 
@@ -72,7 +72,7 @@ public class PostEditVoter implements AccessDecisionVoter<FilterInvocation> {
 
 
     @Autowired
-    public void setUserService(JpaPostRepository postRepository) {
+    public void setUserService(PostRepository postRepository) {
         this.postRepository = postRepository;
     }
 }

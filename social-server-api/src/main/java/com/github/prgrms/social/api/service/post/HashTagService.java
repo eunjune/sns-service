@@ -3,7 +3,7 @@ package com.github.prgrms.social.api.service.post;
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Post;
-import com.github.prgrms.social.api.repository.post.JpaHashTagRepository;
+import com.github.prgrms.social.api.repository.post.HashTagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @RequiredArgsConstructor
 public class HashTagService {
 
-    private final JpaHashTagRepository hashTagRepository;
+    private final HashTagRepository hashTagRepository;
 
 
     // TODO : 더 효율적인 방법이 있을지 고민

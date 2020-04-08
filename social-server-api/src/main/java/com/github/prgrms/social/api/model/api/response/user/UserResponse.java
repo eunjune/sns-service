@@ -22,4 +22,6 @@ public class UserResponse {
     private Integer followingCount;
 
     private Integer followerCount;
+
+    private Integer postCount;
 }
