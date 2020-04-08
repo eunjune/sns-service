@@ -267,7 +267,9 @@ class UserRestControllerTest {
     @DisplayName("이메일 로그인 성공")
     @Test
     void emailLogin() throws Exception {
-        mockMvc.perform(get("/api/auth/test1@gmail.com"))
+        mockMvc.perform(post("/api/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"address\" : \"test1@gmail.com\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.token").isNotEmpty())
                 .andExpect(jsonPath("$.response.user").isNotEmpty())

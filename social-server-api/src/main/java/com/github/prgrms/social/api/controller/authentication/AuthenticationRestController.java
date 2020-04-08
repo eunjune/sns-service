@@ -38,26 +38,10 @@ public class AuthenticationRestController {
             Authentication authentication = authenticationManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             AuthenticationResult authenticationResult = (AuthenticationResult) authentication.getDetails();
-            return OK(dtoUtils.convertAuthenticationResponse(authenticationResult));
-        } catch (AuthenticationException e) {
-            throw new UnauthorizedException(e.getMessage());
-        }
-    }
 
-    @GetMapping("{address}")
-    @ApiOperation(value = "사용자 이메일 로그인 (API 토큰 필요없음)")
-    public ApiResult<AuthenticationResponse> emailAuthentication(
-            @ApiParam(value = "이메일", example = "test00@gmail.com", required = true) @PathVariable String address
-    ) throws UnauthorizedException {
-        try {
-            JwtAuthenticationToken authToken = new JwtAuthenticationToken(address);
-            Authentication authentication = authenticationManager.authenticate(authToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            AuthenticationResult authenticationResult = (AuthenticationResult) authentication.getDetails();
-
-            emailService.sendEmailLoginLinkMessage(authenticationResult.getUser(), authenticationResult.getToken());
-
+            if(authRequest.getPassword() == null) {
+                emailService.sendEmailLoginLinkMessage(authenticationResult.getUser(), authenticationResult.getToken());
+            }
 
             return OK(dtoUtils.convertAuthenticationResponse(authenticationResult));
         } catch (AuthenticationException e) {

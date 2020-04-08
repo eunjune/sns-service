@@ -52,6 +52,162 @@ import {
 } from '../reducers/user';
 import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
 
+function loadMeAPI(token) {
+    return axios.get('user/me',{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadMe(action) {
+
+    try {
+        const result = yield call(loadMeAPI,action.data);
+        yield put({
+            type: LOAD_ME_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: LOAD_ME_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchLoadMe() {
+    yield takeLatest(LOAD_ME_REQUEST,loadMe);
+}
+
+function loadUserAPI({userId,token}) {
+    return axios.get(`user/${userId}`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+
+function* loadUser(action) {
+
+    try {
+        const result = yield call(loadUserAPI, action.data);
+        yield put({
+            type: LOAD_USER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: LOAD_USER_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchLoadUser() {
+    yield takeLatest(LOAD_USER_REQUEST, loadUser);
+}
+
+function loadFollowingAPI({token, offset=0}) {
+    return axios.get(`user/followings?page=${offset}&size=3`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadFollowing(action) {
+
+    try {
+        const result = yield call(loadFollowingAPI,action.data);
+        yield put({
+            type: LOAD_FOLLOWING_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: LOAD_FOLLOWING_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchLoadfollowing() {
+    yield takeLatest(LOAD_FOLLOWING_REQUEST,loadFollowing);
+}
+
+function loadFollowerAPI({token, offset=0}) {
+    return axios.get(`user/followers?page=${offset}&size=3`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadFollower(action) {
+
+    try {
+        const result = yield call(loadFollowerAPI,action.data);
+        yield put({
+            type: LOAD_FOLLOWER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: LOAD_FOLLOWER_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchLoadfollower() {
+    yield takeLatest(LOAD_FOLLOWER_REQUEST,loadFollower,);
+}
+
+function resendEmailAPI(token) {
+    return axios.get('user/resend-email',{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+
+function* resendEmail(action) {
+    try {
+        const result = yield call(resendEmailAPI,action.data);
+        yield put({
+            type: EMAIL_RESEND_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: EMAIL_RESEND_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchResendEmail() {
+    yield takeLatest(EMAIL_RESEND_REQUEST, resendEmail);
+}
+
 function emailCheckAPI(address) {
     const formData = new FormData();
     formData.append('address', address);
@@ -65,10 +221,13 @@ function* emailCheck(action) {
             type: EMAIL_CHECK_SUCCESS,
             data: !result.data.response,
         });
-    } catch (error) { // 실패
+    } catch (e) { // 실패
         yield put({
             type: EMAIL_CHECK_FAILURE,
-            error: error.response.data.error.message,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
         });
     }
 }
@@ -90,10 +249,13 @@ function* nameCheck(action) {
             type: NAME_CHECK_SUCCESS,
             data: !result.data.response,
         });
-    } catch (error) { // 실패
+    } catch (e) { // 실패
         yield put({
             type: NAME_CHECK_FAILURE,
-            error: error.response.data.error.message,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
         });
     }
 }
@@ -102,6 +264,32 @@ function* watchNameCheck() {
     yield takeLatest(NAME_CHECK_REQUEST, nameCheck);
 }
 
+function emailCertificateAPI(data) {
+    return axios.post('check-email-token', data);
+}
+
+
+function* emailCertificate(action) {
+    try {
+        const result = yield call(emailCertificateAPI,action.data);
+        yield put({
+            type: EMAIL_CERTIFICATION_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: EMAIL_CERTIFICATION_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchEmailCertificate() {
+    yield takeLatest(EMAIL_CERTIFICATION_REQUEST, emailCertificate);
+}
 
 function signUpAPI({name,address,password}) {
     const formData = new FormData();
@@ -122,70 +310,18 @@ function* signUp(action) {
             data: result.data,
         });
     } catch (e) { // 실패
-        console.error(e);
         yield put({
             type: SIGN_UP_FAILURE,
-            error: e.response.data.error.message,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
         });
     }
 }
 
 function* watchSignUp() {
     yield takeLatest(SIGN_UP_REQUEST, signUp);
-}
-
-function emailCertificateAPI(data) {
-    return axios.post('check-email-token', data);
-}
-
-
-function* emailCertificate(action) {
-    try {
-        const result = yield call(emailCertificateAPI,action.data);
-        yield put({
-            type: EMAIL_CERTIFICATION_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: EMAIL_CERTIFICATION_FAILURE,
-            error: e.response.data.error.message,
-        });
-    }
-}
-
-function* watchEmailCertificate() {
-    yield takeLatest(EMAIL_CERTIFICATION_REQUEST, emailCertificate);
-}
-
-function resendEmailAPI(token) {
-    return axios.get('user/resend-email',{
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
-}
-
-
-function* resendEmail(action) {
-    try {
-        const result = yield call(resendEmailAPI,action.data);
-        yield put({
-            type: EMAIL_RESEND_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: EMAIL_RESEND_FAILURE,
-            error: e.response.data.error.message,
-        });
-    }
-}
-
-function* watchResendEmail() {
-    yield takeLatest(EMAIL_RESEND_REQUEST, resendEmail);
 }
 
 
@@ -201,10 +337,12 @@ function* login(action) {
             data: result.data,
         });
     } catch (e) { // 실패
-        console.error(e);
         yield put({
             type: LOG_IN_FAILURE,
-            error: e.response.data.error.message,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
         });
     }
 }
@@ -213,8 +351,8 @@ function* watchLogin() {
     yield takeLatest(LOG_IN_REQUEST, login);
 }
 
-function emailLoginAPI(address) {
-    return axios.get(`auth/${address}`);
+function emailLoginAPI(loginData) {
+    return axios.post(`auth`, loginData);
 }
 
 function* emailLogin(action) {
@@ -225,10 +363,12 @@ function* emailLogin(action) {
             data: result.data,
         });
     } catch (e) { // 실패
-        console.error(e);
         yield put({
             type: EMAIL_LOG_IN_FAILURE,
-            error: e.response.data.error.message,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
         });
     }
 }
@@ -237,68 +377,9 @@ function* watchEmailLogin() {
     yield takeLatest(EMAIL_LOG_IN_REQUEST, emailLogin);
 }
 
-function loadUserAPI({userId,token}) {
-    return axios.get(`user/${userId}`,{
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
-}
 
-
-function* loadUser(action) {
-
-    try {
-        const result = yield call(loadUserAPI, action.data);
-        yield put({
-            type: LOAD_USER_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: LOAD_USER_FAILURE,
-            error: e
-        });
-    }
-}
-
-function* watchLoadUser() {
-    yield takeLatest(LOAD_USER_REQUEST, loadUser);
-}
-
-function loadMeAPI(token) {
-    return axios.get('user/me',{
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
-}
-
-function* loadMe(action) {
-
-    try {
-        const result = yield call(loadMeAPI,action.data);
-        yield put({
-            type: LOAD_ME_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: LOAD_ME_FAILURE,
-            error: e
-        });
-    }
-}
-
-function* watchLoadMe() {
-    yield takeLatest(LOAD_ME_REQUEST,loadMe);
-}
 
 function followAPI({userId,token}) {
-    console.log('followAPI');
-    console.log(token);
     return axios.post(`user/follow/${userId}`,{},{
         headers: {
             'api_key': 'Bearer ' + token,
@@ -315,10 +396,12 @@ function* follow(action) {
             data: result.data.response,
         });
     } catch (e) { // 실패
-        console.error(e);
         yield put({
             type: FOLLOW_USER_FAILURE,
-            error: e
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
         });
     }
 }
@@ -327,121 +410,7 @@ function* watchFollow() {
     yield takeLatest(FOLLOW_USER_REQUEST,follow);
 }
 
-function unfollowAPI({userId,token}) {
-    return axios.delete(`user/follow/${userId}`,{
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
-}
 
-function* unfollow(action) {
-
-    try {
-        const result = yield call(unfollowAPI, action.data);
-        yield put({
-            type: UNFOLLOW_USER_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: UNFOLLOW_USER_FAILURE,
-            error: e
-        });
-    }
-}
-
-function* watchUnfollow() {
-    yield takeLatest(UNFOLLOW_USER_REQUEST,unfollow);
-}
-
-function loadFollowerAPI({token, offset=0}) {
-    return axios.get(`user/followers?page=${offset}&size=3`,{
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
-}
-
-function* loadFollower(action) {
-
-    try {
-        const result = yield call(loadFollowerAPI,action.data);
-        yield put({
-            type: LOAD_FOLLOWER_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: LOAD_FOLLOWER_FAILURE,
-            error: e
-        });
-    }
-}
-
-function* watchLoadfollower() {
-    yield takeLatest(LOAD_FOLLOWER_REQUEST,loadFollower,);
-}
-
-function loadFollowingAPI({token, offset=0}) {
-    return axios.get(`user/followings?page=${offset}&size=3`,{
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
-}
-
-function* loadFollowing(action) {
-
-    try {
-        const result = yield call(loadFollowingAPI,action.data);
-        yield put({
-            type: LOAD_FOLLOWING_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: LOAD_FOLLOWING_FAILURE,
-            error: e
-        });
-    }
-}
-
-function* watchLoadfollowing() {
-    yield takeLatest(LOAD_FOLLOWING_REQUEST,loadFollowing);
-}
-
-function removeFollowerAPI({userId,token}) {
-    return axios.delete(`user/follower/${userId}`,{
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
-}
-
-function* removeFollower(action) {
-
-    try {
-        const result = yield call(removeFollowerAPI, action.data);
-        yield put({
-            type: REMOVE_FOLLOWER_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        console.error(e);
-        yield put({
-            type: REMOVE_FOLLOWER_FAILURE,
-            error: e
-        });
-    }
-}
-
-function* watchRemovefollower() {
-    yield takeLatest(REMOVE_FOLLOWER_REQUEST,removeFollower);
-}
 
 function editProfileAPI({profileRequest,token}) {
 
@@ -461,10 +430,12 @@ function* editProfile(action) {
             data: result.data.response,
         });
     } catch (e) { // 실패
-        console.error(e);
         yield put({
             type: EDIT_PROFILE_FAILURE,
-            error: e.response.data.error.message,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
         });
     }
 }
@@ -494,10 +465,12 @@ function* editProfileImage(action) {
             data: result.data.response,
         });
     } catch (e) { // 실패
-        console.error(e);
         yield put({
             type: UPLOAD_IMAGE_FAILURE,
-            error: e.response.data.error.message,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
         });
     }
 }
@@ -506,23 +479,92 @@ function* watchEditProfileImage() {
     yield takeLatest(UPLOAD_IMAGE_REQUEST,editProfileImage);
 }
 
+function unfollowAPI({userId,token}) {
+    return axios.delete(`user/follow/${userId}`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* unfollow(action) {
+
+    try {
+        const result = yield call(unfollowAPI, action.data);
+        yield put({
+            type: UNFOLLOW_USER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: UNFOLLOW_USER_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchUnfollow() {
+    yield takeLatest(UNFOLLOW_USER_REQUEST,unfollow);
+}
+
+function removeFollowerAPI({userId,token}) {
+    return axios.delete(`user/follower/${userId}`,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* removeFollower(action) {
+
+    try {
+        const result = yield call(removeFollowerAPI, action.data);
+        yield put({
+            type: REMOVE_FOLLOWER_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: REMOVE_FOLLOWER_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchRemovefollower() {
+    yield takeLatest(REMOVE_FOLLOWER_REQUEST,removeFollower);
+}
+
 export default function* userSaga() {
     yield all([
-        fork(watchEmailCheck),
-        fork(watchEmailCertificate),
+        //GET
+        fork(watchLoadMe),
+        fork(watchLoadUser),
+        fork(watchLoadfollowing),
+        fork(watchLoadfollower),
         fork(watchResendEmail),
+
+        //POST
+        fork(watchEmailCheck),
         fork(watchNameCheck),
+        fork(watchEmailCertificate),
+        fork(watchSignUp),
         fork(watchLogin),
         fork(watchEmailLogin),
-        fork(watchSignUp),
-        fork(watchLoadUser),
-        fork(watchLoadMe),
         fork(watchFollow),
-        fork(watchUnfollow),
-        fork(watchLoadfollower),
-        fork(watchLoadfollowing),
-        fork(watchRemovefollower),
+
+        //PUT
         fork(watchEditProfile),
         fork(watchEditProfileImage),
+
+        //DELETE
+        fork(watchUnfollow),
+        fork(watchRemovefollower),
     ]);
 }

@@ -28,7 +28,9 @@ const Login = () => {
         if(forgotPassword) {
             dispatch({
                 type: EMAIL_LOG_IN_REQUEST,
-                data: email
+                data: {
+                    address: email
+                }
             });
         } else {
             dispatch({
