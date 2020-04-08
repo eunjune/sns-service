@@ -88,29 +88,20 @@ public class UserService {
         return null;
     }
 
-    // TODO
     @Transactional(readOnly = true)
     public List<User> getFollowings(Long userId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
-
-        List<User> followings = new ArrayList<>(userRepository.findFollowingsById(userId).getFollowings());
-
-        /*long start = pageable.getOffset() * pageable.getPageSize();
-        long end = start + pageable.getPageSize();
-        followings.subList(start,end);*/
-
-        return null;
+        List<User> followings = userRepository.findFollowingsById(userId, pageable);
+        return followings.size() == 1 && followings.get(0) == null ? new ArrayList<>() : followings;
     }
 
-    // TODO
     @Transactional(readOnly = true)
     public List<User> getFollowers(Long userId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
 
-        // TODO: 쿼리로 처리하는 방법?
+        List<User> followers = userRepository.findFollowersById(userId, pageable);
 
-        List<User> followers = new ArrayList<>(userRepository.findFollowersById(userId).getFollowers());
-        return null;
+        return followers.size() == 1 && followers.get(0) == null ? new ArrayList<>() : followers;
     }
 
     @Transactional
@@ -154,21 +145,8 @@ public class UserService {
                     user.afterLoginSuccess();
                     return user;
 
-        }).orElseThrow(() -> new NotFoundException("이메일이 존재하지 않습니다"));
+        }).orElseThrow(() -> new NotFoundException(User.class, "이메일이 존재하지 않습니다"));
     }
-
-    @Transactional
-    public User login(Email email) {
-        checkNotNull(email, "email must be provided.");
-
-        return getUser(email)
-                .map(user -> {
-                    user.afterLoginSuccess();
-                    return user;
-
-                }).orElseThrow(() -> new NotFoundException("이메일이 존재하지 않습니다"));
-    }
-
 
     @Transactional
     public User certificateEmail(String token, String email) {
@@ -243,7 +221,6 @@ public class UserService {
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, id));
     }
-
     @Transactional
     public Long removeFollowing(Long meId, Long userId) {
         checkNotNull(meId, "meId must be provided.");
@@ -273,6 +250,7 @@ public class UserService {
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, userId));
     }
+
 
     // S3에 이미지 업로드
     /*private String uploadProfileImage(AttachedFile profileFile) {

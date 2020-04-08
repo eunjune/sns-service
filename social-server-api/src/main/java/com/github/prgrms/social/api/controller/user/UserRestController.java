@@ -106,7 +106,7 @@ public class UserRestController {
 
     // TODO: 팔로우, 게시글 데이터 확인
     @GetMapping(path = "user/{id}")
-    @ApiOperation(value = "다른 사람 정보")
+    @ApiOperation(value = "다른 사람 정보 (API 토큰 필요없음)")
     public ApiResult<UserResponse> findUser(
             @ApiParam(value = "유저 PK", example = "1", required = true, type = "integer") @PathVariable("id") User user
     ) {
@@ -209,7 +209,7 @@ public class UserRestController {
     }
 
     @PostMapping("check-email-token")
-    @ApiOperation(value = "회원가입 이메일 인증")
+    @ApiOperation(value = "회원가입 이메일 인증  (API 토큰 필요없음)")
     public ApiResult<MeResponse> checkEmailToken(
             @RequestBody EmailAuthenticationRequest emailAuthenticationRequest
     ) {
@@ -254,7 +254,6 @@ public class UserRestController {
         return OK(dtoUtils.convertMeResponse(userService.updateProfileImage(authentication.id.getValue(), file, request.getServletContext().getRealPath("/"))));
 
     }
-
     @DeleteMapping(path = "user/follow/{userId}")
     @ApiOperation(value = "언팔로우")
     public ApiResult<Long> unfollow(
@@ -272,6 +271,7 @@ public class UserRestController {
     ) {
         return OK(userService.removeFollower(authentication.id.getValue(), userId));
     }
+
 
     // Subscribe 요청 처리.(카프카에게 Subscribe 정보 전송 후 응답 처리)
     @PostMapping(path = "subscribe")

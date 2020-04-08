@@ -42,8 +42,6 @@ import {
     EDIT_POST_FAILURE
 } from '../reducers/post';
 import axios from 'axios';
-import { UNFOLLOW_me_SUCCESS } from '../reducers/user';
-
 
 function loadMainPostsAPI(lastId=0) {
 

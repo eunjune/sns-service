@@ -140,7 +140,7 @@ const reducer = (state = initialState, action) => {
 
             case LOAD_FOLLOWING_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
+                // alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -151,14 +151,14 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_FOLLOWER_SUCCESS: {
-                draft.followers = draft.followers.concat(action.data)
+                draft.followers = draft.followers.concat(action.data);
                 draft.hasMoreFollower = action.data.length === 3;
                 break;
             }
 
             case LOAD_FOLLOWER_FAILURE: {
-                console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
+                console.error(action.errofr);
+                // alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -373,7 +373,11 @@ const reducer = (state = initialState, action) => {
             }
 
             case UNFOLLOW_USER_SUCCESS: {
-                draft.me.followings = draft.me.followings.filter(v=>v !== action.data);
+                if(draft.followings.length > 0) {
+                    draft.followings = draft.followings.filter(v=>v.id !== action.data);
+                }
+
+                draft.me.followings = draft.me.followings.filter(v => v !== action.data);
                 break;
             }
 
@@ -389,8 +393,8 @@ const reducer = (state = initialState, action) => {
             }
 
             case REMOVE_FOLLOWER_SUCCESS: {
-                draft.me.followers = draft.me.followers.filter(v=>v.id !== action.data);
                 draft.followers = draft.followers.filter(v => v.id !== action.data);
+                draft.me.followers = draft.me.followers.filter(v => v !== action.data);
                 break;
             }
 
@@ -404,6 +408,8 @@ const reducer = (state = initialState, action) => {
             case LOG_OUT: {
                 cookie.remove('token', { path: '/' });
                 draft.me = null;
+                draft.followings = [];
+                draft.followers = [];
                 break;
             }
 

@@ -305,8 +305,8 @@ class UserRestControllerTest {
                         .andExpect(status().isOk())
                         .andDo(print());
 
-        User resultUser1 = userService.getUserWithConnectedUserAndPost(user.getId()).orElse(null);
-        User resultUser2 = userService.getUserWithConnectedUserAndPost(user2.getId()).orElse(null);
+        User resultUser1 = userRepository.findWithUserAllById(user.getId()).orElse(null);
+        User resultUser2 = userRepository.findWithUserAllById(user2.getId()).orElse(null);
 
         assertNotNull(resultUser1);
         assertNotNull(resultUser2);
@@ -322,16 +322,16 @@ class UserRestControllerTest {
 
         userService.addFollowing(user.getId(), user2.getId());
 
-        User beforeUser1 = userService.getUserWithConnectedUserAndPost(user.getId()).orElse(null);
-        User beforeUser2 = userService.getUserWithConnectedUserAndPost(user2.getId()).orElse(null);
+        User beforeUser1 = userRepository.findWithUserAllById(user.getId()).orElse(null);
+        User beforeUser2 = userRepository.findWithUserAllById(user2.getId()).orElse(null);
 
         mockMvc.perform(delete("/api/user/follow/" + user2.getId())
                 .header(tokenHeader, apiToken))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        User afterUser1 = userService.getUserWithConnectedUserAndPost(user.getId()).orElse(null);
-        User afterUser2 = userService.getUserWithConnectedUserAndPost(user2.getId()).orElse(null);
+        User afterUser1 = userRepository.findWithUserAllById(user.getId()).orElse(null);
+        User afterUser2 = userRepository.findWithUserAllById(user2.getId()).orElse(null);
 
         assertNotNull(beforeUser1);
         assertNotNull(beforeUser2);
@@ -388,7 +388,31 @@ class UserRestControllerTest {
         userService.addFollowing(user.getId(), user6.getId());
         userService.addFollowing(user.getId(), user7.getId());
 
-        mockMvc.perform(get("/api/user/followings?page=0&size=3")
+        mockMvc.perform(get("/api/user/followings?page=1&size=3")
+                .header(tokenHeader, apiToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.response.size()").value("3"))
+                .andDo(print());
+    }
+
+    @DisplayName("팔로워 목록")
+    @Test
+    public void followers() throws Exception {
+        User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
+        User user3 = userService.join("test3", new Email("test3@gmail.com"), "12345678");
+        User user4 = userService.join("test4", new Email("test4@gmail.com"), "12345678");
+        User user5 = userService.join("test5", new Email("test5@gmail.com"), "12345678");
+        User user6 = userService.join("test6", new Email("test6@gmail.com"), "12345678");
+        User user7 = userService.join("test7", new Email("test7@gmail.com"), "12345678");
+
+        userService.addFollowing(user2.getId(), user.getId());
+        userService.addFollowing(user3.getId(), user.getId());
+        userService.addFollowing(user4.getId(), user.getId());
+        userService.addFollowing(user5.getId(), user.getId());
+        userService.addFollowing(user6.getId(), user.getId());
+        userService.addFollowing(user7.getId(), user.getId());
+
+        mockMvc.perform(get("/api/user/followers?page=0&size=3")
                 .header(tokenHeader, apiToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.size()").value("3"))

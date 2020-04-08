@@ -1,6 +1,8 @@
 import {Button, Card, Icon, List} from "antd";
 import React, {memo} from "react";
 import PropTypes from 'prop-types';
+import Link from "next/link";
+import AvartarCustom from "./AvartarCustom";
 
 const FollowList = memo(({header, hasMore, onClickMore, data, onClickStop}) => {
 
@@ -16,7 +18,12 @@ const FollowList = memo(({header, hasMore, onClickMore, data, onClickStop}) => {
             renderItem={item => (
                 <List.Item style={{marginTop: '20px'}}>
                     <Card actions={[<Icon key="stop" type="stop" onClick={onClickStop(item.id)} />]}>
-                        <Card.Meta description={item.name}/>
+                        <Card.Meta description={
+                            <Link href={{pathname: '/user', query: {id: item.id}}} as={`/user/${item.id}`}>
+                                <a>{item.name}</a>
+                            </Link>
+                        }
+                        />
                     </Card>
                 </List.Item>
             )}

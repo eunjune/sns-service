@@ -5,8 +5,6 @@ import React from "react";
 
 const AvartarCustom = ({shape,size, profileImageUrl, name}) => {
 
-    console.log('avartar');
-    console.log(name);
     return (
         <Avatar shape={shape} size={size} icon={profileImageUrl ?
             <img src={`http://localhost:8080/image/profile/${profileImageUrl}`} alt=""/> :

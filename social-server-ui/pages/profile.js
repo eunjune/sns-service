@@ -178,16 +178,16 @@ const Profile = () => {
                     <Card
                         actions={[
                             <div onClick={clickPost}>게시글<br/>{me && me.postCount}</div>,
-                            <div onClick={clickFollow}>팔로윙<br/>{me && me.followingCount}</div>,
-                            <div onClick={clickFollow}>팔로워<br/>{me && me.followerCount}</div>
+                            <div onClick={clickFollow}>팔로윙<br/>{me && me.followings.length}</div>,
+                            <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
                         ]}
                         cover={<img ref={updateProfileImage} src={me && me.profileImageUrl ? `http://localhost:8080/image/profile/${me.profileImageUrl}` :
                                             'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
                     >
                         {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
                         {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>프로필 이미지 변경</Button>}
-                        <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={me.profileImageUrl} name={me.name} />}
-                                   title={me.name}/>
+                        <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={me && me.profileImageUrl} name={me && me.name} />}
+                                   title={me && me.name}/>
 
                     </Card>
                     {profileOn && uploadImageReady && <Button type="primary" style={{width: '100%'}} onClick={onClickUploadImage}>프로필 이미지 변경</Button>}
@@ -238,18 +238,16 @@ Profile.getInitialProps = async(context) => {
     const token = cookie.load('token') || (context.isServer && context.req.headers.cookie.includes('token')
         ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
 
-    console.log('profile');
-    console.log(token);
     if(token.length > 0) {
-        /*context.store.dispatch({
+        context.store.dispatch({
             type: LOAD_FOLLOWER_REQUEST,
-            data: token
+            data: {token}
         });
 
         context.store.dispatch({
             type: LOAD_FOLLOWING_REQUEST,
-            data: token
-        });*/
+            data: {token}
+        });
 
         console.log(token);
         context.store.dispatch({

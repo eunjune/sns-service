@@ -14,7 +14,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -71,7 +71,7 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
         }
 
         // 비공개 계정인 경우 팔로워만 승인
-        Set<User> followers = userRepository.findFollowersById(uriId.getValue()).getFollowers();
+        List<User> followers = userRepository.findFollowersAllById(uriId.getValue()).getFollowers();
         for(User follower : followers) {
             if(follower.getId().equals(jwtAuthentication.id.getValue())) {
                 return ACCESS_GRANTED;

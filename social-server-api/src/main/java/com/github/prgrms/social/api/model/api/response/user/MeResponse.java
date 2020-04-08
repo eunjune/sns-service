@@ -3,6 +3,7 @@ package com.github.prgrms.social.api.model.api.response.user;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 public class MeResponse {
@@ -25,9 +26,9 @@ public class MeResponse {
 
     private LocalDateTime lastLoginAt;
 
-    private Integer followingCount;
+    private Set<Long> followings;
 
-    private Integer followerCount;
+    private Set<Long> followers;
 
     private Integer postCount;
 }

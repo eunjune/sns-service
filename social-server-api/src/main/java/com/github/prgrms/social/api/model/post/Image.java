@@ -2,6 +2,7 @@ package com.github.prgrms.social.api.model.post;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

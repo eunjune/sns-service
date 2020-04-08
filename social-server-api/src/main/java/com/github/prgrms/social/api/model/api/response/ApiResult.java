@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
+import springfox.documentation.annotations.ApiIgnore;
 
 // 응답 VO
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

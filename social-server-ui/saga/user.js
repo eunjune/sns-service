@@ -147,6 +147,8 @@ function* watchLoadfollowing() {
 }
 
 function loadFollowerAPI({token, offset=0}) {
+    console.log('followers');
+    console.log(token);
     return axios.get(`user/followers?page=${offset}&size=3`,{
         headers: {
             'api_key': 'Bearer ' + token,

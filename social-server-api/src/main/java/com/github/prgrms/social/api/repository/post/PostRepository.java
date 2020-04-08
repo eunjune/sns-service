@@ -1,7 +1,6 @@
 package com.github.prgrms.social.api.repository.post;
 
 import com.github.prgrms.social.api.model.post.Post;
-import com.github.prgrms.social.api.repository.post.extension.PostRepositoryExtension;
 import com.github.prgrms.social.api.repository.projection.PostProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -11,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-public interface PostRepository extends JpaRepository<Post,Long>, PostRepositoryExtension {
+public interface PostRepository extends JpaRepository<Post,Long> {
 
     Post save(Post post);
 

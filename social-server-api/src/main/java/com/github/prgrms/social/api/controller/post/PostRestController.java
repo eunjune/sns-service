@@ -77,13 +77,12 @@ public class PostRestController {
 
 
     @GetMapping(path = "user/post/list")
-    @ApiOperation(value = "전체 포스트 목록 조회")
+    @ApiOperation(value = "전체 포스트 목록 조회  (API 토큰 필요없음)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "lastId", dataType = "integer", paramType = "query", defaultValue = "0", value = "마지막 포스트 PK(0이면 처음조회)"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "4", value = "최대 조회 갯수")
     })
     public ApiResult<List<PostResponse>> postAll(
-            @AuthenticationPrincipal JwtAuthentication authentication,
             @ApiIgnore Pageable pageable,
             @RequestParam Long lastId
     ) {
@@ -99,7 +98,7 @@ public class PostRestController {
 
 
     @GetMapping(path = "/post/{tag}/list")
-    @ApiOperation(value = "특정 해시태그의 포스트 목록 조회")
+    @ApiOperation(value = "특정 해시태그의 포스트 목록 조회  (API 토큰 필요없음)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "lastId", dataType = "integer", paramType = "query", defaultValue = "0", value = "마지막 포스트 PK(0이면 처음조회)"),
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "4", value = "최대 조회 갯수")

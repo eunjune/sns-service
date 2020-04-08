@@ -15,8 +15,6 @@ const User = ({ id }) => {
     const { posts, hasMorePost,loadUserPostError } = useSelector((state) => state.post);
     const { user } = useSelector((state) => state.user);
 
-    const [profileFollowOn,setProfileFollowOn] = useState(false);
-    const [profilePostOn,setProfilePostOn] = useState(true);
 
     const {followers, followings, hasMoreFollower, hasMoreFollowing} = useSelector(state => state.user);
     const token = cookie.load('token');
@@ -48,57 +46,22 @@ const User = ({ id }) => {
 
     }, [posts.length, hasMorePost]);
 
-    const clickPost = useCallback(() => {
-        setProfilePostOn(true);
-        setProfileFollowOn(false);
-    },[]);
 
-    const clickFollow = useCallback(() => {
-        setProfilePostOn(false);
-        setProfileFollowOn(true);
-    },[]);
-
-    const loadMoreFollowings = useCallback(() => {
-        if(followings) {
-            dispatch({
-                type: LOAD_FOLLOWING_REQUEST,
-                data: {
-                    token,
-                    offset: followings.length/3
-
-                }
-            });
-        }
-
-    },[followings]);
-
-    const loadMoreFollowers = useCallback(() => {
-        if(followers) {
-            dispatch({
-                type: LOAD_FOLLOWER_REQUEST,
-                data: {
-                    token,
-                    offset: followers.length/3
-                }
-            });
-        }
-
-    },[followers]);
     return (
       <Row gutter={8}>
           <Col xs={24} md={8}>
               <div style={{padding: 50}}>
                   <Card
                       actions={[
-                          <div onClick={clickPost}>게시글<br/>{user && user.postCount}</div>,
-                          <div onClick={clickFollow}>팔로윙<br/>{user && user.followingCount}</div>,
-                          <div onClick={clickFollow}>팔로워<br/>{user && user.followerCount}</div>
+                          <div>게시글<br/>{user && user.postCount}</div>,
+                          <div>팔로윙<br/>{user && user.followingCount}</div>,
+                          <div>팔로워<br/>{user && user.followerCount}</div>
                       ]}
                       cover={<img src={user && user.profileImageUrl ? `http://localhost:8080/image/profile/${user.profileImageUrl}` :
                           'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
                   >
-                      <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={user.profileImageUrl} name={user.name} />}
-                                 title={user.name}/>
+                      <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={user && user.profileImageUrl} name={user && user.name} />}
+                                 title={user && user.name}/>
                   </Card>
               </div>
           </Col>
@@ -108,34 +71,11 @@ const User = ({ id }) => {
 
               <>
               <Col xs={24} md={8}>
-
-                  {profilePostOn &&
                   <div style={{paddingTop: 50}}>
                       {posts.map((p) => (
                           <PostCards key={+p.id} post={p} />
                       ))}
                   </div>
-                  }
-                  {profileFollowOn &&
-                  <div style={{paddingTop: 50}}>
-                      <FollowList
-                          header="팔로잉 목록"
-                          hasMore={hasMoreFollowing}
-                          onClickMore={loadMoreFollowings}
-                          onClickStop={null}
-                          data={followings}
-                      />
-
-                      <FollowList
-                          header="팔로워 목록"
-                          hasMore={hasMoreFollower}
-                          onClickMore={loadMoreFollowers}
-                          onClickStop={null}
-                          data={followers}
-                      />
-
-                  </div>
-                  }
               </Col>
               <Col xs={24} md={8}></Col>
               </>
