@@ -13,7 +13,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [forgotPassword, setForgotPassword] = useState(false);
-    const {isLoggingIn, loginErrorReason,isEmailLogInWaiting} = useSelector(state => state.user);
+    const {isLoggingIn, loginError,isEmailLogInWaiting} = useSelector(state => state.user);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -99,7 +99,7 @@ const Login = () => {
                                 Forgot password
                             </a>
                         }
-                        {loginErrorReason.length > 0 ? <div style={{color: 'red'}}>{loginErrorReason}</div> : null}
+                        {loginError && <div style={{color: 'red'}}>{loginError.message}</div>}
                     </Form.Item>
                 </Form>
 

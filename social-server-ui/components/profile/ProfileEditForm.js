@@ -12,7 +12,7 @@ const ProfileEditForm = ({me}) => {
     const [editPrivate, setEditPrivate] = useState(me && me.isPrivate);
 
     const dispatch = useDispatch();
-    const {isEditing, editErrorReason} = useSelector(state => state.user);
+    const {isEditing, editError} = useSelector(state => state.user);
     const token = cookie.load('token');
 
     const onSubmit = useCallback((e) => {
@@ -71,7 +71,7 @@ const ProfileEditForm = ({me}) => {
                     }
                 ]}>
                 <Input name="user-name" value={editName} required onChange={onChangeName} />
-                {editErrorReason.length > 0 ? <div style={{color: 'red'}}>{editErrorReason}</div> : null}
+                {editError && <div style={{color: 'red'}}>{editError.message}</div>}
             </Form.Item>
 
             <Form.Item
@@ -103,7 +103,7 @@ const ProfileEditForm = ({me}) => {
 
             <Form.Item>
                 <Button type="primary" htmlType="submit" loading={isEditing} style={{width: '100%'}}>수정</Button>
-                {editErrorReason.length > 0 ? <div style={{color: 'red'}}>{editErrorReason}</div> : null}
+                {editError && <div style={{color: 'red'}}>{editErrorReason}</div>}
             </Form.Item>
         </Form>
 

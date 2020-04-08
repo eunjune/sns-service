@@ -23,13 +23,8 @@ public class NotFoundException extends ServiceRuntimeException {
 
     @Override
     public String getMessage() {
-        return super.getMessage();
-    }
-
-    /*@Override
-    public String getMessage() {
         return MessageUtils.getInstance().getMessage(getDetailKey(), getParams());
-    }*/
+    }
 
     @Override
     public String toString() {

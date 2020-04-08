@@ -14,11 +14,9 @@ export const initialState = {
     isEditingPost: false,
     isEditPost: false,
 
-    addCommentError: false,
-    addCommentErrorReason: '',
-    loadUserError: null,
-    addPostError: false,
-    addPostErrorReason: '',
+    addCommentError: null,
+    loadUserPostError: null,
+    addPostError: null,
 };
 
 
@@ -100,6 +98,9 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_MAIN_POSTS_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 
@@ -117,6 +118,9 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_MY_POSTS_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
     
@@ -133,6 +137,9 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_HASHTAG_POSTS_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 
@@ -149,7 +156,9 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_USER_POSTS_FAILURE: {
-                draft.loadUserError = action.error;
+                console.error(action.error);
+
+                draft.loadUserPostError = action.error;
                 break;
             }
 
@@ -164,13 +173,16 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_COMMENTS_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 
             case ADD_POST_REQUEST: {
                 draft.isAddingPost =  true;
                 draft.addedPost = false;
-                draft.addPostErrorReason = '';
+                draft.addPostError = null;
                 break;
             }
 
@@ -184,9 +196,11 @@ const reducer = (state = initialState, action) => {
             }
 
             case ADD_POST_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 draft.isAddingPost = false;
-                draft.addPostError = true;
-                draft.addPostErrorReason = action.error;
+                draft.addPostError = action.error;
                 break;
             }
 
@@ -208,12 +222,15 @@ const reducer = (state = initialState, action) => {
             }
 
             case UPLOAD_IMAGES_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 
             case ADD_COMMENT_REQUEST: {
                 draft.isAddingComment = true;
-                draft.addCommentErrorReason = '';
+                draft.addCommentError = null;
                 draft.addedComment = false;
                 break;
             }
@@ -228,8 +245,11 @@ const reducer = (state = initialState, action) => {
             }
 
             case ADD_COMMENT_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 draft.isAddingComment = false;
-                draft.addCommentErrorReason = action.error;
+                draft.addCommentError = action.error;
                 break;
             }
 
@@ -245,7 +265,9 @@ const reducer = (state = initialState, action) => {
                 break;
             }
             case RETWEET_FAILURE: {
-                alert(action.error.message);
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 
@@ -269,6 +291,9 @@ const reducer = (state = initialState, action) => {
             }
 
             case EDIT_POST_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 draft.isEditingPost = false;
 
                 break;
@@ -286,6 +311,9 @@ const reducer = (state = initialState, action) => {
             }
 
             case LIKE_POST_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
     
@@ -299,6 +327,9 @@ const reducer = (state = initialState, action) => {
             }
 
             case REMOVE_POST_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 
@@ -314,6 +345,9 @@ const reducer = (state = initialState, action) => {
             }
 
             case UNLIKE_POST_FAILURE: {
+                console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 

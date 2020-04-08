@@ -12,7 +12,7 @@ import PrivateUserAccess from "../components/error/PrivateUserAccess";
 
 const User = ({ id }) => {
     const dispatch = useDispatch();
-    const { posts, hasMorePost,loadUserError } = useSelector((state) => state.post);
+    const { posts, hasMorePost,loadUserPostError } = useSelector((state) => state.post);
     const { user } = useSelector((state) => state.user);
 
     const [profileFollowOn,setProfileFollowOn] = useState(false);
@@ -21,10 +21,6 @@ const User = ({ id }) => {
     const {followers, followings, hasMoreFollower, hasMoreFollowing} = useSelector(state => state.user);
     const token = cookie.load('token');
     const usedLastIds = useRef([]);
-
-    console.log('user');
-    console.log(user);
-    console.log(posts);
 
     useEffect(() => {
 
@@ -107,7 +103,7 @@ const User = ({ id }) => {
               </div>
           </Col>
           {
-              loadUserError && loadUserError.status === 403 ?
+              loadUserPostError && loadUserPostError.status === 403 ?
               <PrivateUserAccess /> :
 
               <>

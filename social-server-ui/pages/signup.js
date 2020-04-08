@@ -21,9 +21,9 @@ const Signup = () => {
     const [termError, setTermError] = useState(false);
 
     const dispatch = useDispatch();
-    const { isEmailOk, isEmailChecking, emailCheckingErrorReason } = useSelector((state) => state.user);
-    const { isNameOk, isNameChecking, nameCheckingErrorReason } = useSelector((state) => state.user);
-    const { isSigningUp, signUpErrorReason } = useSelector((state) => state.user);
+    const { isEmailOk, emailCheckingError } = useSelector((state) => state.user);
+    const { isNameOk,  nameCheckingError } = useSelector((state) => state.user);
+    const { isSigningUp} = useSelector((state) => state.user);
     const { me } = useSelector((state) => state.user);
 
     useEffect(() => {
@@ -32,11 +32,7 @@ const Signup = () => {
             Router.push('/');
         }
 
-        if(signUpErrorReason && signUpErrorReason.length() > 0) {
-            alert(signUpErrorReason);
-        }
-
-    }, [me && me.id, signUpErrorReason]);
+    }, [me && me.id]);
 
     const onSubmit = useCallback((e) => {
         e.preventDefault();
@@ -125,7 +121,7 @@ const Signup = () => {
                         ]}>
                         <Input name="user-email" value={email} required onChange={onChangeEmail} onBlur={onBlurEmail}/>
                         {isEmailOk === true ? <div style={{color: 'green'}}>사용 가능한 이메일입니다.</div> :
-                            (isEmailOk === false ? <div style={{color: 'red'}}>{emailCheckingErrorReason}</div> : null)}
+                            (isEmailOk === false && emailCheckingError ? <div style={{color: 'red'}}>{emailCheckingError.message}</div> : null)}
                     </Form.Item>
 
                     <Form.Item
@@ -138,7 +134,7 @@ const Signup = () => {
                         ]}>
                         <Input name="user-name" value={name} required onChange={onChangeName} onBlur={onBlurName}/>
                         {isNameOk === true ? <div style={{color: 'green'}}>사용 가능한 이름입니다.</div> :
-                            (isNameOk === false ? <div style={{color: 'red'}}>{nameCheckingErrorReason}</div> : null)}
+                            (isNameOk === false && nameCheckingError ? <div style={{color: 'red'}}>{nameCheckingError.message}</div> : null)}
                     </Form.Item>
 
                     <Form.Item

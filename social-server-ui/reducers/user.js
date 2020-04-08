@@ -10,24 +10,20 @@ export const initialState = {
     followers: [],
 
     isEmailOk: false,
-    isEmailChecking: false,
     isCertificated: false,
     isNameOk: false,
-    isNameChecking: false,
     isLoggingIn: false,
     isEmailLogInWaiting: false,
-    isSignedUp: false,
     isSigningUp: false,
     isEditing: false,
     hasMoreFollower: false,
     hasMoreFollowing: false,
 
-    signUpErrorReason: '',
-    loginErrorReason: '',
-    editErrorReason: '',
-    nameCheckingErrorReason: null,
-    certificateErrorReason: '',
-    emailCheckingErrorReason: null,
+    signUpError: null,
+    loginError: null,
+    editError: null,
+    nameCheckingError: null,
+    emailCheckingError: null,
 };
 
 export const LOAD_ME_REQUEST = 'LOAD_ME_REQUEST';
@@ -105,14 +101,13 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_ME_SUCCESS: {
-                console.log('me success');
-                console.log(action.data);
                 draft.me = action.data;
                 break;
             }
 
             case LOAD_ME_FAILURE: {
                 console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -127,13 +122,14 @@ const reducer = (state = initialState, action) => {
 
             case LOAD_USER_FAILURE: {
                 console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
             case LOAD_FOLLOWING_REQUEST: {
                 draft.followings = !action.data.offset ? [] : draft.followings;
                 draft.hasMoreFollowing = action.data.offset ? draft.hasMoreFollowing : true;
-                break;1
+                break;
             }
 
             case LOAD_FOLLOWING_SUCCESS: {
@@ -144,6 +140,7 @@ const reducer = (state = initialState, action) => {
 
             case LOAD_FOLLOWING_FAILURE: {
                 console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -161,6 +158,7 @@ const reducer = (state = initialState, action) => {
 
             case LOAD_FOLLOWER_FAILURE: {
                 console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -175,48 +173,44 @@ const reducer = (state = initialState, action) => {
 
             case EMAIL_RESEND_FAILURE: {
                 console.error(action.error);
-                alert(action.error);
+                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
             case EMAIL_CHECK_REQUEST: {
                 draft.isEmailOk = false;
-                draft.isEmailChecking = true;
-                draft.emailCheckingErrorReason = null;
+                draft.emailCheckingError = null;
                 break;
             }
 
             case EMAIL_CHECK_SUCCESS: {
                 draft.isEmailOk = true;
-                draft.isEmailChecking = false;
                 break;
             }
 
             case EMAIL_CHECK_FAILURE: {
                 console.error(action.error);
-                draft.emailCheckingErrorReason = action.error;
-                draft.isEmailChecking = false;
+
+                draft.emailCheckingError = action.error;
                 break;
             }
 
 
             case NAME_CHECK_REQUEST: {
                 draft.isNameOk = false;
-                draft.isNameChecking = true;
-                draft.nameCheckingErrorReason = null;
+                draft.nameCheckingError = null;
                 break;
             }
 
             case NAME_CHECK_SUCCESS: {
                 draft.isNameOk = true;
-                draft.isNameChecking = false;
                 break;
             }
 
             case NAME_CHECK_FAILURE: {
                 console.error(action.error);
-                draft.nameCheckingErrorReason = action.error;
-                draft.isNameChecking = false;
+
+                draft.nameCheckingError = action.error;
                 break;
             }
 
@@ -232,15 +226,14 @@ const reducer = (state = initialState, action) => {
 
             case EMAIL_CERTIFICATION_FAILURE: {
                 console.error(action.error);
-                alert(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 
             case SIGN_UP_REQUEST: {
-                draft.isSignedUp = true;
-                draft.isSignedUp = false;
                 draft.isEmailOk = false;
-                draft.signUpErrorReason = null;
+                draft.signUpError = null;
                 break;
             }
 
@@ -251,22 +244,22 @@ const reducer = (state = initialState, action) => {
                 cookie.save('token',token, { path: '/' });
 
                 draft.isSigningUp = false;
-                draft.isSignedUp = true;
                 draft.me = me;
                 break;
             }
 
             case SIGN_UP_FAILURE: {
                 console.error(action.error);
-                draft.isSignedUp = false;
-                draft.signUpErrorReason = action.error;
+                alert(action.status + '\n' + action.error.message);
+
+                draft.isSigningUp = false;
                 break;
             }
 
             case LOG_IN_REQUEST: {
                 cookie.remove('token', { path: '/' });
                 draft.isLoggingIn = true;
-                draft.loginErrorReason = '';
+                draft.loginError = null;
                 break;
             }
 
@@ -284,8 +277,9 @@ const reducer = (state = initialState, action) => {
 
             case LOG_IN_FAILURE: {
                 console.error(action.error);
+
                 draft.isLoggingIn = false;
-                draft.loginErrorReason = action.error;
+                draft.loginError = action.error;
                 draft.me = null;
                 break;
             }
@@ -293,7 +287,7 @@ const reducer = (state = initialState, action) => {
             case EMAIL_LOG_IN_REQUEST: {
                 cookie.remove('token', { path: '/' });
                 draft.isLoggingIn = true;
-                draft.loginErrorReason = '';
+                draft.loginError = null;
                 break;
             }
 
@@ -304,13 +298,15 @@ const reducer = (state = initialState, action) => {
 
                 draft.isLoggingIn = false;
                 draft.isEmailLogInWaiting = true;
+                draft.loginError = null;
                 break;
             }
 
             case EMAIL_LOG_IN_FAILURE: {
                 console.error(action.error);
+
                 draft.isLoggingIn = false;
-                draft.loginErrorReason = action.error;
+                draft.loginError = action.error;
                 draft.me = null;
                 break;
             }
@@ -326,12 +322,13 @@ const reducer = (state = initialState, action) => {
 
             case FOLLOW_USER_FAILURE: {
                 console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
             case UPLOAD_IMAGE_REQUEST: {
                 draft.isEditing = true;
-                draft.editErrorReason = '';
+                draft.editError= null;
                 break;
             }
 
@@ -343,14 +340,15 @@ const reducer = (state = initialState, action) => {
 
             case UPLOAD_IMAGE_FAILURE: {
                 console.error(action.error);
+
                 draft.isEditing = false;
-                draft.editErrorReason = action.error;
+                draft.editError = action.error;
                 break;
             }
 
             case EDIT_PROFILE_REQUEST: {
                 draft.isEditing = true;
-                draft.editErrorReason = '';
+                draft.editError = null;
                 break;
             }
 
@@ -364,8 +362,9 @@ const reducer = (state = initialState, action) => {
 
             case EDIT_PROFILE_FAILURE: {
                 console.error(action.error);
+
                 draft.isEditing = false;
-                draft.editErrorReason = action.error;
+                draft.editError = action.error;
                 break;
             }
 
@@ -380,6 +379,8 @@ const reducer = (state = initialState, action) => {
 
             case UNFOLLOW_USER_FAILURE: {
                 console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 
@@ -395,6 +396,8 @@ const reducer = (state = initialState, action) => {
 
             case REMOVE_FOLLOWER_FAILURE: {
                 console.error(action.error);
+                alert(action.status + '\n' + action.error.message);
+
                 break;
             }
 

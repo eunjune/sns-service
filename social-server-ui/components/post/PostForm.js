@@ -27,11 +27,6 @@ const PostForm = () => {
       return;
     }
 
- /*   const formData = new FormData();
-    images.forEach((i) => {
-      formData.append('images',i);
-    });
-    formData.append('content',text);*/
     dispatch({
       type: ADD_POST_REQUEST,
       data: {
