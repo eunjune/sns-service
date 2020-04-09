@@ -60,4 +60,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Transactional(readOnly = true)
     UserProjection findPrivateById(Long id);
+
+    @Transactional(readOnly = true)
+    UserProjection findEmailCertificationByEmail(Email email);
 }

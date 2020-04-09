@@ -1,3 +1,4 @@
+/*
 package com.github.prgrms.social.api.configure;
 
 
@@ -108,3 +109,4 @@ public class KafkaConfigure {
 }
 
 
+*/

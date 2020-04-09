@@ -1,6 +1,7 @@
 package com.github.prgrms.social.api.security;
 
 import com.github.prgrms.social.api.model.user.Email;
+import com.github.prgrms.social.api.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

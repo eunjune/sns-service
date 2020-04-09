@@ -8,7 +8,6 @@ import com.github.prgrms.social.api.model.api.response.user.MeResponse;
 import com.github.prgrms.social.api.model.api.response.user.UserResponse;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.Role;
-import com.github.prgrms.social.api.model.user.Subscription;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.security.JwtAuthentication;
@@ -20,15 +19,8 @@ import com.github.prgrms.social.api.validator.CheckNameValidator;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.header.internals.RecordHeader;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
-import org.springframework.kafka.requestreply.RequestReplyFuture;
-import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
@@ -40,7 +32,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
@@ -60,17 +51,9 @@ public class UserRestController {
 
     private final EmailService emailService;
 
-    private final ReplyingKafkaTemplate<String, Subscription, Subscription> replyingKafkaTemplate;
-
     private final CheckEmailValidator checkEmailValidator;
 
     private final CheckNameValidator checkNameValidator;
-
-    @Value("${spring.kafka.topic.request}")
-    private String requestTopic;
-
-    @Value("${spring.kafka.topic.response}")
-    private String responseTopic;
 
     @InitBinder("checkEmailRequest")
     public void initEmailCheckBinder(WebDataBinder webDataBinder) {
@@ -274,7 +257,7 @@ public class UserRestController {
 
 
     // Subscribe 요청 처리.(카프카에게 Subscribe 정보 전송 후 응답 처리)
-    @PostMapping(path = "subscribe")
+   /* @PostMapping(path = "subscribe")
     public ApiResult<Subscription> subscribe(
             @RequestBody SubscribeRequest subscribeRequest,
             @AuthenticationPrincipal JwtAuthentication authentication
@@ -299,5 +282,5 @@ public class UserRestController {
         log.info("success to subscribe {}",consumerRecord.value());
 
         return OK(consumerRecord.value());
-    }
+    }*/
 }

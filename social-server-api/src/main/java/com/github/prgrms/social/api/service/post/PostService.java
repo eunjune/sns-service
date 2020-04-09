@@ -1,6 +1,7 @@
 package com.github.prgrms.social.api.service.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
+import com.github.prgrms.social.api.error.UnauthorizedException;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
 import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.post.HashTag;
@@ -134,6 +135,11 @@ public class PostService {
 
         return userRepository.findById(userId)
                 .map(user -> {
+
+                    if(!user.isEmailCertification()) {
+                        throw new UnauthorizedException("인증된 사용자만 사용할 수 있습니다.");
+                    }
+
                     user.addPost(post);
                     return postRepository.save(post);
                 })

@@ -1,18 +1,19 @@
 import React, { useEffect,useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { LOAD_HASHTAG_POSTS_REQUEST } from '../reducers/post';
+import {LOAD_HASHTAG_POSTS_REQUEST, SIZE} from '../reducers/post';
 import PostCards from '../components/post/PostCards';
+import CenterAlignment from "../components/CenterAlignment";
+import {Alert} from "antd";
+import PostForm from "../components/post/PostForm";
 
 const Hashtag = ({ tag }) => {
   const dispatch = useDispatch();
   const { posts, hasMorePost} = useSelector((state) => state.post);
 
   const onScroll = useCallback(() => {
-        
+        console.log(hasMorePost);
       if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 200 && hasMorePost) {
-          console.log('onScroll');
-          console.log(posts[posts.length-1].id);
 
           dispatch({
               type: LOAD_HASHTAG_POSTS_REQUEST,
@@ -33,11 +34,11 @@ const Hashtag = ({ tag }) => {
   }, [posts]);
 
   return (
-    <div>
-      {posts.map((p) => (
-        <PostCards key={+p.id} post={p} />
-      ))}
-    </div>
+    <CenterAlignment children={<div className='index' style={{padding: 50}}>
+        {posts.map((post) => {
+            return <PostCards key={+post.id} post={post}/>;
+        })}
+    </div>}/>
   );
 };
 

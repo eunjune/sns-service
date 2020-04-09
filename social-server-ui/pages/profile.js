@@ -18,6 +18,7 @@ import CenterAlignment from "../components/CenterAlignment";
 import Router from "next/router";
 import ProfileEditForm from "../components/profile/ProfileEditForm";
 import AvartarCustom from "../components/profile/AvartarCustom";
+import AuthenticationError from "../components/error/AuthenticationError";
 
 
 const Profile = () => {
@@ -172,38 +173,39 @@ const Profile = () => {
     },[uploadImageFile]);
 
     return (
-        <Row gutter={8}>
-            <Col xs={24} md={8}>
-                <div style={{padding: 50}}>
-                    <Card
-                        actions={[
-                            <div onClick={clickPost}>게시글<br/>{me && me.postCount}</div>,
-                            <div onClick={clickFollow}>팔로윙<br/>{me && me.followings.length}</div>,
-                            <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
-                        ]}
-                        cover={<img ref={updateProfileImage} src={me && me.profileImageUrl ? `http://localhost:8080/image/profile/${me.profileImageUrl}` :
-                                            'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
-                    >
-                        {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
-                        {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>프로필 이미지 변경</Button>}
-                        <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={me && me.profileImageUrl} name={me && me.name} />}
-                                   title={me && me.name}/>
 
-                    </Card>
-                    {profileOn && uploadImageReady && <Button type="primary" style={{width: '100%'}} onClick={onClickUploadImage}>프로필 이미지 변경</Button>}
-                </div>
-                {/**/}
-            </Col>
-            <Col xs={24} md={8}>
-                {profileOn && <ProfileEditForm me={me}/>}
-                {profilePostOn &&
+            <Row gutter={8}>
+                <Col xs={24} md={8}>
+                    <div style={{padding: 50}}>
+                        <Card
+                            actions={[
+                                <div onClick={clickPost}>게시글<br/>{me && me.postCount}</div>,
+                                <div onClick={clickFollow}>팔로윙<br/>{me && me.followings.length}</div>,
+                                <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
+                            ]}
+                            cover={<img ref={updateProfileImage} src={me && me.profileImageUrl ? `http://localhost:8080/image/profile/${me.profileImageUrl}` :
+                                'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
+                        >
+                            {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
+                            {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>프로필 이미지 변경</Button>}
+                            <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={me && me.profileImageUrl} name={me && me.name} />}
+                                       title={me && me.name}/>
+
+                        </Card>
+                        {profileOn && uploadImageReady && <Button type="primary" style={{width: '100%'}} onClick={onClickUploadImage}>프로필 이미지 변경</Button>}
+                    </div>
+                    {/**/}
+                </Col>
+                <Col xs={24} md={8}>
+                    {profileOn && <ProfileEditForm me={me}/>}
+                    {profilePostOn &&
                     <div style={{paddingTop: 50}}>
                         {posts.map((p) => (
                             <PostCards key={+p.id} post={p} />
                         ))}
                     </div>
-                }
-                {profileFollowOn &&
+                    }
+                    {profileFollowOn &&
                     <div style={{paddingTop: 50}}>
                         <FollowList
                             header="팔로잉 목록"
@@ -222,13 +224,11 @@ const Profile = () => {
                         />
 
                     </div>
-                }
-            </Col>
-            <Col xs={24} md={8}>
-            </Col>
-        </Row>
-
-
+                    }
+                </Col>
+                <Col xs={24} md={8}>
+                </Col>
+            </Row>
 
     );
 

@@ -9,4 +9,6 @@ public interface UserProjection {
     Boolean getIsPrivate();
 
     List<User> getFollowers();
+
+    Boolean isEmailCertification();
 }

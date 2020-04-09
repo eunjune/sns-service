@@ -5,6 +5,8 @@ import com.github.prgrms.social.api.repository.projection.PostProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -62,5 +64,14 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     PostProjection findUserById(Long id);
 
 
+    @Transactional(readOnly = true)
+    @Query(value = "SELECT p.*,r.target_post_id from hash_tag h " +
+            "LEFT OUTER JOIN post_hashtag ph ON h.id=ph.hashtag_id " +
+            "LEFT OUTER JOIN post p ON ph.post_id=p.id " +
+            "LEFT OUTER JOIN retweet r ON p.id=r.post_id " +
+            "WHERE h.name = :name AND p.id < :lastId ORDER BY p.id DESC" , nativeQuery = true)
+    List<Post> findWithHashtagByName(@Param("name") String name, @Param("lastId") Long lastId,  Pageable pageable);
 
+    @Transactional(readOnly = true)
+    PostProjection findFirstByOrderByIdDesc();
 }

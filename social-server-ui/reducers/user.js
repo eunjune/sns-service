@@ -107,7 +107,6 @@ const reducer = (state = initialState, action) => {
 
             case LOAD_ME_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -122,7 +121,6 @@ const reducer = (state = initialState, action) => {
 
             case LOAD_USER_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -140,7 +138,6 @@ const reducer = (state = initialState, action) => {
 
             case LOAD_FOLLOWING_FAILURE: {
                 console.error(action.error);
-                // alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -158,7 +155,6 @@ const reducer = (state = initialState, action) => {
 
             case LOAD_FOLLOWER_FAILURE: {
                 console.error(action.errofr);
-                // alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -173,7 +169,6 @@ const reducer = (state = initialState, action) => {
 
             case EMAIL_RESEND_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -226,7 +221,6 @@ const reducer = (state = initialState, action) => {
 
             case EMAIL_CERTIFICATION_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
 
                 break;
             }
@@ -250,7 +244,6 @@ const reducer = (state = initialState, action) => {
 
             case SIGN_UP_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
 
                 draft.isSigningUp = false;
                 break;
@@ -322,7 +315,6 @@ const reducer = (state = initialState, action) => {
 
             case FOLLOW_USER_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
                 break;
             }
 
@@ -383,7 +375,6 @@ const reducer = (state = initialState, action) => {
 
             case UNFOLLOW_USER_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
 
                 break;
             }
@@ -400,7 +391,6 @@ const reducer = (state = initialState, action) => {
 
             case REMOVE_FOLLOWER_FAILURE: {
                 console.error(action.error);
-                alert(action.status + '\n' + action.error.message);
 
                 break;
             }

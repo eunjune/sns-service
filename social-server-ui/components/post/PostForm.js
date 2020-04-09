@@ -11,7 +11,7 @@ import {
 const PostForm = () => {
   const [text, setText] = useState('');
   const dispatch = useDispatch();
-  const { imagePaths, isAddingPost, addedPost} = useSelector(state => state.post);
+  const { imagePaths, isAddingPost, addedPost,addPostError} = useSelector(state => state.post);
   const imageInput = useRef();
   const token = cookie.load('token');
 
@@ -21,6 +21,18 @@ const PostForm = () => {
 
   const onSubmitForm = useCallback((e) => {
     e.preventDefault();
+
+    /*console.log('submit');
+    console.log(me.isEmailCertification);
+    if(me && me.isEmailCertification === false) {
+      alert('이메일 인증 후에 이용할 수 있습니다.');
+      return;
+    }*/
+
+    if(addPostError && addPostError.status === 401) {
+      alert(addPostError.message);
+      return;
+    }
 
     if(!text || !text.trim()) {
       alert('게시글을 작성하세욧.');
@@ -37,7 +49,7 @@ const PostForm = () => {
         },
       }
     });
-  },[text, imagePaths]);
+  },[text, imagePaths,addPostError]);
 
   const onChangeText = useCallback((e) => {
     setText(e.target.value)

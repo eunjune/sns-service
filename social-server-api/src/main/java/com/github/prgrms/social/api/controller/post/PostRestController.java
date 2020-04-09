@@ -6,6 +6,7 @@ import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.post.HashTagService;
 import com.github.prgrms.social.api.service.post.PostService;
+import com.github.prgrms.social.api.service.user.UserService;
 import com.github.prgrms.social.api.util.DtoUtils;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,8 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 public class PostRestController {
 
     private final DtoUtils dtoUtils;
+
+    private final UserService userService;
 
     private final PostService postService;
 
@@ -132,6 +135,8 @@ public class PostRestController {
             @ApiParam(value = "대상 포스트 PK",example = "1",required = true) @PathVariable Long postId,
             @RequestBody PostingRequest request
     ) {
+
+
         return OK(dtoUtils.convertPostResponse(postService.updatePost(postId,request)));
     }
 
@@ -145,7 +150,6 @@ public class PostRestController {
             @RequestPart  MultipartFile[] images,
             @ApiIgnore MultipartHttpServletRequest request
     ) throws IOException {
-
 
         return OK(postService.uploadImage(images,request.getServletContext().getRealPath("/")));
     }

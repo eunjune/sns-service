@@ -25,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -94,6 +95,7 @@ class PostRestControllerTest {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
         user = userService.join("test", new Email("test@gmail.com"), "12345678");
         apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
+        userService.certificateEmail(user.getEmailCertificationToken(), user.getEmail().getAddress());
     }
 
     @AfterEach
@@ -348,10 +350,9 @@ class PostRestControllerTest {
         postService.write(post3,user.getId(),new HashSet<>());
         postService.write(post4,user.getId(),new HashSet<>());
 
-        mockMvc.perform(get("/api/post/hashtag/list?lastId=3&size=2"))
+        mockMvc.perform(get("/api/post/hashtag/list?lastId=0&size=2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.size()").value(2))
-                .andExpect(jsonPath("$.response.[0].id").value(2))
                 .andDo(print());
     }
 
@@ -418,6 +419,17 @@ class PostRestControllerTest {
         Post retweet = postService.retweet(savedPost.getId(), user.getId());
 
         mockMvc.perform(post("/api/retweet/post/" + retweet.getId())
+                .header(tokenHeader,apiToken))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    void uploadImage() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", (byte[]) null);
+
+        mockMvc.perform(multipart("/api/post/images")
+                .file(file)
                 .header(tokenHeader,apiToken))
                 .andExpect(status().isBadRequest())
                 .andDo(print());

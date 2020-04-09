@@ -9,6 +9,7 @@ import {
     UPLOAD_IMAGES_REQUEST
 } from "../../reducers/post";
 import {Button, Form, Input, Modal} from "antd";
+import Router from "next/router";
 
 const PostEditForm = ({post}) => {
     const [text, setText] = useState(post.content);
@@ -24,6 +25,8 @@ const PostEditForm = ({post}) => {
 
     const onSubmitForm = useCallback((e) => {
         e.preventDefault();
+
+
 
         if(!text || !text.trim()) {
             alert('게시글을 작성하세욧.');

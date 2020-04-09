@@ -156,7 +156,7 @@ function* loadHashtag(action) {
 
 
 function* watchLoadHashtagPosts() {
-    yield takeLatest(LOAD_HASHTAG_POSTS_REQUEST,loadHashtag);
+    yield throttle(1000,LOAD_HASHTAG_POSTS_REQUEST,loadHashtag);
 }
 
 function loadCommentsAPI({userId,postId,token}) {
