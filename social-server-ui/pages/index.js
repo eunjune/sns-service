@@ -1,4 +1,4 @@
-import React, {useEffect,useCallback,useRef} from 'react';
+import React, {useEffect, useCallback, useRef, useState} from 'react';
 import PostCards from "../components/post/PostCards";
 import PostForm from "../components/post/PostForm";
 import {useDispatch, useSelector} from "react-redux";
@@ -9,12 +9,13 @@ import {Alert} from "antd";
 import cookie from "react-cookies";
 import {EMAIL_RESEND_REQUEST} from "../reducers/user";
 
-const Home = ({isEmailLogin}) => {
+const Home = ({isEmailLogin,usedLastIds}) => {
     const {me,isEmailLogInWaiting} = useSelector(state => state.user);
     const {posts,hasMorePost} = useSelector(state => state.post);
     const dispatch = useDispatch();
-    const usedLastIds = useRef([]);
     const token = cookie.load('token');
+
+    console.log(isEmailLogin);
 
     useEffect(() => {
 
@@ -28,14 +29,14 @@ const Home = ({isEmailLogin}) => {
     const onScroll = useCallback(() => {
 
         if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 200 && hasMorePost) {
-
             const lastId = posts[posts.length-1].id;
-            if(!usedLastIds.current.includes(lastId)) {
+
+            if(!usedLastIds.includes(lastId)) {
                 dispatch({
                     type: LOAD_MAIN_POSTS_REQUEST,
                     lastId: lastId
                 });
-                usedLastIds.current.push(lastId);
+                usedLastIds.push(lastId);
             }
         }
 
@@ -85,7 +86,7 @@ Home.getInitialProps = async (context) => {
         lastId: 0
     });
 
-    return {isEmailLogin};
+    return {isEmailLogin,usedLastIds:[]};
 };
 
 export default Home;

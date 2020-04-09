@@ -16,7 +16,7 @@ const AppLayout = ({ children }) => {
     const { me } = useSelector((state) => state.user);
     const dispatch = useDispatch();
     const onSearch = (value) => {
-        Router.push({pathname: '/hashtag', query: {tag: value}}, `/hashtag/${value}`);
+        Router.push({pathname: '/search', query: {keyword: value}}, `/search/${value}`);
     };
 
     const onLogout = useCallback(() => {

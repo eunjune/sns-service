@@ -80,13 +80,10 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException(User.class, postWriterId));
 
         if(lastId == 0L) {
-            return postRepository.findWithLikeAndImageWithCommentByUser_IdOrderByIdDesc(postWriterId, pageable)
-                    .stream()
-                    .peek(post -> post.setLikesOfMe(userId))
-                    .collect(Collectors.toList());
+            lastId = postRepository.findFirstByOrderByIdDesc().getId() + 1L;
         }
 
-        return postRepository.findWithLikeAndImageWithCommentByUser_IdAndIdLessThanOrderByIdDesc(postWriterId, lastId, pageable)
+        return postRepository.findWithLikeAndImageWithCommentByUser_IdAndIdLessThan(postWriterId, lastId, pageable)
                 .stream()
                 .peek(post -> post.setLikesOfMe(userId))
                 .collect(Collectors.toList());
@@ -97,35 +94,10 @@ public class PostService {
         checkNotNull(lastId, "lastId must be provided.");
 
         if(lastId == 0L) {
-            return postRepository.findWithLikeAndImageWithCommentByUser_IsPrivateFalseOrderByIdDesc(pageable);
+            lastId = postRepository.findFirstByOrderByIdDesc().getId() + 1L;
         }
 
-        return postRepository.findWithLikeAndImageWithCommentByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(lastId, pageable);
-    }
-
-    // !follwings && isPrivate
-    @Transactional(readOnly = true)
-    public List<Post> getPostsWithImageAndLikeWithComment(Long userId, Long lastId, Pageable pageable) {
-        checkNotNull(userId, "userId must be provided.");
-        checkNotNull(lastId, "lastId must be provided.");
-
-        /*if(lastId == 0L) {
-
-        }
-
-
-        return userRepository.findById(userId)
-                .map(user -> {
-                    List<Post> list = lastId == 0L ? postRepository.findAllByOrderByIdDesc(pageable) :
-                            postRepository.findAllByIdLessThanOrderByIdDesc(lastId, pageable);
-                    return list.stream()
-                            .filter(post -> user.getFollowings().contains(post.getUser()) || !post.getUser().isPrivate())
-                            .collect(Collectors.toList());
-
-                })
-                .orElseThrow(() -> new NotFoundException(User.class, userId));*/
-        return null;
-
+        return postRepository.findWithLikeAndImageWithCommentByIdLessThanAndUser_IsPrivateFalse(lastId, pageable);
     }
 
     @Transactional

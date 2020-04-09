@@ -37,28 +37,12 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images","comments"})
-    List<Post> findWithLikeAndImageWithCommentByUser_IdAndIdLessThanOrderByIdDesc(Long postWriterId, Long lastId, Pageable pageable);
-
-    @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"likeInfos","images","comments"})
-    List<Post> findWithLikeAndImageWithCommentByUser_IdOrderByIdDesc(Long postWriterId, Pageable pageable);
-
-    @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"likeInfos","images"})
-    List<Post> findAllByIdLessThanOrderByIdDesc(Long lastId, Pageable pageable);
-
-    @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"likeInfos","images"})
-    List<Post> findAllByOrderByIdDesc(Pageable pageable);
+    List<Post> findWithLikeAndImageWithCommentByUser_IdAndIdLessThan(Long postWriterId, Long lastId, Pageable pageable);
 
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images","comments"})
-    List<Post> findWithLikeAndImageWithCommentByIdLessThanAndUser_IsPrivateFalseOrderByIdDesc(Long lastId, Pageable pageable);
-
-    @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"likeInfos","images","comments"})
-    List<Post> findWithLikeAndImageWithCommentByUser_IsPrivateFalseOrderByIdDesc(Pageable pageable);
+    List<Post> findWithLikeAndImageWithCommentByIdLessThanAndUser_IsPrivateFalse(Long lastId, Pageable pageable);
 
     @Transactional(readOnly = true)
     PostProjection findUserById(Long id);
@@ -69,9 +53,14 @@ public interface PostRepository extends JpaRepository<Post,Long> {
             "LEFT OUTER JOIN post_hashtag ph ON h.id=ph.hashtag_id " +
             "LEFT OUTER JOIN post p ON ph.post_id=p.id " +
             "LEFT OUTER JOIN retweet r ON p.id=r.post_id " +
-            "WHERE h.name = :name AND p.id < :lastId ORDER BY p.id DESC" , nativeQuery = true)
-    List<Post> findWithHashtagByName(@Param("name") String name, @Param("lastId") Long lastId,  Pageable pageable);
+            "LEFT OUTER JOIN users u ON p.user_id=u.id " +
+            "WHERE h.name = :name AND p.id < :lastId AND u.is_private = false ORDER BY p.id DESC" , nativeQuery = true)
+    List<Post> findWithHashtagByName(@Param("name") String name, @Param("lastId") Long lastId, Pageable pageable);
 
     @Transactional(readOnly = true)
     PostProjection findFirstByOrderByIdDesc();
+
+    @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"likeInfos","images","comments"})
+    List<Post> findSearchByContentContainingAndIdLessThanAndUser_IsPrivateFalse(String keyword, Long lastId, Pageable pageable);
 }

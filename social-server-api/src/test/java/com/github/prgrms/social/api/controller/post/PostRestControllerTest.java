@@ -2,6 +2,7 @@ package com.github.prgrms.social.api.controller.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
+import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
@@ -340,19 +341,25 @@ class PostRestControllerTest {
     @DisplayName("해시태그 검색")
     @Test
     void postsOfHashTag() throws Exception {
+        User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+        userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
+        userService.updateProfile(user2.getId(), new ProfileRequest(null,null,true));
+
         Post post1 = Post.builder().content("#hashtag").build();
         Post post2 = Post.builder().content("#hashtag").build();
         Post post3 = Post.builder().content("#hashtag").build();
         Post post4 = Post.builder().content("#hashtag").build();
 
         postService.write(post1,user.getId(),new HashSet<>());
-        postService.write(post2,user.getId(),new HashSet<>());
+        postService.write(post2,user2.getId(),new HashSet<>());
         postService.write(post3,user.getId(),new HashSet<>());
         postService.write(post4,user.getId(),new HashSet<>());
+        postService.like(post1.getId(),user2.getId(),user.getId());
+        commentService.write(post1.getId(),user2.getId(),user.getId(), Comment.builder().content("comment1").build());
 
-        mockMvc.perform(get("/api/post/hashtag/list?lastId=0&size=2"))
+        mockMvc.perform(get("/api/post/hashtag/list?lastId=0&size=4"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.size()").value(2))
+                .andExpect(jsonPath("$.response.size()").value(4))
                 .andDo(print());
     }
 

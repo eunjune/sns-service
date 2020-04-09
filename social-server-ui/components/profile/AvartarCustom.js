@@ -6,7 +6,7 @@ import React from "react";
 const AvartarCustom = ({shape,size, profileImageUrl, name}) => {
 
     return (
-        <Avatar shape={shape} size={size} icon={profileImageUrl ?
+        <Avatar style={{cursor: 'pointer'}} shape={shape} size={size} icon={profileImageUrl ?
             <img src={`http://localhost:8080/image/profile/${profileImageUrl}`} alt=""/> :
             (name === null ? <UserOutlined style={{marginRight: 0}} /> : null)
         }>

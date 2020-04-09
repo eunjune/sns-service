@@ -39,7 +39,7 @@ import {
     SIZE,
     EDIT_POST_REQUEST,
     EDIT_POST_SUCCESS,
-    EDIT_POST_FAILURE
+    EDIT_POST_FAILURE, LOAD_SEARCH_POSTS_REQUEST, LOAD_SEARCH_POSTS_SUCCESS, LOAD_SEARCH_POSTS_FAILURE
 } from '../reducers/post';
 import axios from 'axios';
 
@@ -98,7 +98,7 @@ function* loadMyPost(action) {
 }
 
 function* watchLoadMyPosts() {
-    yield takeLatest(LOAD_MY_POSTS_REQUEST,loadMyPost);
+    yield throttle(1000,LOAD_MY_POSTS_REQUEST,loadMyPost);
 }
 
 function loadUserPostAPI({userId,token,lastId=0}) {
@@ -157,6 +157,34 @@ function* loadHashtag(action) {
 
 function* watchLoadHashtagPosts() {
     yield throttle(1000,LOAD_HASHTAG_POSTS_REQUEST,loadHashtag);
+}
+
+function loadSearchPostsAPI({keyword,lastId=0}) {
+    return axios.get(`/search/${encodeURIComponent(keyword)}?lastId=${lastId}&size=${SIZE}`);
+}
+
+
+function* loadSearchPosts(action) {
+    try {
+        const result = yield call(loadSearchPostsAPI, action.data);
+        yield put({
+            type: LOAD_SEARCH_POSTS_SUCCESS,
+            data : result.data.response,
+        });
+    } catch (e) {
+        yield put({
+            type: LOAD_SEARCH_POSTS_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            },
+        })
+    }
+}
+
+
+function* watchLoadSearchPosts() {
+    yield throttle(1000,LOAD_SEARCH_POSTS_REQUEST,loadSearchPosts);
 }
 
 function loadCommentsAPI({userId,postId,token}) {
@@ -449,6 +477,7 @@ export default function* postSaga() {
         fork(watchLoadMainPosts),
         fork(watchLoadMyPosts),
         fork(watchLoadUserPosts),
+        fork(watchLoadSearchPosts),
         fork(watchLoadHashtagPosts),
         fork(watchLoadComments),
 

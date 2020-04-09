@@ -1,7 +1,7 @@
-import React, { useEffect,useCallback } from 'react';
+import React, {useEffect, useCallback, useRef} from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import {LOAD_HASHTAG_POSTS_REQUEST, SIZE} from '../reducers/post';
+import {LOAD_HASHTAG_POSTS_REQUEST, LOAD_MY_POSTS_REQUEST, SIZE} from '../reducers/post';
 import PostCards from '../components/post/PostCards';
 import CenterAlignment from "../components/CenterAlignment";
 import {Alert} from "antd";
@@ -10,20 +10,26 @@ import PostForm from "../components/post/PostForm";
 const Hashtag = ({ tag }) => {
   const dispatch = useDispatch();
   const { posts, hasMorePost} = useSelector((state) => state.post);
+    const usedLastIds = useRef([]);
 
   const onScroll = useCallback(() => {
         console.log(hasMorePost);
       if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 200 && hasMorePost) {
+          const lastId = posts[posts.length-1].id;
+          if(!usedLastIds.current.includes(lastId)) {
+              dispatch({
+                  type: LOAD_HASHTAG_POSTS_REQUEST,
+                  data : {
+                      tag,
+                      lastId: lastId,
+                  }
+              });
+              usedLastIds.current.push(lastId);
+          }
 
-          dispatch({
-              type: LOAD_HASHTAG_POSTS_REQUEST,
-              data : {
-                tag,
-                lastId: posts[posts.length-1] && posts[posts.length-1].id,
-              }
-          });
       }
-  }, [posts.length, hasMorePost]);
+
+  }, [posts, hasMorePost]);
 
   useEffect(() => {
 

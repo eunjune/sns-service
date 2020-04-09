@@ -30,7 +30,7 @@ const CardWrapper = styled.div`
   margin-bottom: 100px;
 `;
 
-const PostCards = memo(({post}) => {
+const PostCards = memo(({post, keyword}) => {
     const {isEditPost, editPostId} = useSelector(state => state.post);
     const [commentFormOpened, setCommentFormOpened] = useState(false);
     const meId = useSelector(state => state.user.me && state.user.me.id);
@@ -204,7 +204,7 @@ const PostCards = memo(({post}) => {
                                     </a>
                                 </Link>}
                             title={post.retweetPost.user.name}
-                            description={<PostCardContent postData={post.retweetPost.content}/>}
+                            description={<PostCardContent postData={post.retweetPost.content} keyword={keyword}/>}
                         />
                     </Card>
                     :
@@ -219,7 +219,7 @@ const PostCards = memo(({post}) => {
                             title={post.user.name}
                             description={isEditPost === true && editPostId === post.id ?
                                             <PostEditForm key={post.id} post={post} /> :<
-                                            PostCardContent postData={post.content}/>}
+                                            PostCardContent postData={post.content } keyword={keyword}/>}
                         />
 
                     )

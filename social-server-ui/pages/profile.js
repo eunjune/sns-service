@@ -53,7 +53,7 @@ const Profile = () => {
             window.removeEventListener('scroll', onScroll);
         }
 
-    },[me]);
+    },[me,posts,hasMorePost]);
 
     const onScroll = useCallback(() => {
 
@@ -71,7 +71,7 @@ const Profile = () => {
             }
         }
 
-    }, [posts.length, hasMorePost]);
+    }, [posts, hasMorePost]);
 
     const onUnfollow = useCallback(userId => () => {
 
@@ -189,7 +189,7 @@ const Profile = () => {
                             {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
                             {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>프로필 이미지 변경</Button>}
                             <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={me && me.profileImageUrl} name={me && me.name} />}
-                                       title={me && me.name}/>
+                                       title={me && <span style={{cursor: 'pointer'}}>{me.name}</span>} onClick={clickProfile}/>
 
                         </Card>
                         {profileOn && uploadImageReady && <Button type="primary" style={{width: '100%'}} onClick={onClickUploadImage}>프로필 이미지 변경</Button>}

@@ -37,6 +37,10 @@ export const LOAD_HASHTAG_POSTS_REQUEST = 'LOAD_HASHTAG_POSTS_REQUEST';
 export const LOAD_HASHTAG_POSTS_SUCCESS = 'LOAD_HASHTAG_POSTS_SUCCESS';
 export const LOAD_HASHTAG_POSTS_FAILURE = 'LOAD_HASHTAG_POSTS_FAILURE';
 
+export const LOAD_SEARCH_POSTS_REQUEST = 'LOAD_SEARCH_POSTS_REQUEST';
+export const LOAD_SEARCH_POSTS_SUCCESS = 'LOAD_SEARCH_POSTS_SUCCESS';
+export const LOAD_SEARCH_POSTS_FAILURE = 'LOAD_SEARCH_POSTS_FAILURE';
+
 export const LOAD_COMMENTS_REQUEST = 'LOAD_COMMENTS_REQUEST';
 export const LOAD_COMMENTS_SUCCESS = 'LOAD_COMMENTS_SUCCESS';
 export const LOAD_COMMENTS_FAILURE = 'LOAD_COMMENTS_FAILURE';
@@ -104,7 +108,6 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_MY_POSTS_REQUEST: {
-
                 draft.posts = action.data.lastId === 0 ? [] : draft.posts;
                 draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
                 break;
@@ -113,6 +116,7 @@ const reducer = (state = initialState, action) => {
             case LOAD_MY_POSTS_SUCCESS: {
                 draft.posts = draft.posts.concat(action.data);
                 draft.hasMorePost = action.data.length === SIZE;
+                console.log(draft.posts.length);
                 break;
             }
 
@@ -135,6 +139,24 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_HASHTAG_POSTS_FAILURE: {
+                console.error(action.error);
+
+                break;
+            }
+
+            case LOAD_SEARCH_POSTS_REQUEST: {
+                draft.posts = !action.data.lastId ? [] : draft.posts;
+                draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
+                break;
+            }
+
+            case LOAD_SEARCH_POSTS_SUCCESS: {
+                draft.posts = draft.posts.concat(action.data);
+                draft.hasMorePost = action.data.length === SIZE;
+                break;
+            }
+
+            case LOAD_SEARCH_POSTS_FAILURE: {
                 console.error(action.error);
 
                 break;

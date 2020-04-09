@@ -11,6 +11,8 @@ import com.github.prgrms.social.api.util.DtoUtils;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +50,7 @@ public class PostRestController {
             @AuthenticationPrincipal JwtAuthentication authentication,
             @ApiParam(value = "공개 유저 PK(비공개 유저인 경우 팔로워만 가능)", example = "1", required = true) @PathVariable Long userId,
             @RequestParam Long lastId,
-            @ApiIgnore Pageable pageable
+            @ApiIgnore @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return OK(
                 postService.getPostsWithImageAndLikeWithComment(authentication.id.getValue(), userId, lastId, pageable)
@@ -68,7 +70,7 @@ public class PostRestController {
     public ApiResult<List<PostResponse>> myPosts(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestParam Long lastId,
-            @ApiIgnore Pageable pageable
+            @ApiIgnore @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return OK(
                 postService.getPostsWithImageAndLikeWithComment(authentication.id.getValue(), authentication.id.getValue(), lastId, pageable)
@@ -86,7 +88,7 @@ public class PostRestController {
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "4", value = "최대 조회 갯수")
     })
     public ApiResult<List<PostResponse>> postAll(
-            @ApiIgnore Pageable pageable,
+            @ApiIgnore @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam Long lastId
     ) {
 
