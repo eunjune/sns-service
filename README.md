@@ -52,5 +52,3 @@ https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-JPA-%EC%9B%B9%EC%95%
 - 스프링 부트와 AWS로 혼자 구현하는 웹 서비스(도서)
 
 
-이전 Repository에 문제가 생겨서 다시 만듬. 이전 Repository에서 진행한 commit log
-![Alt text](./readme-img/commit.png)
