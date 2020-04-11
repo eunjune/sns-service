@@ -36,6 +36,9 @@
 - Notification
 
 
+### 테이블
+![Alt text](./readme-img/table.png)
+
 
 ### 참고 자료
 - 웹 백엔드 시스템 구현 스터디
