@@ -14,37 +14,36 @@ const User = ({ id }) => {
     const dispatch = useDispatch();
     const { posts, hasMorePost,loadUserPostError } = useSelector((state) => state.post);
     const { user } = useSelector((state) => state.user);
-
-
-    const {followers, followings, hasMoreFollower, hasMoreFollowing} = useSelector(state => state.user);
     const token = cookie.load('token');
     const usedLastIds = useRef([]);
 
     useEffect(() => {
-
+        console.log('sdfsd')
       window.addEventListener('scroll', onScroll);
       return () => {
           window.removeEventListener('scroll', onScroll);
       }
-    }, [posts]);
+    }, [posts, hasMorePost]);
 
 
     const onScroll = useCallback(() => {
 
         if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 200 && hasMorePost) {
-
             const lastId = posts[posts.length-1].id;
             if(!usedLastIds.current.includes(lastId)) {
                 dispatch({
-                    type: LOAD_MAIN_POSTS_REQUEST,
-                    token: token,
-                    lastId: lastId
+                    type: LOAD_USER_POSTS_REQUEST,
+                    data : {
+                        userId: id,
+                        lastId: lastId,
+                        token: token,
+                    }
                 });
                 usedLastIds.current.push(lastId);
             }
         }
 
-    }, [posts.length, hasMorePost]);
+    }, [posts, hasMorePost]);
 
 
     return (
@@ -96,21 +95,20 @@ User.getInitialProps = async (context) => {
 
 
     context.store.dispatch({
-    type: LOAD_USER_REQUEST,
-    data: {
-        userId: id,
-        token : token
-    },
+        type: LOAD_USER_REQUEST,
+        data: {
+            userId: id,
+            token : token
+        },
     });
 
     context.store.dispatch({
-    type: LOAD_USER_POSTS_REQUEST,
-    data: {
-        userId: id,
-        token: token,
-        lastId: 0
-    },
-  });
+        type: LOAD_USER_POSTS_REQUEST,
+        data: {
+            userId: id,
+            token: token,
+        },
+    });
 
   return { id: parseInt(context.query.id) }; // 프론트의 props에 전달 가능.
 };

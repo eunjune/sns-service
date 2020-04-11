@@ -142,7 +142,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_FOLLOWER_REQUEST: {
-                draft.followers = draft.followers.length === 0 ? [] : draft.followers;
+                draft.followers = !action.data.offset ? [] : draft.followers;
                 draft.hasMoreFollower = action.data.offset ? draft.hasMoreFollower : true;
                 break;
             }
@@ -154,7 +154,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_FOLLOWER_FAILURE: {
-                console.error(action.errofr);
+                console.error(action.error);
                 break;
             }
 

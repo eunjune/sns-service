@@ -36,6 +36,7 @@ public class EmailServiceImpl implements EmailService {
                 .message("회원가입 인증을 위해 링크를 클릭하세요.")
                 .build();
 
+
         sendEamil(emailHtmlMessage,user,"SNS service, 회원가입 인증");
     }
 

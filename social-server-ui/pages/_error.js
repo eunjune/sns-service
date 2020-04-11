@@ -1,12 +1,17 @@
 import Error from 'next/error';
 import React from 'react';
 import PropTypes from 'prop-types';
+import NotFoundError from "../components/error/NotFoundError";
 
 const MyError = (props) => {
     return (
         <div>
-            <h1>에러 발생</h1>
-            <Error statusCode={props.statusCode}/>
+            {
+                props.statusCode === 404 && <NotFoundError />
+            }
+            {
+                props.statusCode !== 404 && <Error statusCode={props.statusCode}/>
+            }
         </div>
     );
 }

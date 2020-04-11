@@ -163,14 +163,16 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_USER_POSTS_REQUEST: {
-                draft.posts = action.data.lastId === 0 ? [] : draft.posts;
+                console.log(action.data.lastId ? draft.hasMorePost : true);
+                console.log(LOAD_USER_POSTS_REQUEST);
+                draft.posts = !action.data.lastId? [] : draft.posts;
                 draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
                 break;
             }
     
             case LOAD_USER_POSTS_SUCCESS: {
                 draft.posts = draft.posts.concat(action.data);
-                draft.hasMorePost = action.data.length === 8;
+                draft.hasMorePost = action.data.length === SIZE;
                 break;
             }
 
