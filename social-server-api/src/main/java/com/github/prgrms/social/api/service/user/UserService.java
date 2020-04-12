@@ -64,30 +64,7 @@ public class UserService {
 
         return userRepository.findUserWithUserWithPostById(userId);
     }
-
-    private List<User> getPageSizeList(List<User> list, Pageable pageable) {
-        /*// TODO: 쿼리로 처리하는 방법?
-        list.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
-        if(lastId == 0L) {
-            return list.subList(0,Math.min(pageable.getPageSize(), list.size()));
-        }
-
-        int startIndex = 0;
-        for(int i=0; i<list.size(); ++i) {
-            if(list.get(i).getId().equals(lastId)) {
-                startIndex = i + 1;
-                break;
-            }
-        }
-
-        int size = list.size() - startIndex < pageable.getPageSize() ?
-                list.size() :
-                pageable.getPageSize() + startIndex;
-
-        return list.subList(startIndex, size);*/
-        return null;
-    }
-
+    
     @Transactional(readOnly = true)
     public List<User> getFollowings(Long userId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");

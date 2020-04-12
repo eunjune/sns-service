@@ -1,6 +1,7 @@
-import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
+
 import {Avatar} from "antd";
 import React from "react";
+import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
 
 
 const AvartarCustom = ({shape,size, profileImageUrl, name}) => {

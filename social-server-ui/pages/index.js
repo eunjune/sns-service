@@ -11,11 +11,12 @@ import {EMAIL_RESEND_REQUEST} from "../reducers/user";
 
 const Home = ({isEmailLogin,usedLastIds}) => {
     const {me,isEmailLogInWaiting} = useSelector(state => state.user);
-    const {posts,hasMorePost} = useSelector(state => state.post);
+    const {posts,hasMorePost,retweetError} = useSelector(state => state.post);
     const dispatch = useDispatch();
     const token = cookie.load('token');
 
-    console.log(isEmailLogin);
+    console.log('token');
+    console.log(token);
 
     useEffect(() => {
 
@@ -34,7 +35,10 @@ const Home = ({isEmailLogin,usedLastIds}) => {
             if(!usedLastIds.includes(lastId)) {
                 dispatch({
                     type: LOAD_MAIN_POSTS_REQUEST,
-                    lastId: lastId
+                    data: {
+                        lastId,
+                        token : !token ? null : token,
+                    }
                 });
                 usedLastIds.push(lastId);
             }
@@ -70,6 +74,9 @@ const Home = ({isEmailLogin,usedLastIds}) => {
                         <Alert message='이메일로 로그인 했습니다. 패스워드를 변경하세요.' type="success" />
                     </div> : null
                 }
+                {
+                    retweetError && <Alert message={retweetError.message} type="error" />
+                }
                 {me && <PostForm />}
                 {posts.map((post) => {
                     return <PostCards key={post.id} post={post}/>;
@@ -80,10 +87,15 @@ const Home = ({isEmailLogin,usedLastIds}) => {
 
 Home.getInitialProps = async (context) => {
     const isEmailLogin = !!context.query.token;
+    const token = cookie.load('token') || (context.isServer && context.req.headers.cookie.includes('token')
+        ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
 
     context.store.dispatch({
         type: LOAD_MAIN_POSTS_REQUEST,
-        lastId: 0
+        data: {
+            lastId: 0,
+            token : token.length > 0 ? token : null
+        }
     });
 
     return {isEmailLogin,usedLastIds:[]};

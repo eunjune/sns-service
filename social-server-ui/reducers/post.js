@@ -14,6 +14,7 @@ export const initialState = {
     isEditingPost: false,
     isEditPost: false,
 
+    retweetError: null,
     addCommentError: null,
     loadUserPostError: null,
     addPostError: null,
@@ -90,8 +91,8 @@ const reducer = (state = initialState, action) => {
     
             case LOAD_MAIN_POSTS_REQUEST: {
                 console.log('my posts');
-                draft.posts = action.lastId === 0 ? [] : draft.posts;
-                draft.hasMorePost = action.lastId ? draft.hasMorePost : true;
+                draft.posts = action.data.lastId === 0 ? [] : draft.posts;
+                draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
                 break;
             }
 
@@ -283,7 +284,7 @@ const reducer = (state = initialState, action) => {
             }
             case RETWEET_FAILURE: {
                 console.error(action.error);
-
+                draft.retweetError = action.error;
                 break;
             }
 

@@ -1,7 +1,7 @@
 import React, {useState, useCallback, useEffect, memo} from 'react';
 import cookie from 'react-cookies';
 import PropTypes from 'prop-types';
-import {Button, Card, Icon, Avatar, Tooltip, List, Comment, Input, Popover, Modal} from 'antd';
+import {Button, Card, Icon, Avatar, Tooltip, List, Comment, Input, Popover, Modal, Alert} from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     ADD_COMMENT_REQUEST,
@@ -37,9 +37,6 @@ const PostCards = memo(({post, keyword}) => {
     const dispatch = useDispatch();
     const token = cookie.load('token');
 
-    useEffect(() => {
-
-    },[post]);
 
     const onToggleComment = useCallback(() => {
 

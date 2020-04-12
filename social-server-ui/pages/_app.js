@@ -26,11 +26,11 @@ const Root = ({ Component, store, pageProps }) => (
           } , {
             'http-equiv' : 'X-UA-Compatible', content: 'IE-edge',
           }, {
-            name: 'description', content: '트위터 클론 페이지'
+            name: 'description', content: 'SNS 페이지'
           }, {
             name: 'og:tittle', content: 'SNS',
           }, {
-            name: 'og:description',content: '트위터 클론 페이지'
+            name: 'og:description',content: 'SNS 페이지'
           }, {
             property: 'og:type', content: 'website',
           }]}

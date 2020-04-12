@@ -39,6 +39,12 @@ const Search = ({ keyword }) => {
 
     return (
         <CenterAlignment children={<div className='index' style={{padding: 50}}>
+            {
+                <h2>검색 결과 : {keyword}</h2>
+            }
+            {
+                posts.length === 0 && <h3>검색 결과를 찾을 수 없습니다.</h3>
+            }
             {posts.map((post) => {
                 return <PostCards key={+post.id} post={post} keyword={keyword}/>;
             })}

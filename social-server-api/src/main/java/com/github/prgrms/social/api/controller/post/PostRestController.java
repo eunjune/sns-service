@@ -92,9 +92,26 @@ public class PostRestController {
             @RequestParam Long lastId
     ) {
 
-        // TODO : 로그인했을 경우 팔로잉 유저것도 가져올 것인지
-
         return OK(postService.getPostsWithImageAndLikeWithComment(lastId, pageable)
+                .stream()
+                .map(dtoUtils::convertPostResponse)
+                .collect(Collectors.toList())
+        );
+    }
+
+    @GetMapping(path = "user/post/list-login")
+    @ApiOperation(value = "전체 포스트 목록 조회 - 로그인  (API 토큰 필요없음)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "lastId", dataType = "integer", paramType = "query", defaultValue = "0", value = "마지막 포스트 PK(0이면 처음조회)"),
+            @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "4", value = "최대 조회 갯수")
+    })
+    public ApiResult<List<PostResponse>> postAllLogin(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @ApiIgnore @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam Long lastId
+    ) {
+
+        return OK(postService.getPostsWithImageAndLikeWithComment(authentication.id.getValue(), lastId, pageable)
                 .stream()
                 .map(dtoUtils::convertPostResponse)
                 .collect(Collectors.toList())

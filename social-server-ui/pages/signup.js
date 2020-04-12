@@ -24,7 +24,7 @@ const Signup = () => {
     const { isEmailOk, emailCheckingError } = useSelector((state) => state.user);
     const { isNameOk,  nameCheckingError } = useSelector((state) => state.user);
     const { isSigningUp} = useSelector((state) => state.user);
-    const { me } = useSelector((state) => state.user);
+    const { me, signUpError } = useSelector((state) => state.user);
 
     useEffect(() => {
         if (me) {
@@ -168,6 +168,7 @@ const Signup = () => {
                     <Form.Item>
                         <Button type="primary" htmlType="submit" loading={isSigningUp} style={{width: '100%'}}>가입하기</Button>
                     </Form.Item>
+                    {signUpError && <div style={{color: 'red'}}>{signUpError.message}</div>}
                 </Form>
             }/>
         </DivWrap>

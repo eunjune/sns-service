@@ -90,6 +90,24 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    public List<Post> getPostsWithImageAndLikeWithComment(Long userId, Long lastId, Pageable pageable) {
+        checkNotNull(userId, "userId must be provided.");
+        checkNotNull(lastId, "lastId must be provided.");
+
+        Set<User> meFollowings = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(User.class, userId)).getFollowings();
+
+        if(lastId == 0L) {
+            lastId = postRepository.findFirstByOrderByIdDesc().getId() + 1L;
+        }
+
+        return postRepository.findWithLikeAndImageWithCommentByIdLessThanAndUser_IsPrivateFalse(lastId, pageable)
+                            .stream()
+                            .peek(post->post.setLikesOfMe(userId))
+                            .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<Post> getPostsWithImageAndLikeWithComment(Long lastId, Pageable pageable) {
         checkNotNull(lastId, "lastId must be provided.");
 

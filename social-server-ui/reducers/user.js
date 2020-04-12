@@ -245,6 +245,7 @@ const reducer = (state = initialState, action) => {
             case SIGN_UP_FAILURE: {
                 console.error(action.error);
 
+                draft.signUpError = action.error;
                 draft.isSigningUp = false;
                 break;
             }

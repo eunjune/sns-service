@@ -43,14 +43,25 @@ import {
 } from '../reducers/post';
 import axios from 'axios';
 
-function loadMainPostsAPI(lastId=0) {
+function loadMainPostsAPI({lastId=0,token}) {
 
-    return axios.get(`user/post/list?lastId=${lastId}&size=${SIZE}`);
+    console.log('load');
+    console.log(token);
+
+    if(token === null) {
+        return axios.get(`user/post/list?lastId=${lastId}&size=${SIZE}`);
+    }
+
+    return axios.get(`user/post/list-login?lastId=${lastId}&size=${SIZE}`, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
 }
 
 function* loadMainPosts(action) {
     try {
-        const result = yield call(loadMainPostsAPI, action.lastId);
+        const result = yield call(loadMainPostsAPI, action.data);
         yield put({
             type: LOAD_MAIN_POSTS_SUCCESS,
             data : result.data.response,

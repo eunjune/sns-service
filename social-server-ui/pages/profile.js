@@ -177,6 +177,9 @@ const Profile = () => {
             <Row gutter={8}>
                 <Col xs={24} md={8}>
                     <div style={{padding: 50}}>
+
+
+
                         <Card
                             actions={[
                                 <div onClick={clickPost}>게시글<br/>{me && me.postCount}</div>,
