@@ -21,8 +21,8 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-@Entity(name = "users")
 @ToString(exclude = {"followings","followers","posts"})
+@Entity(name = "users")
 public class User {
 
     @ApiModelProperty(value = "PK", required = true)

@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
-@Entity
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
 @ToString(exclude = {"user","post"})
+@Entity
 public class LikeInfo {
 
     @ApiModelProperty(value = "PK", required = true)

@@ -44,7 +44,6 @@ public class CommentService {
 
         return postRepository.findWithCommentByIdAndUser_Id(postId, postWriterId)
             .map(post -> {
-                System.out.println("write 테스트");
                 post.addComment(comment);
                 comment.setUser(user);
                 Comment saveComment = commentRepository.save(comment);

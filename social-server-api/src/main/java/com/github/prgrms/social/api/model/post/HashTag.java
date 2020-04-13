@@ -15,9 +15,9 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
-@Entity
 @ToString(exclude = {"posts"})
 @EqualsAndHashCode(of = "id")
+@Entity
 public class HashTag {
 
     @ApiModelProperty(value = "PK", required = true)

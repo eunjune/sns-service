@@ -18,12 +18,12 @@ import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-@Entity
+@NoArgsConstructor(force = true)
 @Getter
 @Setter
-@NoArgsConstructor(force = true)
-@ToString(exclude = {"retweetPost","postsRetweetedMe","images","likeInfos"})
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = {"retweetPost","postsRetweetedMe","images","likeInfos"})
+@Entity
 public class Post {
 
     @ApiModelProperty(value = "PK", required = true)

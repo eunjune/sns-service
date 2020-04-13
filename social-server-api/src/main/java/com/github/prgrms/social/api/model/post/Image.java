@@ -2,7 +2,6 @@ package com.github.prgrms.social.api.model.post;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,12 +11,12 @@ import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-@Entity
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
 @ToString(exclude = {"post"})
+@Entity
 public class Image {
 
     @ApiModelProperty(value = "PK", required = true)

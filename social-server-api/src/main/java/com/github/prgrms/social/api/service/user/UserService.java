@@ -4,10 +4,10 @@ import com.github.prgrms.social.api.aws.S3Client;
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.event.JoinEvent;
 import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
-import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.user.UserRepository;
+import com.github.prgrms.social.api.service.FileService;
 import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +35,8 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 public class UserService {
 
     private final S3Client s3Client;
+
+    private final FileService fileService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -64,7 +66,7 @@ public class UserService {
 
         return userRepository.findUserWithUserWithPostById(userId);
     }
-    
+
     @Transactional(readOnly = true)
     public List<User> getFollowings(Long userId, Pageable pageable) {
         checkNotNull(userId, "userId must be provided.");
@@ -166,9 +168,7 @@ public class UserService {
 
         return getUser(id)
                 .map(user -> {
-                    if(profileRequest.getPassword() != null && !profileRequest.getPassword().isEmpty()) {
-                        profileRequest.setPassword(passwordEncoder.encode(profileRequest.getPassword()));
-                    }
+                    profileRequest.encode(passwordEncoder);
                     modelMapper.map(profileRequest,user);
                     return user;
                 })
@@ -184,12 +184,8 @@ public class UserService {
         //Todo 메소드 분리
         //Todo 배포시 변경 필요
         realPath = realPath.substring(0,34) + "uploads" + File.separator + "profile";
-        AttachedFile attachedFile = AttachedFile.toAttachedFile(file);
-        assert attachedFile != null;
-        String extension = attachedFile.extension("png");
-        String randomName = attachedFile.randomName(realPath,extension);
-        file.transferTo(new File(randomName));
-        String newProfileImageUrl = randomName.substring(realPath.length()+1);
+
+        String newProfileImageUrl = fileService.uploadFile(realPath, file);
 
         return getUser(id)
                 .map(user -> {

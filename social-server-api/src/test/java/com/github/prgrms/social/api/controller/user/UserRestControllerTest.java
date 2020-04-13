@@ -281,7 +281,7 @@ class UserRestControllerTest {
     @DisplayName("프로필 수정 - 성공")
     @Test
     void updateProfile() throws Exception {
-        ProfileRequest profileRequest = new ProfileRequest("",null,true);
+        ProfileRequest profileRequest = new ProfileRequest("","asdf",true);
 
         mockMvc.perform(put("/api/user/profile")
                         .header(tokenHeader, apiToken)
@@ -290,7 +290,6 @@ class UserRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response.isPrivate").value("true"))
                 .andDo(print());
-
     }
 
 

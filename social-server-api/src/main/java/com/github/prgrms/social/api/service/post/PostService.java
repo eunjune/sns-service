@@ -3,7 +3,6 @@ package com.github.prgrms.social.api.service.post;
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.error.UnauthorizedException;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
-import com.github.prgrms.social.api.model.commons.AttachedFile;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.LikeInfo;
@@ -14,13 +13,13 @@ import com.github.prgrms.social.api.repository.post.ImageRepository;
 import com.github.prgrms.social.api.repository.post.PostLikeRepository;
 import com.github.prgrms.social.api.repository.post.PostRepository;
 import com.github.prgrms.social.api.repository.user.UserRepository;
+import com.github.prgrms.social.api.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,6 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
+    private final FileService fileService;
 
     private final UserRepository userRepository;
 
@@ -299,12 +300,7 @@ public class PostService {
 
         List<String> result = new ArrayList<>();
         for(MultipartFile file : files) {
-            AttachedFile attachedFile = AttachedFile.toAttachedFile(file);
-            assert attachedFile != null;
-            String extension = attachedFile.extension("png");
-            String randomName = attachedFile.randomName(realPath,extension);
-            file.transferTo(new File(randomName));
-            result.add(randomName.substring(realPath.length()+1));
+            result.add(fileService.uploadFile(realPath,file));
         }
 
         return result;

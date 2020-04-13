@@ -7,12 +7,12 @@ import javax.persistence.Embeddable;
 
 import static java.util.regex.Pattern.matches;
 
-@Embeddable
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode(of = "address")
 @ToString
+@Embeddable
 public class Email {
 
     @ApiModelProperty(value = "이메일 주소", required = true)

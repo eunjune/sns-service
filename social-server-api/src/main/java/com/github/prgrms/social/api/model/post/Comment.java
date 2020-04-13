@@ -12,12 +12,12 @@ import static java.time.LocalDateTime.now;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-@Entity
+@NoArgsConstructor(force = true)
 @Getter
 @Setter
-@NoArgsConstructor(force = true)
 @ToString(exclude = {"post","user"})
 @EqualsAndHashCode(of = "id")
+@Entity
 public class Comment {
 
     @ApiModelProperty(value = "PK", required = true)
