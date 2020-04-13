@@ -6,7 +6,6 @@ import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.post.HashTagService;
 import com.github.prgrms.social.api.service.post.PostService;
-import com.github.prgrms.social.api.service.user.UserService;
 import com.github.prgrms.social.api.util.DtoUtils;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +32,6 @@ import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 public class PostRestController {
 
     private final DtoUtils dtoUtils;
-
-    private final UserService userService;
 
     private final PostService postService;
 

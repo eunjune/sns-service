@@ -58,7 +58,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     List<Post> findWithHashtagByName(@Param("name") String name, @Param("lastId") Long lastId, Pageable pageable);
 
     @Transactional(readOnly = true)
-    PostProjection findFirstByOrderByIdDesc();
+    Optional<PostProjection> findFirstByOrderByIdDesc();
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"likeInfos","images","comments"})

@@ -26,7 +26,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -95,8 +94,8 @@ class PostRestControllerTest {
     void setup() {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
         user = userService.join("test", new Email("test@gmail.com"), "12345678");
-        apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
         userService.certificateEmail(user.getEmailCertificationToken(), user.getEmail().getAddress());
+        apiToken = "Bearer " + user.newApiToken(jwt, new String[]{Role.USER.getValue()});
     }
 
     @AfterEach
@@ -216,8 +215,8 @@ class PostRestControllerTest {
     @Test
     void findAllUserOk() throws Exception {
         User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
-        user2.setPrivate(true);
-        user.addFollowing(user2);
+        user2.setEmailCertification(true);
+        this.user.addFollowing(user2);
         userRepository.save(user2);
 
         Post post1 = Post.builder().content("post1").build();
@@ -240,8 +239,9 @@ class PostRestControllerTest {
     @Test
     void findAllUserFail() throws Exception {
         User user2 = userService.join("test2", new Email("test2@gmail.com"), "12345678");
-        user2.setPrivate(true);
+        user2.setEmailCertification(true);
         userRepository.save(user2);
+        user2 = userService.updateProfile(user2.getId(), new ProfileRequest(null,null,true));
 
         Post post1 = Post.builder().content("post1").build();
         Post post2 = Post.builder().content("post2").build();
@@ -311,6 +311,7 @@ class PostRestControllerTest {
     @Test
     void removePost() throws Exception {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+        userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
 
         PostingRequest postingRequest = new PostingRequest("update", new HashSet<>());
         Post post1 = Post.builder().content("post1").build();
@@ -328,6 +329,7 @@ class PostRestControllerTest {
     @Test
     void removePostFail() throws Exception {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+        userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
 
         Post post1 = Post.builder().content("post1").build();
         Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
@@ -342,8 +344,8 @@ class PostRestControllerTest {
     @Test
     void postsOfHashTag() throws Exception {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
-        userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
-        userService.updateProfile(user2.getId(), new ProfileRequest(null,null,true));
+        user2 = userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
+        user2 = userService.updateProfile(user2.getId(), new ProfileRequest(null,null,true));
 
         Post post1 = Post.builder().content("#hashtag").build();
         Post post2 = Post.builder().content("#hashtag").build();
@@ -357,9 +359,9 @@ class PostRestControllerTest {
         postService.like(post1.getId(),user2.getId(),user.getId());
         commentService.write(post1.getId(),user2.getId(),user.getId(), Comment.builder().content("comment1").build());
 
-        mockMvc.perform(get("/api/post/hashtag/list?lastId=0&size=4"))
+        mockMvc.perform(get("/api/post/hashtag/list?lastId=0&size=3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.response.size()").value(4))
+                .andExpect(jsonPath("$.response.size()").value(3))
                 .andDo(print());
     }
 
@@ -367,6 +369,7 @@ class PostRestControllerTest {
     @Test
     void like() throws Exception {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+        userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
 
         Post post1 = Post.builder().content("post1").build();
         Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
@@ -384,6 +387,7 @@ class PostRestControllerTest {
     @Test
     void unlike() throws Exception {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+        userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
 
         Post post1 = Post.builder().content("post1").build();
         Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
@@ -404,6 +408,7 @@ class PostRestControllerTest {
     @Test
     void retweet() throws Exception {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+        userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
 
         Post post1 = Post.builder().content("post1").build();
         Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
@@ -420,6 +425,7 @@ class PostRestControllerTest {
     @Test
     void retweetFail() throws Exception {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+        userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
 
         Post post1 = Post.builder().content("post1").build();
         Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
@@ -431,14 +437,4 @@ class PostRestControllerTest {
                 .andDo(print());
     }
 
-    @Test
-    void uploadImage() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("file", (byte[]) null);
-
-        mockMvc.perform(multipart("/api/post/images")
-                .file(file)
-                .header(tokenHeader,apiToken))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-    }
 }

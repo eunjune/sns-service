@@ -80,7 +80,9 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException(User.class, postWriterId));
 
         if(lastId == 0L) {
-            lastId = postRepository.findFirstByOrderByIdDesc().getId() + 1L;
+            lastId = postRepository.findFirstByOrderByIdDesc()
+                    .map(postProjection -> postProjection.getId() + 1L)
+                    .orElse(1L);
         }
 
         return postRepository.findWithLikeAndImageWithCommentByUser_IdAndIdLessThan(postWriterId, lastId, pageable)
@@ -98,7 +100,9 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundException(User.class, userId)).getFollowings();
 
         if(lastId == 0L) {
-            lastId = postRepository.findFirstByOrderByIdDesc().getId() + 1L;
+            lastId = postRepository.findFirstByOrderByIdDesc()
+                    .map(postProjection -> postProjection.getId() + 1L)
+                    .orElse(1L);
         }
 
         return postRepository.findWithLikeAndImageWithCommentByIdLessThanAndUser_IsPrivateFalse(lastId, pageable)
@@ -112,7 +116,9 @@ public class PostService {
         checkNotNull(lastId, "lastId must be provided.");
 
         if(lastId == 0L) {
-            lastId = postRepository.findFirstByOrderByIdDesc().getId() + 1L;
+            lastId = postRepository.findFirstByOrderByIdDesc()
+                        .map(postProjection -> postProjection.getId() + 1L)
+                        .orElse(1L);
         }
 
         return postRepository.findWithLikeAndImageWithCommentByIdLessThanAndUser_IsPrivateFalse(lastId, pageable);

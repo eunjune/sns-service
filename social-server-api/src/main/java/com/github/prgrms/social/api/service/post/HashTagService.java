@@ -22,7 +22,9 @@ public class HashTagService {
         checkNotNull(tag, "tag must be provided.");
 
         if(lastId == 0L) {
-            lastId =postRepository.findFirstByOrderByIdDesc().getId() + 1L;
+            lastId = postRepository.findFirstByOrderByIdDesc()
+                        .map(postProjection -> postProjection.getId() + 1L)
+                        .orElse(1L);
         }
 
         return postRepository.findWithHashtagByName(tag,lastId,pageable);

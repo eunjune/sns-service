@@ -15,6 +15,5 @@ public class CommentRequest {
         return Comment.builder()
                 .content(content)
                 .build();
-
     }
 }

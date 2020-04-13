@@ -43,7 +43,9 @@ public class SearchController {
     ) {
 
         if(lastId == 0L) {
-            lastId = postRepository.findFirstByOrderByIdDesc().getId() + 1L;
+            lastId = postRepository.findFirstByOrderByIdDesc()
+                                .map(postProjection -> postProjection.getId() + 1L)
+                                .orElse(1L);
         }
 
         return OK(postRepository.findSearchByContentContainingAndIdLessThanAndUser_IsPrivateFalse(keyword,lastId,pageable)

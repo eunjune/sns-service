@@ -114,6 +114,7 @@ class CommentRestControllerTest {
     @Test
     void comment() throws Exception {
         User user2 = userService.join("test2",new Email("test2@gmail.com"),"12345678");
+        user2 = userService.certificateEmail(user2.getEmailCertificationToken(), user2.getEmail().getAddress());
 
         Post post1 = Post.builder().content("post1").build();
         Post savedPost = postService.write(post1, user2.getId(), new HashSet<>());
