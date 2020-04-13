@@ -47,7 +47,7 @@ public class PostRestController {
             @AuthenticationPrincipal JwtAuthentication authentication,
             @ApiParam(value = "공개 유저 PK(비공개 유저인 경우 팔로워만 가능)", example = "1", required = true) @PathVariable Long userId,
             @RequestParam Long lastId,
-            @ApiIgnore @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable
+            @ApiIgnore @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return OK(
                 postService.getPostsWithImageAndLikeWithComment(authentication.id.getValue(), userId, lastId, pageable)
@@ -67,7 +67,7 @@ public class PostRestController {
     public ApiResult<List<PostResponse>> myPosts(
             @AuthenticationPrincipal JwtAuthentication authentication,
             @RequestParam Long lastId,
-            @ApiIgnore @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable
+            @ApiIgnore @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return OK(
                 postService.getPostsWithImageAndLikeWithComment(authentication.id.getValue(), authentication.id.getValue(), lastId, pageable)
@@ -85,7 +85,7 @@ public class PostRestController {
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "4", value = "최대 조회 갯수")
     })
     public ApiResult<List<PostResponse>> postAll(
-            @ApiIgnore @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @ApiIgnore @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam Long lastId
     ) {
 
@@ -104,7 +104,7 @@ public class PostRestController {
     })
     public ApiResult<List<PostResponse>> postAllLogin(
             @AuthenticationPrincipal JwtAuthentication authentication,
-            @ApiIgnore @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @ApiIgnore @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam Long lastId
     ) {
 

@@ -1,23 +1,21 @@
 package com.github.prgrms.social.api.model.post;
 
+import com.github.prgrms.social.api.model.BaseTimeEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.time.LocalDateTime.now;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"post"})
 @Entity
-public class Image {
+public class Image extends BaseTimeEntity {
 
     @ApiModelProperty(value = "PK", required = true)
     @Id
@@ -28,20 +26,15 @@ public class Image {
     @Column(nullable = false)
     private final String path;
 
-    @ApiModelProperty(value = "이미지 업로드 날짜", required = true)
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private final LocalDateTime createAt;
-
     @ManyToOne
     private Post post;
 
     @Builder
-    private Image(Long id, String path, LocalDateTime createAt) {
+    private Image(Long id, String path) {
         checkArgument(isNotEmpty(path), "path must be provided.");
 
         this.id = id;
         this.path = path;
-        this.createAt = defaultIfNull(createAt,now());
     }
 
 

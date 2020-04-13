@@ -1,24 +1,23 @@
 package com.github.prgrms.social.api.model.post;
 
+import com.github.prgrms.social.api.model.BaseTimeEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
 @ToString(exclude = {"posts"})
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @Entity
-public class HashTag {
+public class HashTag extends BaseTimeEntity {
 
     @ApiModelProperty(value = "PK", required = true)
     @Id
@@ -29,10 +28,6 @@ public class HashTag {
     @Column(nullable = false, unique = true)
     private final String name;
 
-    @ApiModelProperty(value = "생성일시", required = true)
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private final LocalDateTime createAt;
-
     @ManyToMany
     @JoinTable(
             name = "post_hashtag",
@@ -41,11 +36,10 @@ public class HashTag {
     private Set<Post> posts = new HashSet<>();
 
     @Builder
-    private HashTag(Long id, String name, LocalDateTime createAt) {
+    private HashTag(Long id, String name) {
         checkArgument(isNotEmpty(name), "name must be provided. ");
 
         this.id = id;
         this.name = name;
-        this.createAt = defaultIfNull(createAt, LocalDateTime.now());
     }
 }

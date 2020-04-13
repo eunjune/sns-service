@@ -16,11 +16,11 @@ import static org.apache.commons.lang3.StringUtils.*;
 @Getter
 public class AttachedFile {
 
-    private String originalFileName;
+    private final String originalFileName;
 
-    private String contentType;
+    private final String contentType;
 
-    private byte[] bytes;
+    private final byte[] bytes;
 
     // 파일 보안 검사. 올바른 파일인지
     private static boolean verify(MultipartFile multipartFile) throws IOException {

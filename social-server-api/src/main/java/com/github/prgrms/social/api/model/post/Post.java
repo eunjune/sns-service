@@ -1,11 +1,11 @@
 package com.github.prgrms.social.api.model.post;
 
+import com.github.prgrms.social.api.model.BaseTimeEntity;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,17 +14,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.time.LocalDateTime.now;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"retweetPost","postsRetweetedMe","images","likeInfos"})
 @Entity
-public class Post {
+public class Post extends BaseTimeEntity {
 
     @ApiModelProperty(value = "PK", required = true)
     @javax.persistence.Id
@@ -40,9 +38,6 @@ public class Post {
     @Transient
     private boolean likesOfMe;
 
-    @ApiModelProperty(value = "작성일시", required = true)
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private final LocalDateTime createAt;
 
     // postCards.js(id,name), FollowButton.js(id)
     @ApiModelProperty(value = "작성자")
@@ -72,7 +67,7 @@ public class Post {
     private Set<Post> postsRetweetedMe = new HashSet<>();
 
     @Builder
-    private Post(Long id, String content, boolean likesOfMe, LocalDateTime createAt) {
+    private Post(Long id, String content, boolean likesOfMe) {
         checkArgument(isNotEmpty(content), "contents must be provided.");
         checkArgument(
                 content.length() >= 4 && content.length() <= 500,
@@ -82,7 +77,6 @@ public class Post {
         this.id = id;
         this.content = content;
         this.likesOfMe = likesOfMe;
-        this.createAt = defaultIfNull(createAt, now());
     }
 
     public void setLikesOfMe(Long userId) {

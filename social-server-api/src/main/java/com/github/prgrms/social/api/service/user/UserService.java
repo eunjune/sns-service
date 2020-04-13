@@ -139,7 +139,6 @@ public class UserService {
                     }
 
                     user.setEmailCertification(true);
-                    user.setCreateAt(LocalDateTime.now());
                     return user;
                 })
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 접근 입니다."));

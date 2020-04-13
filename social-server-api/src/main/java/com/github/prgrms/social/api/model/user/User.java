@@ -1,5 +1,6 @@
 package com.github.prgrms.social.api.model.user;
 
+import com.github.prgrms.social.api.model.BaseTimeEntity;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.security.JWT;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,16 +15,15 @@ import java.util.UUID;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.time.LocalDateTime.now;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"followings","followers","posts"})
 @Entity(name = "users")
-public class User {
+public class User extends BaseTimeEntity{
 
     @ApiModelProperty(value = "PK", required = true)
     @Id
@@ -62,9 +62,6 @@ public class User {
     @ApiModelProperty(value = "최종 로그인 일시")
     private LocalDateTime lastLoginAt;
 
-    @ApiModelProperty(value = "생성일시", required = true)
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime createAt;
 
     // profile.js, FollowButton.js
     @ApiModelProperty(value = "팔로잉 목록")
@@ -83,7 +80,7 @@ public class User {
     private Set<Post> posts = new HashSet<>();
 
     @Builder(toBuilder = true)
-    private User(Long id, String name, Email email, String password, String profileImageUrl, boolean isPrivate, boolean isEmailCertification, String emailCertificationToken, int loginCount, LocalDateTime lastLoginAt, LocalDateTime createAt) {
+    private User(Long id, String name, Email email, String password, String profileImageUrl, boolean isPrivate, boolean isEmailCertification, String emailCertificationToken, int loginCount, LocalDateTime lastLoginAt) {
         checkArgument(isNotEmpty(name), "name must be provided.");
         checkArgument(
                 name.length() >= 1 && name.length() <= 10,
@@ -102,7 +99,6 @@ public class User {
         this.emailCertificationToken = emailCertificationToken;
         this.loginCount = loginCount;
         this.lastLoginAt = lastLoginAt;
-        this.createAt = defaultIfNull(createAt, now());
     }
 
 

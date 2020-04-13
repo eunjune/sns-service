@@ -1,24 +1,22 @@
 package com.github.prgrms.social.api.model.post;
 
+import com.github.prgrms.social.api.model.BaseTimeEntity;
 import com.github.prgrms.social.api.model.user.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.time.LocalDateTime.now;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
 @ToString(exclude = {"post","user"})
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id",callSuper = false)
 @Entity
-public class Comment {
+public class Comment extends BaseTimeEntity {
 
     @ApiModelProperty(value = "PK", required = true)
     @javax.persistence.Id
@@ -29,10 +27,6 @@ public class Comment {
     @Column(nullable = false)
     private String content;
 
-    @ApiModelProperty(value = "작성일시", required = true)
-    @Column(nullable = false, columnDefinition = "TIMESTAMP")
-    private final LocalDateTime createAt;
-
     @ManyToOne
     private Post post;
 
@@ -40,7 +34,7 @@ public class Comment {
     private User user;
 
     @Builder
-    private Comment(Long id, String content, LocalDateTime createAt) {
+    private Comment(Long id, String content) {
         checkArgument(isNotEmpty(content), "contents must be provided.");
         checkArgument(
                 content.length() >= 4 && content.length() <= 500,
@@ -49,6 +43,5 @@ public class Comment {
 
         this.id = id;
         this.content = content;
-        this.createAt = defaultIfNull(createAt, now());
     }
 }
