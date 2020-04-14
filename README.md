@@ -6,8 +6,8 @@
 
 
 ### 사용 스텍
-- 백엔드 : Spring Boot, Spring Security, Spring Data JPA, JWT, JUnit, Lombok, Swagger, MySql
-- 프론트 : React, React-Hooks, Redux, Redux-Saga, ESLint, Next.js, Webpack, Axios, SSR
+- 백엔드 : Spring Boot, Spring MVC, Spring Security, Spring Data JPA, Spring AOP, JWT, JUnit, Lombok, Swagger, MySql
+- 프론트엔드 : React, React-Hooks, Redux, Redux-Saga, Next.js, Webpack, Axios, SSR, Ant design, styled-component, ESLint
 - 기타 : Git, AWS S3
 
 
