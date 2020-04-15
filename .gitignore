@@ -8,7 +8,6 @@ social-server-ui/.next
 social-server-ui/.env
 /target/
 target/
-!.mvn/wrapper/maven-wrapper.jar
 /log/
 log/
 *.log
