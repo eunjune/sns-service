@@ -6,6 +6,7 @@ import com.github.prgrms.social.api.security.*;
 import com.github.prgrms.social.api.security.voter.ConnectionBasedVoter;
 import com.github.prgrms.social.api.security.voter.PostEditVoter;
 import com.github.prgrms.social.api.service.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -36,16 +37,13 @@ import static org.apache.commons.lang3.math.NumberUtils.toLong;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     private final JwtAccessDeniedHandler accessDeniedHandler;
 
     private final EntryPointUnauthorizedHandler unauthorizedHandler;
 
-    public WebSecurityConfigure(JwtAccessDeniedHandler accessDeniedHandler, EntryPointUnauthorizedHandler unauthorizedHandler) {
-        this.accessDeniedHandler = accessDeniedHandler;
-        this.unauthorizedHandler = unauthorizedHandler;
-    }
 
     @Autowired
     public void configureAuthentication(AuthenticationManagerBuilder builder, JwtAuthenticationProvider authenticationProvider) {

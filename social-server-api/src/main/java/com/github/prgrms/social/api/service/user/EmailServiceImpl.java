@@ -4,6 +4,7 @@ import com.github.prgrms.social.api.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 // Todo 시스템 에러 발생. 메모리 관련 에러라서 원인은 알 수 없음. 추후검토
-//@Primary
+@Profile("prod")
 @Slf4j
 @Service
 @RequiredArgsConstructor

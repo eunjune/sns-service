@@ -3,12 +3,11 @@ package com.github.prgrms.social.api.service.user;
 import com.github.prgrms.social.api.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
-@Primary
-//@Profile("test")
+@Profile("!prod")
 @Slf4j
 @Service
 @RequiredArgsConstructor

@@ -22,7 +22,7 @@ public class MeResponse {
 
     private boolean isPrivate;
 
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     private LocalDateTime lastLoginAt;
 

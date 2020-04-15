@@ -151,8 +151,6 @@ public class PostRestController {
             @ApiParam(value = "대상 포스트 PK",example = "1",required = true) @PathVariable Long postId,
             @RequestBody PostingRequest request
     ) {
-
-
         return OK(dtoUtils.convertPostResponse(postService.updatePost(postId,request)));
     }
 

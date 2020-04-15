@@ -22,7 +22,7 @@ public class PostResponse {
 
     private Boolean isRetweet;
 
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     private Integer commentCount;
 
