@@ -1,21 +1,12 @@
-const withBunddleAnalyzer = require('@zeit/next-bundle-analyzer');
+const withBunddleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+});
 const webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin')
 
 module.exports = withBunddleAnalyzer({
     distDir: '.next',
-    analyzeServer: ["server", "both"].includes(process.env.BUNDLE_ANALYZE),
-    analyzeBrowser: ["browser", "both"].includes(process.env.BUNDLE_ANALYZE),
-    bundleAnalyzerConfig: {
-        server: {
-            analyzerMode: 'static',
-            reportFilename: '../bundles/server.html'
-        },
-        browser: {
-            analyzerMode: 'static',
-            reportFilename: '../bundles/client.html'
-        }
-    },
+
     webpack(config) {
         console.log('config',config);
         const prod = process.env.NODE_ENV === 'production';
@@ -30,7 +21,9 @@ module.exports = withBunddleAnalyzer({
 
         return {
             ...config,
-            mode: prod ? 'production' : 'development',
+
+            // 기본 설정에 덮어 씌울 부분
+           mode: prod ? 'production' : 'development',
             devtool: prod ? 'hidden-source-map' : 'eval',
             module: {
                 ...config.module,

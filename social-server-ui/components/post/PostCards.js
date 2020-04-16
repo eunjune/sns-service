@@ -187,7 +187,7 @@ const PostCards = memo(({post, keyword}) => {
                 title={post.isRetweet ? `${post.user.name}님이 리트윗 하셨습니다.` : null}
                 extra={<FollowButton post={post} onUnfollow={onUnfollow} onFollow={onFollow}/>}
             >
-                <div style={{float: 'right'}}>{moment(post.createAt).fromNow()}</div>
+                <div style={{float: 'right'}}>{moment(post.createdAt).fromNow()}</div>
                 {post.isRetweet ?
                     <Card
                         cover={post.retweetPost.images[0] && <PostImages images={post.retweetPost.images}/>}
@@ -249,7 +249,7 @@ const PostCards = memo(({post, keyword}) => {
                         content={item.content}
                         datetime={
                             <Tooltip title={moment().format('YYYY-MM-DD HH:mm:ss')}>
-                                <span>{moment(item.createAt).fromNow()}</span>
+                                <span>{moment(item.createdAt).fromNow()}</span>
                             </Tooltip>
                         }
                       />
@@ -265,7 +265,7 @@ PostCards.propTypes = {
     post: PropTypes.shape({
         user: PropTypes.object,
         content: PropTypes.string,
-        createAt: PropTypes.string,
+        createdAt: PropTypes.string,
     }),
 };
 

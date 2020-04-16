@@ -30,7 +30,7 @@ export const H1 = styled.h1`
 
 export const SlickWrapper = styled.div`
   height: calc(100% - 44px);
-  background: #090909;
+  background: black;
 `;
 
 export const CloseButton= styled(Icon)`
@@ -63,7 +63,7 @@ export const ImgWrapper = styled.div`
   text-align: center;
 
   & img {
-    margin: 0 auto;
+    margin: auto;
     max-height: 750px;
   }
 `;

@@ -1,6 +1,6 @@
 import React, {useEffect, useCallback, useState, useRef} from 'react';
 import cookie from 'react-cookies';
-import {Button, List, Card, Icon, Col, Row, Input, Form, Avatar} from 'antd';
+import {Button, Card, Col, Row} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     LOAD_FOLLOWER_REQUEST,
@@ -14,11 +14,12 @@ import {
 } from '../reducers/post';
 import PostCards from '../components/post/PostCards';
 import FollowList from "../components/profile/FollowList";
-import CenterAlignment from "../components/CenterAlignment";
 import Router from "next/router";
 import ProfileEditForm from "../components/profile/ProfileEditForm";
 import AvartarCustom from "../components/profile/AvartarCustom";
-import AuthenticationError from "../components/error/AuthenticationError";
+import PictureTwoTone from "@ant-design/icons/lib/icons/PictureTwoTone";
+import PictureOutlined from "@ant-design/icons/lib/icons/PictureOutlined";
+import FileImageOutlined from "@ant-design/icons/lib/icons/FileImageOutlined";
 
 
 const Profile = () => {
@@ -180,6 +181,7 @@ const Profile = () => {
 
 
 
+
                         <Card
                             actions={[
                                 <div onClick={clickPost}>게시글<br/>{me && me.postCount}</div>,
@@ -190,9 +192,15 @@ const Profile = () => {
                                 'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
                         >
                             {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
-                            {profileOn && <Button style={{float: 'right'}} onClick={onClickSelectImage}>프로필 이미지 변경</Button>}
+                            <span style={{float: 'right' ,height: '100%'}}>{profileOn && <FileImageOutlined  onClick={onClickSelectImage}/>}</span>
                             <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={me && me.profileImageUrl} name={me && me.name} />}
-                                       title={me && <span style={{cursor: 'pointer'}}>{me.name}</span>} onClick={clickProfile}/>
+                                       title={me &&
+                                            <div>
+                                                <span style={{cursor: 'pointer'}}>{me.name}</span>
+
+                                            </div>}
+                                       onClick={clickProfile}/>
+
 
                         </Card>
                         {profileOn && uploadImageReady && <Button type="primary" style={{width: '100%'}} onClick={onClickUploadImage}>프로필 이미지 변경</Button>}

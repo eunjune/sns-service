@@ -97,8 +97,6 @@ const PostEditForm = ({post}) => {
                         editPostImages.map((v,i) => {
                             return (
                                 <div key={v} style={{display: 'inline-block' ,marginTop: '20px'}}>
-                                    {v}
-                                    {i}
                                     <img src={`http://localhost:8080/image/${v}`}  style={{width: '200px'}} alt={v}/>
                                     <div>
                                         <Button onClick={onRemoveImage(i)}>제거</Button>

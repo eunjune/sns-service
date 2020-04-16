@@ -321,7 +321,8 @@ const reducer = (state = initialState, action) => {
 
             case LIKE_POST_SUCCESS: {
                 const postIndex = draft.posts.findIndex(v => v.id === action.data.id);
-                draft.posts[postIndex] = action.data;
+                draft.posts[postIndex].likeCount = action.data.likeCount;
+                draft.posts[postIndex].likesOfMe = action.data.likesOfMe;
 
                 break;
             }
@@ -353,8 +354,9 @@ const reducer = (state = initialState, action) => {
             }
             case UNLIKE_POST_SUCCESS: {
                 const postIndex = draft.posts.findIndex(v => v.id === action.data.id);
-                draft.posts[postIndex] = action.data;
-                
+                draft.posts[postIndex].likeCount = action.data.likeCount;
+                draft.posts[postIndex].likesOfMe = action.data.likesOfMe;
+
                 break;
             }
 
