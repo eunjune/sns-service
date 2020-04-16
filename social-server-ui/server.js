@@ -13,6 +13,7 @@ const app = next({dev});
 const handle = app.getRequestHandler();
 dotenv.config();
 app.prepare().then(() => {
+
   const server = express();
 
   server.use(express.static('public'));
@@ -45,7 +46,7 @@ app.prepare().then(() => {
     return handle(req,res);
   });
 
-  server.listen(3060, () => {
-    console.log('next+express running on port 3060');
+  server.listen(prod ? process.env.PORT : 3060, () => {
+    console.log(`next+express running on port ${process.env.PORT}`);
   });
 });
