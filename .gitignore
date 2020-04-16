@@ -1,7 +1,9 @@
 */src/main/resources/application.yml
+*/src/main/resources/application-prod.yml
 */src/main/resources/banner.txt
 */src/test/resources/test_profile.jpg
 */src/test/resources/application.yml
+*/src/test/resources/application-prod.yml
 social-server-api/src/test/java/com/github/prgrms/social/api/aws/
 social-server-ui/node_modules
 social-server-ui/.next

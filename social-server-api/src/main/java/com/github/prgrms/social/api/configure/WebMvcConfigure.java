@@ -17,6 +17,9 @@ public class WebMvcConfigure implements WebMvcConfigurer {
 
     @Value("${jwt.token.header}") private String tokenHeader;
 
+    @Value("${app.host}")
+    private String client;
+
     private String baseApiPath = "/api";
 
     @Override
@@ -57,7 +60,7 @@ public class WebMvcConfigure implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3060")
+                .allowedOrigins(client)
                 .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS");
 
     }
