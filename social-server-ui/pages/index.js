@@ -15,9 +15,6 @@ const Home = ({isEmailLogin,usedLastIds}) => {
     const dispatch = useDispatch();
     const token = cookie.load('token');
 
-    console.log('token');
-    console.log(token);
-
     useEffect(() => {
 
         window.addEventListener('scroll', onScroll);

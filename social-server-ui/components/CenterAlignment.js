@@ -2,7 +2,7 @@ import {Col, Row} from "antd";
 import React, {memo} from "react";
 
 const CenterAlignment = memo(({children}) => {
-     console.log(children);
+
     const center = children.props.className === 'index' ? 12 : 8;
     const side = children.props.className === 'index' ? 6 : 8;
 

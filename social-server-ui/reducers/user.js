@@ -1,7 +1,5 @@
 import cookie from 'react-cookies';
 import produce from 'immer';
-import Router from "next/router";
-import {UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_SUCCESS} from "./post";
 
 export const initialState = {
     me: null,
@@ -398,9 +396,10 @@ const reducer = (state = initialState, action) => {
 
             case LOG_OUT: {
                 cookie.remove('token', { path: '/' });
-                draft.me = null;
-                draft.followings = [];
-                draft.followers = [];
+                draft.me= null;
+                draft.followings= [];
+                draft.followers= [];
+
                 break;
             }
 

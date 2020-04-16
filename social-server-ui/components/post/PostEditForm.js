@@ -10,6 +10,7 @@ import {
 } from "../../reducers/post";
 import {Button, Form, Input, Modal} from "antd";
 import Router from "next/router";
+import {baseUrl} from "../../saga";
 
 const PostEditForm = ({post}) => {
     const [text, setText] = useState(post.content);
@@ -97,7 +98,7 @@ const PostEditForm = ({post}) => {
                         editPostImages.map((v,i) => {
                             return (
                                 <div key={v} style={{display: 'inline-block' ,marginTop: '20px'}}>
-                                    <img src={`http://localhost:8080/image/${v}`}  style={{width: '200px'}} alt={v}/>
+                                    <img src={baseUrl + `image/${v}`}  style={{width: '200px'}} alt={v}/>
                                     <div>
                                         <Button onClick={onRemoveImage(i)}>제거</Button>
                                     </div>

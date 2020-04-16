@@ -9,6 +9,7 @@ import {LOAD_FOLLOWER_REQUEST, LOAD_FOLLOWING_REQUEST, LOAD_USER_REQUEST} from '
 import FollowList from "../components/profile/FollowList";
 import AvartarCustom from "../components/profile/AvartarCustom";
 import PrivateUserAccess from "../components/error/PrivateUserAccess";
+import {baseUrl} from "../saga";
 
 const User = ({ id }) => {
     const dispatch = useDispatch();
@@ -18,7 +19,6 @@ const User = ({ id }) => {
     const usedLastIds = useRef([]);
 
     useEffect(() => {
-        console.log('sdfsd')
       window.addEventListener('scroll', onScroll);
       return () => {
           window.removeEventListener('scroll', onScroll);
@@ -56,8 +56,8 @@ const User = ({ id }) => {
                           <div>팔로윙<br/>{user && user.followingCount}</div>,
                           <div>팔로워<br/>{user && user.followerCount}</div>
                       ]}
-                      cover={<img src={user && user.profileImageUrl ? `http://localhost:8080/image/profile/${user.profileImageUrl}` :
-                          'http://localhost:8080/image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
+                      cover={<img src={user && user.profileImageUrl ? baseUrl + `image/profile/${user.profileImageUrl}` :
+                          baseUrl +  'image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
                   >
                       <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={user && user.profileImageUrl} name={user && user.name} />}
                                  title={user && user.name}/>

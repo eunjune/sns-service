@@ -7,6 +7,7 @@ import {
   REMOVE_IMAGE,
   UPLOAD_IMAGES_REQUEST
 } from '../../reducers/post';
+import {baseUrl} from "../../saga";
 
 const PostForm = () => {
   const [text, setText] = useState('');
@@ -98,7 +99,7 @@ const PostForm = () => {
                   imagePaths.map((v,i) => {
                   return (
                         <div key={v} style={{display: 'inline-block'}}>
-                            <img src={`http://localhost:8080/image/${v}`}  style={{width: '200px'}} alt={v}/>
+                            <img src={baseUrl + `image/${v}`}  style={{width: '200px'}} alt={v}/>
                             <div>
                                 <Button onClick={onRemoveImage(i)}>제거</Button>
                             </div>

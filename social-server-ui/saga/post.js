@@ -46,7 +46,8 @@ import axios from 'axios';
 function loadMainPostsAPI({lastId=0,token}) {
 
     console.log('load');
-    console.log(token);
+    console.log('lastId');
+    console.log(lastId);
 
     if(token === null) {
         return axios.get(`user/post/list?lastId=${lastId}&size=${SIZE}`);

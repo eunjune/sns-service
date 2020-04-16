@@ -1,4 +1,6 @@
 import produce from 'immer'
+import cookie from "react-cookies";
+import {LOG_OUT} from "./user";
 
 export const initialState = {
     posts: [],
@@ -82,6 +84,8 @@ export const SHOW_EDIT_POST = 'SHOW_EDIT_POST';
 export const CANCEL_EDIT_POST = 'CANCEL_EDIT_POST';
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
+export const LOG_OUT_POST = 'LOG_OUT_POST';
+
 export const SIZE = 3;
 
 const reducer = (state = initialState, action) => {
@@ -90,7 +94,10 @@ const reducer = (state = initialState, action) => {
 
     
             case LOAD_MAIN_POSTS_REQUEST: {
-                console.log('my posts');
+                console.log('posts');
+                console.log(draft.posts.length);
+                console.log(action.data.lastId === 0);
+
                 draft.posts = action.data.lastId === 0 ? [] : draft.posts;
                 draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
                 break;
