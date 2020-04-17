@@ -94,10 +94,6 @@ const reducer = (state = initialState, action) => {
 
     
             case LOAD_MAIN_POSTS_REQUEST: {
-                console.log('posts');
-                console.log(draft.posts.length);
-                console.log(action.data.lastId === 0);
-
                 draft.posts = action.data.lastId === 0 ? [] : draft.posts;
                 draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
                 break;

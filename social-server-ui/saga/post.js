@@ -42,13 +42,9 @@ import {
     EDIT_POST_FAILURE, LOAD_SEARCH_POSTS_REQUEST, LOAD_SEARCH_POSTS_SUCCESS, LOAD_SEARCH_POSTS_FAILURE
 } from '../reducers/post';
 import axios from 'axios';
+import {baseUrl} from "../config/config";
 
-function loadMainPostsAPI({lastId=0,token}) {
-
-    console.log('load');
-    console.log('lastId');
-    console.log(lastId);
-
+function loadMainPostsAPI({lastId=0,token=null}) {
     if(token === null) {
         return axios.get(`user/post/list?lastId=${lastId}&size=${SIZE}`);
     }

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {Overlay, Header, CloseButton, SlickWrapper, ImgWrapper, Indicator} from '../styles/imagesZoomStyle';
 import Slick from 'react-slick';
 import {Carousel} from "antd";
-import {baseUrl} from "../../saga";
+import {baseUrl} from "../../config/config";
 
 const ImagesZoom = ({images,onClose}) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -17,7 +17,7 @@ const ImagesZoom = ({images,onClose}) => {
       <SlickWrapper>
           <Carousel>
               {images.map((v) => {
-                  const src = baseUrl + `image/${v}`;
+                  const src = `${baseUrl}/image/${v}`;
                   return (
                       <ImgWrapper>
                           <img src={src} alt=""/>

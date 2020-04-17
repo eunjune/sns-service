@@ -20,7 +20,7 @@ import AvartarCustom from "../components/profile/AvartarCustom";
 import PictureTwoTone from "@ant-design/icons/lib/icons/PictureTwoTone";
 import PictureOutlined from "@ant-design/icons/lib/icons/PictureOutlined";
 import FileImageOutlined from "@ant-design/icons/lib/icons/FileImageOutlined";
-import {baseUrl} from "../saga";
+import {baseUrl} from "../config/config";
 
 
 const Profile = () => {
@@ -41,9 +41,6 @@ const Profile = () => {
 
     useEffect(() => {
         if(!me) {
-            console.log('!me');
-            console.log(posts.length);
-            console.log(hasMorePost);
             Router.push("/");
             return;
         }
@@ -191,8 +188,8 @@ const Profile = () => {
                                 <div onClick={clickFollow}>팔로윙<br/>{me && me.followings.length}</div>,
                                 <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
                             ]}
-                            cover={<img ref={updateProfileImage} src={me && me.profileImageUrl ? baseUrl + `image/profile/${me.profileImageUrl}` :
-                                baseUrl + 'image/profile/default-user.png'} alt="프로필 사진" style={{padding: 50}}/>}
+                            cover={<img ref={updateProfileImage} src={me && me.profileImageUrl ? `${baseUrl}/image/profile/${me.profileImageUrl}` :
+                                `${baseUrl}/image/profile/default-user.png`} alt="프로필 사진" style={{padding: 50}}/>}
                         >
                             {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
                             <span style={{float: 'right' ,height: '100%'}}>{profileOn && <FileImageOutlined  onClick={onClickSelectImage}/>}</span>
@@ -249,8 +246,8 @@ const Profile = () => {
 };
 
 Profile.getInitialProps = async(context) => {
-    const token = cookie.load('token') || (context.isServer && context.req.headers.cookie.includes('token')
-        ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
+    const token = cookie.load('token') ||
+        (context.isServer && context.req.headers.cookie && context.req.headers.cookie.replace(/(token=)(.+)/,"$2"));
 
     if(token.length > 0) {
         context.store.dispatch({

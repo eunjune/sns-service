@@ -84,14 +84,14 @@ const Home = ({isEmailLogin,usedLastIds}) => {
 
 Home.getInitialProps = async (context) => {
     const isEmailLogin = !!context.query.token;
-    const token = cookie.load('token') || (context.isServer && context.req.headers.cookie.includes('token')
-        ? context.req.headers.cookie.replace(/(.+)(token=)(.+)/,"$3") : '');
+    const token = cookie.load('token') ||
+        (context.isServer && context.req.headers.cookie && context.req.headers.cookie.replace(/(token=)(.+)/,"$2"));
 
     context.store.dispatch({
         type: LOAD_MAIN_POSTS_REQUEST,
         data: {
             lastId: 0,
-            token : token.length > 0 ? token : null
+            token : token
         }
     });
 

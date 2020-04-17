@@ -6,6 +6,7 @@
 */src/test/resources/application-prod.yml
 social-server-api/src/test/java/com/github/prgrms/social/api/aws/
 social-server-ui/node_modules
+social-server-ui/config
 social-server-ui/.next
 social-server-ui/.env
 /target/

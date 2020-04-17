@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types'
 import { Icon } from 'antd';
 import ImagesZoom from './ImagesZoom';
-import {baseUrl} from "../../saga";
+import {baseUrl} from "../../config/config";
 
 const PostImages = ({images}) => {
 
@@ -19,7 +19,7 @@ const PostImages = ({images}) => {
   if(images.length === 1) {
     return (
       <>
-        <img src={baseUrl + `image/${images[0]}`} alt="" onClick={onZoom}/>
+        <img src={`${baseUrl}/image/${images[0]}`} alt="" onClick={onZoom}/>
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose}/>}
       </>
     );
@@ -29,8 +29,8 @@ const PostImages = ({images}) => {
     return (
       <>
         <div>
-          <img src={baseUrl + `image/${images[0]}`} width="50%" alt="" onClick={onZoom}/>
-          <img src={baseUrl + `image/${images[1]}`} width="50%" alt="" onClick={onZoom}/>
+          <img src={`${baseUrl}/image/${images[0]}`} width="50%" alt="" onClick={onZoom}/>
+          <img src={`${baseUrl}/image/${images[1]}`} width="50%" alt="" onClick={onZoom}/>
         </div>
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose}/>}
       </>
@@ -40,7 +40,7 @@ const PostImages = ({images}) => {
   return (
     <>
       <div>
-        <img src={baseUrl + `image/${images[0]}`} width="50%" alt="" />
+        <img src={`${baseUrl}/image/${images[0]}`} width="50%" alt="" />
         <div style={{display: 'inline-block', width: '50%', textAlign: 'center', verticalAlign: 'middle'}} onClick={onZoom}>
           <Icon type='plus'/>
           <br/>

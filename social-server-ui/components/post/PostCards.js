@@ -24,7 +24,7 @@ import PostForm from "./PostForm";
 import PostEditForm from "./PostEditForm";
 import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
 import AvartarCustom from "../profile/AvartarCustom";
-import {baseUrl} from "../../saga";
+import {baseUrl} from "../../config/config";
 moment.locale('ko');
 
 const CardWrapper = styled.div`
@@ -241,7 +241,7 @@ const PostCards = memo(({post, keyword}) => {
                         avatar={
                             <Link href={{pathname: '/user', query: {id : post.user.id}}} as={`/user/${post.user.id}`}>
                                 <a>
-                                    <Avatar shape="circle" icon={post.user.profileImageUrl && <img src={baseUrl + `image/profile/${post.user.profileImageUrl}`} alt=""/>}>
+                                    <Avatar shape="circle" icon={post.user.profileImageUrl && <img src={`${baseUrl}/image/profile/${post.user.profileImageUrl}`} alt=""/>}>
                                         {post.user.name[0]}
                                     </Avatar>
                                 </a>
