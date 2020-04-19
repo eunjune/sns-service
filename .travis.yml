@@ -12,6 +12,25 @@ before_install:
 
 script: "./mvnw clean package"
 
+
+before-deploy:
+  - zip -r sns-service *
+  - mkdir -p deploy
+  - mv sns-service.zip deploy/sns-service.zip
+
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: sns-service
+    region: ap-northeast-2
+    skip-cleanup: true
+    acl: private
+    local_dir: deploy
+    wait-until-deployed: true
+
+
 notifications:
   email:
     recipients:
