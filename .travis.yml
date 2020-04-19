@@ -30,6 +30,16 @@ deploy:
     local_dir: deploy
     wait-until-deployed: true
 
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: sns-service
+    key: sns-service.zip
+    bundle_type: zip
+    application: sns-service
+    deployment_group: sns-service-group
+    region: ap-northeast-2
+    wait-until-deployed: true
 
 notifications:
   email:
