@@ -15,8 +15,6 @@ import java.util.List;
 @Configuration
 public class WebMvcConfigure implements WebMvcConfigurer {
 
-    @Value("${jwt.token.header}") private String tokenHeader;
-
     @Value("${app.host}")
     private String client;
 
@@ -62,7 +60,6 @@ public class WebMvcConfigure implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(client)
                 .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS");
-
     }
 
 }

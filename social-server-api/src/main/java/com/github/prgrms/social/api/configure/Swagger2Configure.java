@@ -47,7 +47,6 @@ public class Swagger2Configure implements WebMvcConfigurer {
                 .build();
     }
 
-    // oauth?
     @Bean
     public SecurityConfiguration security() {
         return SecurityConfigurationBuilder.builder()

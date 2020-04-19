@@ -4,6 +4,7 @@ import com.github.prgrms.social.api.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -31,32 +32,32 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmailCertificationMessage(User user) {
         EmailHtmlMessage emailHtmlMessage = EmailHtmlMessage.builder()
-                .link("/check-email-token?token=" + user.getEmailCertificationToken() + "&email=" +user.getEmail().getAddress())
+                .link("/check-email-token?token=" + user.getEmailCertificationToken() + "&email=" + user.getEmail().getAddress())
                 .name(user.getName())
                 .linkName("인증하기")
                 .message("회원가입 인증을 위해 링크를 클릭하세요.")
                 .build();
 
 
-        sendEamil(emailHtmlMessage,user,"SNS service, 회원가입 인증");
+        sendEamil(emailHtmlMessage, user, "SNS service, 회원가입 인증");
     }
 
     @Override
     public void sendEmailLoginLinkMessage(User user, String apiToken) {
         EmailHtmlMessage emailHtmlMessage = EmailHtmlMessage.builder()
-                .link("/login-link?token=" + user.getEmailCertificationToken() + "&email=" +user.getEmail().getAddress())
+                .link("/login-link?token=" + user.getEmailCertificationToken() + "&email=" + user.getEmail().getAddress())
                 .name(user.getName())
                 .linkName("이메일 로그인")
                 .message("이메일 로그인을 위해 링크를 클릭하세요.")
                 .build();
 
-        sendEamil(emailHtmlMessage,user,"SNS service, 이메일 로그인");
+        sendEamil(emailHtmlMessage, user, "SNS service, 이메일 로그인");
     }
 
     private String getHtmlMessage(EmailHtmlMessage emailHtmlMessage) {
         Context context = new Context();
-        context.setVariable("link",emailHtmlMessage.getLink());
-        context.setVariable("name",emailHtmlMessage.getName());
+        context.setVariable("link", emailHtmlMessage.getLink());
+        context.setVariable("name", emailHtmlMessage.getName());
         context.setVariable("linkName", emailHtmlMessage.getLinkName());
         context.setVariable("message", emailHtmlMessage.getMessage());
         context.setVariable("host", host);
