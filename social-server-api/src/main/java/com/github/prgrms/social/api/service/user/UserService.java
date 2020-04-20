@@ -7,7 +7,7 @@ import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.user.UserRepository;
-import com.github.prgrms.social.api.service.FileService;
+import com.github.prgrms.social.api.service.FileServiceLocal;
 import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +35,7 @@ public class UserService {
 
     private final S3Client s3Client;
 
-    private final FileService fileService;
+    private final FileServiceLocal fileServiceLocal;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -184,7 +183,7 @@ public class UserService {
         //Todo 배포시 변경 필요
         realPath = realPath.substring(0,34) + "uploads" + File.separator + "profile";
 
-        String newProfileImageUrl = fileService.uploadFile(realPath, file);
+        String newProfileImageUrl = fileServiceLocal.uploadFile(realPath, file);
 
         return getUser(id)
                 .map(user -> {

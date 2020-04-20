@@ -13,7 +13,7 @@ import com.github.prgrms.social.api.repository.post.ImageRepository;
 import com.github.prgrms.social.api.repository.post.PostLikeRepository;
 import com.github.prgrms.social.api.repository.post.PostRepository;
 import com.github.prgrms.social.api.repository.user.UserRepository;
-import com.github.prgrms.social.api.service.FileService;
+import com.github.prgrms.social.api.service.FileServiceLocal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final FileService fileService;
+    private final FileServiceLocal fileServiceLocal;
 
     private final UserRepository userRepository;
 
@@ -300,7 +300,7 @@ public class PostService {
 
         List<String> result = new ArrayList<>();
         for(MultipartFile file : files) {
-            result.add(fileService.uploadFile(realPath,file));
+            result.add(fileServiceLocal.uploadFile(realPath,file));
         }
 
         return result;
