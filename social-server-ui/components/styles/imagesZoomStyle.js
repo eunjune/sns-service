@@ -8,6 +8,7 @@ export const Overlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
+  background: black;
 `;
 
 export const Header = styled.header`
@@ -37,7 +38,7 @@ export const CloseButton= styled(Icon)`
   position: absolute;
   right: 0;
   top: 0;
-  padding: 15;
+  padding: 15px;
   line-height: 14px;
   cursor: pointer;
 `

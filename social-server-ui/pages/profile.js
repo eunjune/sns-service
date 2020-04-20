@@ -188,8 +188,7 @@ const Profile = () => {
                                 <div onClick={clickFollow}>팔로윙<br/>{me && me.followings.length}</div>,
                                 <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
                             ]}
-                            cover={<img ref={updateProfileImage} src={me && me.profileImageUrl ? `${baseUrl}/image/profile/${me.profileImageUrl}` :
-                                `${baseUrl}/image/profile/default-user.png`} alt="프로필 사진" style={{padding: 50}}/>}
+                            cover={<img ref={updateProfileImage} src={me.profileImageUrl} alt="프로필 사진" style={{padding: 50}}/>}
                         >
                             {profileOn && <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages}/>}
                             <span style={{float: 'right' ,height: '100%'}}>{profileOn && <FileImageOutlined  onClick={onClickSelectImage}/>}</span>

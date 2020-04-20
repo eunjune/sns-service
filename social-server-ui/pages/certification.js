@@ -12,6 +12,7 @@ const Certification = ({emailToken, email}) => {
     useEffect(() => {
 
         if(me.isEmailCertification === true) {
+            alert('인증 되었습니다.');
             Router.push('/');
         }
 

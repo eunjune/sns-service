@@ -241,7 +241,7 @@ const PostCards = memo(({post, keyword}) => {
                         avatar={
                             <Link href={{pathname: '/user', query: {id : post.user.id}}} as={`/user/${post.user.id}`}>
                                 <a>
-                                    <Avatar shape="circle" icon={post.user.profileImageUrl && <img src={`${baseUrl}/image/profile/${post.user.profileImageUrl}`} alt=""/>}>
+                                    <Avatar shape="circle" icon={post.user.profileImageUrl && <img src={`${post.user.profileImageUrl}`} alt=""/>}>
                                         {post.user.name[0]}
                                     </Avatar>
                                 </a>

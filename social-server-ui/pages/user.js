@@ -56,8 +56,7 @@ const User = ({ id }) => {
                           <div>팔로윙<br/>{user && user.followingCount}</div>,
                           <div>팔로워<br/>{user && user.followerCount}</div>
                       ]}
-                      cover={<img src={user && user.profileImageUrl ? `${baseUrl}/image/profile/${user.profileImageUrl}` :
-                          `${baseUrl}/image/profile/default-user.png`} alt="프로필 사진" style={{padding: 50}}/>}
+                      cover={<img src={user.profileImageUrl} alt="프로필 사진" style={{padding: 50}}/>}
                   >
                       <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={user && user.profileImageUrl} name={user && user.name} />}
                                  title={user && user.name}/>

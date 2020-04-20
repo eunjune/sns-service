@@ -6,26 +6,24 @@ import {Carousel} from "antd";
 import {baseUrl} from "../../config/config";
 
 const ImagesZoom = ({images,onClose}) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
 
   return (
     <Overlay>
       <Header>
-        <h1>상세 이미지</h1>
         <CloseButton type="close" onClick={onClose}/>
+        <h1>상세 이미지</h1>
       </Header>
-      <SlickWrapper>
-          <Carousel>
-              {images.map((v) => {
-                  const src = `${baseUrl}/image/${v}`;
-                  return (
-                      <ImgWrapper>
-                          <img src={src} alt=""/>
-                      </ImgWrapper>
-                  );
-              })}
-          </Carousel>
-      </SlickWrapper>
+        <Carousel>
+            {images.map((v) => {
+                const src = `${v}`;
+                return (
+                    <ImgWrapper>
+                        <img src={src} alt=""/>
+                    </ImgWrapper>
+                );
+            })}
+        </Carousel>
+
     </Overlay>
   );
 };
