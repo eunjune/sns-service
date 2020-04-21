@@ -7,11 +7,13 @@ import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.user.Email;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.user.UserRepository;
+import com.github.prgrms.social.api.service.FileService;
 import com.github.prgrms.social.api.service.FileServiceLocal;
 import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,9 +35,10 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final S3Client s3Client;
+    @Value("${app.default-user-image}")
+    private String defaultUserImage;
 
-    private final FileServiceLocal fileServiceLocal;
+    private final FileService fileService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -97,6 +100,7 @@ public class UserService {
                 .name(name)
                 .email(email)
                 .password(passwordEncoder.encode(password))
+                .profileImageUrl(defaultUserImage)
                 .build();
 
         User saved = userRepository.save(user);
@@ -179,11 +183,11 @@ public class UserService {
         checkNotNull(file, "file must be provided.");
         checkArgument(isNotEmpty(realPath),"realPath must be provided." );
 
-        //Todo 메소드 분리
-        //Todo 배포시 변경 필요
-        realPath = realPath.substring(0,34) + "uploads" + File.separator + "profile";
+        realPath = fileService instanceof FileServiceLocal ?
+                realPath.substring(0,34) + "uploads" :
+                null;
 
-        String newProfileImageUrl = fileServiceLocal.uploadFile(realPath, file);
+        String newProfileImageUrl = fileService.uploadFile(realPath, file);
 
         return getUser(id)
                 .map(user -> {
@@ -223,20 +227,5 @@ public class UserService {
     }
 
 
-    // S3에 이미지 업로드
-    /*private String uploadProfileImage(AttachedFile profileFile) {
 
-        String profileImage = null;
-
-        if(profileFile != null) {
-            try {
-                profileImage = s3Client.upload(profileFile.inputStream(), profileFile.length()
-                        , profileFile.randomName("eunjun","png"), profileFile.getContentType(), null);
-            } catch(AmazonS3Exception e) {
-                log.warn("Amazon S3 error (key : {} ) {}", e.getMessage(), e);
-            }
-        }
-
-        return profileImage;
-    }*/
 }

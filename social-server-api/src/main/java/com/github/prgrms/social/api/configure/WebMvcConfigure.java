@@ -30,10 +30,6 @@ public class WebMvcConfigure implements WebMvcConfigurer {
         registry
             .addResourceHandler("/image/**").addResourceLocations("file:/Users/iws16/AppData/Local/Temp/uploads/").setCachePeriod(0);
 
-
-        registry
-                .addResourceHandler("/image/profile/**").addResourceLocations("file:/Users/iws16/AppData/Local/Temp/uploads/profile/").setCachePeriod(0);
-
         registry
             .addResourceHandler("/", "/**")
             .setCachePeriod(0)

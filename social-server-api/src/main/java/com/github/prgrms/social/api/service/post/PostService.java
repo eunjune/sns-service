@@ -13,8 +13,10 @@ import com.github.prgrms.social.api.repository.post.ImageRepository;
 import com.github.prgrms.social.api.repository.post.PostLikeRepository;
 import com.github.prgrms.social.api.repository.post.PostRepository;
 import com.github.prgrms.social.api.repository.user.UserRepository;
+import com.github.prgrms.social.api.service.FileService;
 import com.github.prgrms.social.api.service.FileServiceLocal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final FileServiceLocal fileServiceLocal;
+    private final FileService fileService;
 
     private final UserRepository userRepository;
 
@@ -257,6 +259,7 @@ public class PostService {
                     for(String key : removeImageMap.keySet()) {
                         if(!postingRequest.getImagePaths().contains(key)) {
                             post.removeImage(removeImageMap.get(key));
+                            fileService.deleteFile(key);
                             imageRepository.deleteById(removeImageMap.get(key).getId());
                         }
                     }
@@ -284,6 +287,9 @@ public class PostService {
 
         return postRepository.findById(postId)
                 .map(post -> {
+                    for(Image image : post.getImages()) {
+                        fileService.deleteFile(image.getPath());
+                    }
                     postRepository.deleteById(postId);
                     return post.getId();
                 })
@@ -294,13 +300,13 @@ public class PostService {
         // 20 * 1024 * 1024
         checkNotNull(files, "files must be provided.");
 
-        //Todo 메소드 분리
-        //Todo 배포시 변경 필요
-        realPath = realPath.substring(0,34) + "uploads";
+        realPath = fileService instanceof FileServiceLocal ?
+                realPath.substring(0,34) + "uploads" :
+                null;
 
         List<String> result = new ArrayList<>();
         for(MultipartFile file : files) {
-            result.add(fileServiceLocal.uploadFile(realPath,file));
+            result.add(fileService.uploadFile(realPath,file));
         }
 
         return result;

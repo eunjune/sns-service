@@ -15,7 +15,6 @@ import org.thymeleaf.context.Context;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-// Todo 시스템 에러 발생. 메모리 관련 에러라서 원인은 알 수 없음. 추후검토
 @Profile("prod")
 @Slf4j
 @Service
