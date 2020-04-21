@@ -6,18 +6,11 @@ branches:
   only:
     - master
 
-before_install:
-  - cd social-server-api
-  - chmod +x mvnw
-
-script: "./mvnw clean package"
-
 
 before-deploy:
   - zip -r sns-service *
   - mkdir -p deploy
   - mv sns-service.zip deploy/sns-service.zip
-
 
 deploy:
   - provider: s3
