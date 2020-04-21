@@ -4,11 +4,14 @@
 ### 간단 소개
 트위터 클론 프로젝트
 
+http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com/
+(크롬,웨일 접속 가능)
+
 
 ### 사용 스텍
-- 백엔드 : Spring Boot, Spring MVC, Spring Security, Spring Data JPA, Spring AOP, JWT, JUnit, Lombok, Swagger, MySql
+- 백엔드 : Spring Boot, Spring MVC, Spring Security, Spring Data JPA, Spring AOP, JWT, JUnit, Lombok, Swagger, MySql, MariaDB
 - 프론트엔드 : React, React-Hooks, Redux, Redux-Saga, Next.js(SSR), Webpack, Axios, Ant design, styled-component, ESLint
-- 기타 : Git, AWS S3
+- 인프라 : Git, AWS(EC2, RDS, S3, CodeDeploy), Travis CI
 
 
 ### 개발 내용
@@ -33,8 +36,14 @@
 - 이벤트
 
 
+### 서버 API
+http://ec2-13-125-116-71.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui.html
+
+
+
 ### 테이블
 ![Alt text](./readme-img/table.png)
+
 
 
 ### 참고 자료
