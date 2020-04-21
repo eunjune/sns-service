@@ -179,9 +179,9 @@ const Profile = () => {
 
                     <Card
                         actions={[
-                            <div onClick={clickPost}>게시글<br/>{me && me.postCount}</div>,
-                            <div onClick={clickFollow}>팔로잉<br/>{me && me.followings.length}</div>,
-                            <div onClick={clickFollow}>팔로워<br/>{me && me.followers.length}</div>
+                            <div onClick={clickPost}>게시글<br/>{posts.length}</div>,
+                            <div onClick={clickFollow}>팔로잉<br/>{followings.length}</div>,
+                            <div onClick={clickFollow}>팔로워<br/>{followers.length}</div>
                         ]}
                         cover={<img ref={updateProfileImage} src={me && me.profileImageUrl} alt="프로필 사진"
                                     style={{padding: 50}}/>}

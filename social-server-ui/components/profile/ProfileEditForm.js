@@ -63,11 +63,11 @@ const ProfileEditForm = ({me}) => {
             </Form.Item>
 
             <Form.Item
-                label='이름'
+                label='이름(닉네임)'
                 rules={[
                     {
                         required: false,
-                        message: '이름을 입력해주세요!',
+                        message: '이름(닉네임)을 입력해주세요!',
                     }
                 ]}>
                 <Input name="user-name" value={editName} required onChange={onChangeName}/>

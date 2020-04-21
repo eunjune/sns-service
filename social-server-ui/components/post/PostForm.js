@@ -7,6 +7,7 @@ import {
     REMOVE_IMAGE,
     UPLOAD_IMAGES_REQUEST
 } from '../../reducers/post';
+import {ADD_POST} from "../../reducers/user";
 
 const PostForm = () => {
     const [text, setText] = useState('');
@@ -42,6 +43,7 @@ const PostForm = () => {
                 },
             }
         });
+
     }, [text, imagePaths, addPostError]);
 
     const onChangeText = useCallback((e) => {

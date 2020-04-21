@@ -11,7 +11,7 @@ import {
     REMOVE_POST_REQUEST,
     SHOW_EDIT_POST
 } from '../../reducers/post';
-import {FOLLOW_USER_REQUEST, UNFOLLOW_USER_REQUEST} from '../../reducers/user'
+import {FOLLOW_USER_REQUEST, REMOVE_POST, UNFOLLOW_USER_REQUEST} from '../../reducers/user'
 import Link from 'next/link';
 import PostImages from './PostImages'
 import PostCardContent from './PostCardContent'
@@ -132,6 +132,7 @@ const PostCards = memo(({post, keyword}) => {
                 token
             }
         });
+
     }, []);
 
     const showEditPost = useCallback(() => {
