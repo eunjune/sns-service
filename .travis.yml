@@ -6,7 +6,6 @@ branches:
   only:
     - master
 
-
 before-deploy:
   - zip -r sns-service *
   - mkdir -p deploy
