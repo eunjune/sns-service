@@ -11,16 +11,16 @@ const Certification = ({emailToken, email}) => {
 
     useEffect(() => {
 
-        if(me.isEmailCertification === true) {
+        if (me.isEmailCertification === true) {
             alert('인증 되었습니다.');
             Router.push('/');
         }
 
-    },[me]);
+    }, [me]);
 
     return (
         <SpinDiv>
-            <Spin />
+            <Spin/>
         </SpinDiv>
     );
 };
@@ -40,7 +40,7 @@ Certification.getInitialProps = async (context) => {
         data: {emailToken, email},
     });
 
-    return { emailToken, email };
+    return {emailToken, email};
 };
 
 export default Certification;

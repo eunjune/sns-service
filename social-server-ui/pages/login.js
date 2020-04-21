@@ -1,31 +1,30 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {EMAIL_LOG_IN_REQUEST, FORGOT_PASSWORD, LOG_IN_REQUEST} from "../reducers/user";
-import {Button, Checkbox, Col, Form, Input, Row} from "antd";
-import Link from "next/link";
+import {EMAIL_LOG_IN_REQUEST, LOG_IN_REQUEST} from "../reducers/user";
+import {Button, Form, Input} from "antd";
 import Router from "next/router";
 import {DivWrap} from "../components/styles/ContainerStyle";
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import {UserOutlined, LockOutlined} from '@ant-design/icons';
 import CenterAlignment from "../components/CenterAlignment";
 
 const Login = () => {
-    const {me} = useSelector(state=>state.user);
+    const {me} = useSelector(state => state.user);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [forgotPassword, setForgotPassword] = useState(false);
-    const {isLoggingIn, loginError,isEmailLogInWaiting} = useSelector(state => state.user);
+    const {isLoggingIn, loginError, isEmailLogInWaiting} = useSelector(state => state.user);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if(me || isEmailLogInWaiting === true) {
+        if (me || isEmailLogInWaiting === true) {
             Router.push('/');
         }
-    },[me,isEmailLogInWaiting]);
+    }, [me, isEmailLogInWaiting]);
 
     const onSubmitForm = useCallback((e) => {
         e.preventDefault();
 
-        if(forgotPassword) {
+        if (forgotPassword) {
             dispatch({
                 type: EMAIL_LOG_IN_REQUEST,
                 data: {
@@ -70,7 +69,8 @@ const Login = () => {
                                 message: '이메일을 입력해주세요!',
                             }
                         ]}>
-                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="이메일" name="user-email" value={email} onChange={onChangeEmail}/>
+                        <Input prefix={<UserOutlined className="site-form-item-icon"/>} placeholder="이메일"
+                               name="user-email" value={email} onChange={onChangeEmail}/>
 
                     </Form.Item>
 
@@ -84,7 +84,9 @@ const Login = () => {
                                         message: '비밀번호를을 입력해주세요!',
                                     }
                                 ]}>
-                                <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="패스워드" name="user-password" type="password" value={password} onChange={onChangePassword}/>
+                                <Input prefix={<LockOutlined className="site-form-item-icon"/>} placeholder="패스워드"
+                                       name="user-password" type="password" value={password}
+                                       onChange={onChangePassword}/>
                             </Form.Item>
                             :
                             null
@@ -103,7 +105,7 @@ const Login = () => {
                     </Form.Item>
                 </Form>
 
-            } />
+            }/>
 
         </DivWrap>
 

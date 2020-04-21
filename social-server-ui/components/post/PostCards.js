@@ -1,18 +1,17 @@
-import React, {useState, useCallback, useEffect, memo} from 'react';
+import React, {useState, useCallback, memo} from 'react';
 import cookie from 'react-cookies';
 import PropTypes from 'prop-types';
-import {Button, Card, Icon, Avatar, Tooltip, List, Comment, Input, Popover, Modal, Alert} from 'antd';
-import { useSelector, useDispatch } from 'react-redux';
+import {Button, Card, Icon, Avatar, Tooltip, List, Comment, Popover} from 'antd';
+import {useSelector, useDispatch} from 'react-redux';
 import {
-    ADD_COMMENT_REQUEST,
     LOAD_COMMENTS_REQUEST,
     UNLIKE_POST_REQUEST,
     LIKE_POST_REQUEST,
     RETWEET_REQUEST,
     REMOVE_POST_REQUEST,
-    REMOVE_IMAGE, SHOW_EDIT_POST, CANCEL_EDIT_POST, EDIT_POST_REQUEST
+    SHOW_EDIT_POST
 } from '../../reducers/post';
-import {FOLLOW_USER_REQUEST,UNFOLLOW_USER_REQUEST} from '../../reducers/user'
+import {FOLLOW_USER_REQUEST, UNFOLLOW_USER_REQUEST} from '../../reducers/user'
 import Link from 'next/link';
 import PostImages from './PostImages'
 import PostCardContent from './PostCardContent'
@@ -20,11 +19,9 @@ import styled from 'styled-components';
 import moment from "moment";
 import CommentForm from "./CommentForm";
 import FollowButton from "./FollowButton";
-import PostForm from "./PostForm";
 import PostEditForm from "./PostEditForm";
-import UserOutlined from "@ant-design/icons/lib/icons/UserOutlined";
 import AvartarCustom from "../profile/AvartarCustom";
-import {baseUrl} from "../../config/config";
+
 moment.locale('ko');
 
 const CardWrapper = styled.div`
@@ -41,24 +38,24 @@ const PostCards = memo(({post, keyword}) => {
 
     const onToggleComment = useCallback(() => {
 
-        if(!meId) {
+        if (!meId) {
             return alert('로그인이 필요합니다.');
         }
 
         setCommentFormOpened(prev => !prev);
 
-        if(!commentFormOpened) {
-          dispatch({
-              type: LOAD_COMMENTS_REQUEST,
-              data: {
-                  postId: post.id,
-                  userId: meId,
-                  token,
-              },
-          })
+        if (!commentFormOpened) {
+            dispatch({
+                type: LOAD_COMMENTS_REQUEST,
+                data: {
+                    postId: post.id,
+                    userId: meId,
+                    token,
+                },
+            })
         }
 
-    },[meId,post.id]);
+    }, [meId, post.id]);
 
     const onFollow = useCallback(userId => () => {
 
@@ -69,7 +66,7 @@ const PostCards = memo(({post, keyword}) => {
                 token
             }
         });
-    },[]);
+    }, []);
 
     const onUnfollow = useCallback(userId => () => {
 
@@ -80,66 +77,65 @@ const PostCards = memo(({post, keyword}) => {
                 token
             }
         });
-    },[]);
+    }, []);
 
     const onToggleLike = useCallback(() => {
 
-      if(!meId) {
-        return alert('로그인이 필요합니다.');
-      }
+        if (!meId) {
+            return alert('로그인이 필요합니다.');
+        }
 
-      if(post.likesOfMe) {
-        return dispatch({
-          type: UNLIKE_POST_REQUEST,
-          data: {
-            userId: post.user.id,
-            postId: post.id,
-            token
-          }
-        });
-      } else {
-        return dispatch({
-          type: LIKE_POST_REQUEST,
-          data: {
-            userId: post.user.id,
-            postId: post.id,
-            token
-          }
-        });
-      }
+        if (post.likesOfMe) {
+            return dispatch({
+                type: UNLIKE_POST_REQUEST,
+                data: {
+                    userId: post.user.id,
+                    postId: post.id,
+                    token
+                }
+            });
+        } else {
+            return dispatch({
+                type: LIKE_POST_REQUEST,
+                data: {
+                    userId: post.user.id,
+                    postId: post.id,
+                    token
+                }
+            });
+        }
 
-    },[meId, post]);
+    }, [meId, post]);
 
     const onRetweet = useCallback(() => {
 
 
-      if(!meId) {
-        return alert('로그인이 필요합니다.');
-      }
-
-      return dispatch({
-        type: RETWEET_REQUEST,
-        data: {
-          postId: post.id,
-          token,
+        if (!meId) {
+            return alert('로그인이 필요합니다.');
         }
-      });
-    }, [meId, post.id] );
 
+        return dispatch({
+            type: RETWEET_REQUEST,
+            data: {
+                postId: post.id,
+                token,
+            }
+        });
+    }, [meId, post.id]);
 
 
     const onRemovePost = useCallback(postId => () => {
-      dispatch({
-        type: REMOVE_POST_REQUEST,
-        data: {
-          postId,
-          token
-        }
-      });
-    },[]);
+        dispatch({
+            type: REMOVE_POST_REQUEST,
+            data: {
+                postId,
+                token
+            }
+        });
+    }, []);
 
     const showEditPost = useCallback(() => {
-        if(!post.isRetweet) {
+        if (!post.isRetweet) {
             dispatch({
                 type: SHOW_EDIT_POST,
                 postId: post.id,
@@ -147,10 +143,10 @@ const PostCards = memo(({post, keyword}) => {
             });
         }
 
-    },[post]);
+    }, [post]);
 
 
-  return (
+    return (
         <CardWrapper>
             <Card
                 type="inner"
@@ -158,7 +154,8 @@ const PostCards = memo(({post, keyword}) => {
                 actions={[
                     <Icon type="retweet" key="retweet" onClick={onRetweet}/>,
                     <div>
-                        <Icon type="heart" key="heart" theme={post.likesOfMe ? 'twoTone' : 'outlined'} twoToneColor="#eb2f96" onClick={onToggleLike}/>
+                        <Icon type="heart" key="heart" theme={post.likesOfMe ? 'twoTone' : 'outlined'}
+                              twoToneColor="#eb2f96" onClick={onToggleLike}/>
                         <span style={{marginLeft: 10}}>{post.likeCount}</span>
                     </div>,
 
@@ -196,9 +193,12 @@ const PostCards = memo(({post, keyword}) => {
                         <Card.Meta
 
                             avatar={
-                                <Link href={{pathname: '/user', query: {id: post.retweetPost.user.id}}} as={`/user/${post.retweetPost.user.id}`}>
+                                <Link href={{pathname: '/user', query: {id: post.retweetPost.user.id}}}
+                                      as={`/user/${post.retweetPost.user.id}`}>
                                     <a>
-                                        <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={post.retweetPost.user.profileImageUrl} name={post.retweetPost.user.name}/>
+                                        <AvartarCustom shape={"circle"} size={"default"}
+                                                       profileImageUrl={post.retweetPost.user.profileImageUrl}
+                                                       name={post.retweetPost.user.name}/>
                                     </a>
                                 </Link>}
                             title={post.retweetPost.user.name}
@@ -209,15 +209,18 @@ const PostCards = memo(({post, keyword}) => {
                     (
                         <Card.Meta
                             avatar={
-                                <Link href={{pathname: '/user', query: {id: post.user.id}}} as={`/user/${post.user.id}`}>
+                                <Link href={{pathname: '/user', query: {id: post.user.id}}}
+                                      as={`/user/${post.user.id}`}>
                                     <a>
-                                        <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={post.user.profileImageUrl} name={post.user.name} />
+                                        <AvartarCustom shape={"circle"} size={"default"}
+                                                       profileImageUrl={post.user.profileImageUrl}
+                                                       name={post.user.name}/>
                                     </a>
                                 </Link>}
                             title={post.user.name}
                             description={isEditPost === true && editPostId === post.id ?
-                                            <PostEditForm key={post.id} post={post} /> :<
-                                            PostCardContent postData={post.content } keyword={keyword}/>}
+                                <PostEditForm key={post.id} post={post}/> : <
+                                    PostCardContent postData={post.content} keyword={keyword}/>}
                         />
 
                     )
@@ -228,35 +231,37 @@ const PostCards = memo(({post, keyword}) => {
             </Card>
 
             {commentFormOpened && (
-            <>
-                <CommentForm post={post}/>
-                <List
-                    header={` 댓글`}
-                    itemLayout = "horizontal"
-                    dataSource={post.comments || []}
-                    renderItem={ item => (
+                <>
+                    <CommentForm post={post}/>
+                    <List
+                        header={` 댓글`}
+                        itemLayout="horizontal"
+                        dataSource={post.comments || []}
+                        renderItem={item => (
 
-                      <Comment
-                        author={item.user.name}
-                        avatar={
-                            <Link href={{pathname: '/user', query: {id : post.user.id}}} as={`/user/${post.user.id}`}>
-                                <a>
-                                    <Avatar shape="circle" icon={post.user.profileImageUrl && <img src={`${post.user.profileImageUrl}`} alt=""/>}>
-                                        {post.user.name[0]}
-                                    </Avatar>
-                                </a>
-                            </Link>
-                        }
-                        content={item.content}
-                        datetime={
-                            <Tooltip title={moment().format('YYYY-MM-DD HH:mm:ss')}>
-                                <span>{moment(item.createdAt).fromNow()}</span>
-                            </Tooltip>
-                        }
-                      />
-                    )}
-                />
-            </>
+                            <Comment
+                                author={item.user.name}
+                                avatar={
+                                    <Link href={{pathname: '/user', query: {id: post.user.id}}}
+                                          as={`/user/${post.user.id}`}>
+                                        <a>
+                                            <Avatar shape="circle" icon={post.user.profileImageUrl &&
+                                            <img src={`${post.user.profileImageUrl}`} alt=""/>}>
+                                                {post.user.name[0]}
+                                            </Avatar>
+                                        </a>
+                                    </Link>
+                                }
+                                content={item.content}
+                                datetime={
+                                    <Tooltip title={moment().format('YYYY-MM-DD HH:mm:ss')}>
+                                        <span>{moment(item.createdAt).fromNow()}</span>
+                                    </Tooltip>
+                                }
+                            />
+                        )}
+                    />
+                </>
             )}
         </CardWrapper>
     );

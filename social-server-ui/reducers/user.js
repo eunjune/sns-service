@@ -233,7 +233,7 @@ const reducer = (state = initialState, action) => {
                 const me = action.data.response.user;
                 const token = action.data.response.token;
 
-                cookie.save('token',token, { path: '/' });
+                cookie.save('token', token, {path: '/'});
 
                 draft.isSigningUp = false;
                 draft.me = me;
@@ -249,7 +249,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOG_IN_REQUEST: {
-                cookie.remove('token', { path: '/' });
+                cookie.remove('token', {path: '/'});
                 draft.isLoggingIn = true;
                 draft.loginError = null;
                 break;
@@ -259,7 +259,7 @@ const reducer = (state = initialState, action) => {
                 const me = action.data.response.user;
                 const token = action.data.response.token;
 
-                cookie.save('token',token, { path: '/' });
+                cookie.save('token', token, {path: '/'});
 
                 draft.isLoggingIn = false;
                 draft.me = me;
@@ -277,7 +277,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case EMAIL_LOG_IN_REQUEST: {
-                cookie.remove('token', { path: '/' });
+                cookie.remove('token', {path: '/'});
                 draft.isLoggingIn = true;
                 draft.loginError = null;
                 break;
@@ -286,7 +286,7 @@ const reducer = (state = initialState, action) => {
             case EMAIL_LOG_IN_SUCCESS: {
                 const token = action.data.response.token;
 
-                cookie.save('token',token, { path: '/' });
+                cookie.save('token', token, {path: '/'});
 
                 draft.isLoggingIn = false;
                 draft.isEmailLogInWaiting = true;
@@ -319,7 +319,7 @@ const reducer = (state = initialState, action) => {
 
             case UPLOAD_IMAGE_REQUEST: {
                 draft.isEditing = true;
-                draft.editError= null;
+                draft.editError = null;
                 break;
             }
 
@@ -364,8 +364,8 @@ const reducer = (state = initialState, action) => {
             }
 
             case UNFOLLOW_USER_SUCCESS: {
-                if(draft.followings.length > 0) {
-                    draft.followings = draft.followings.filter(v=>v.id !== action.data);
+                if (draft.followings.length > 0) {
+                    draft.followings = draft.followings.filter(v => v.id !== action.data);
                 }
 
                 draft.me.followings = draft.me.followings.filter(v => v !== action.data);
@@ -395,10 +395,10 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOG_OUT: {
-                cookie.remove('token', { path: '/' });
-                draft.me= null;
-                draft.followings= [];
-                draft.followers= [];
+                cookie.remove('token', {path: '/'});
+                draft.me = null;
+                draft.followings = [];
+                draft.followers = [];
 
                 break;
             }

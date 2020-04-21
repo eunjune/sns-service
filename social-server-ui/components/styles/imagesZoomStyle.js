@@ -1,4 +1,4 @@
-import { Icon } from 'antd';
+import {Icon} from 'antd';
 import styled from 'styled-components';
 
 export const Overlay = styled.div`
@@ -34,7 +34,7 @@ export const SlickWrapper = styled.div`
   background: black;
 `;
 
-export const CloseButton= styled(Icon)`
+export const CloseButton = styled(Icon)`
   position: absolute;
   right: 0;
   top: 0;

@@ -1,6 +1,6 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {Button, Card, Form, Input, Radio} from "antd";
-import { useDispatch, useSelector } from 'react-redux';
+import {Button, Form, Input, Radio} from "antd";
+import {useDispatch, useSelector} from 'react-redux';
 import {EDIT_PROFILE_REQUEST} from '../../reducers/user';
 import cookie from "react-cookies";
 
@@ -35,7 +35,7 @@ const ProfileEditForm = ({me}) => {
         });
         setEditPassword('');
         setEditPasswordCheck('');
-    }, [editName,editPassword, editPasswordCheck]);
+    }, [editName, editPassword, editPasswordCheck]);
 
     const onChangeName = useCallback((e) => {
         setEditName(e.target.value);
@@ -52,7 +52,7 @@ const ProfileEditForm = ({me}) => {
 
     const onChangeRadio = useCallback((e) => {
         setEditPrivate(!editPrivate);
-    },[editPrivate]);
+    }, [editPrivate]);
 
     return (
         <Form onSubmit={onSubmit} style={{padding: 50}}>
@@ -70,7 +70,7 @@ const ProfileEditForm = ({me}) => {
                         message: '이름을 입력해주세요!',
                     }
                 ]}>
-                <Input name="user-name" value={editName} required onChange={onChangeName} />
+                <Input name="user-name" value={editName} required onChange={onChangeName}/>
                 {editError && <div style={{color: 'red'}}>{editError.message}</div>}
             </Form.Item>
 
@@ -82,7 +82,8 @@ const ProfileEditForm = ({me}) => {
             <Form.Item
                 label='비밀번호 확인'
             >
-                <Input name="user-password-check" value={editPasswordCheck} type="password" onChange={onChangePasswordCheck}/>
+                <Input name="user-password-check" value={editPasswordCheck} type="password"
+                       onChange={onChangePasswordCheck}/>
                 {editPasswordError && <div style={{color: 'red'}}>비밀번호가 일치하지 않습니다.</div>}
             </Form.Item>
 

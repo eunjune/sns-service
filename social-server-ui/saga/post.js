@@ -1,4 +1,4 @@
-import {call, all, fork, takeLatest,delay,put,throttle} from 'redux-saga/effects'
+import {call, all, fork, takeLatest, put, throttle} from 'redux-saga/effects'
 import {
     ADD_COMMENT_FAILURE,
     ADD_COMMENT_REQUEST,
@@ -43,8 +43,8 @@ import {
 } from '../reducers/post';
 import axios from 'axios';
 
-function loadMainPostsAPI({lastId=0,token=null}) {
-    if(!token) {
+function loadMainPostsAPI({lastId = 0, token = null}) {
+    if (!token) {
         return axios.get(`user/post/list?lastId=${lastId}&size=${SIZE}`);
     }
 
@@ -60,7 +60,7 @@ function* loadMainPosts(action) {
         const result = yield call(loadMainPostsAPI, action.data);
         yield put({
             type: LOAD_MAIN_POSTS_SUCCESS,
-            data : result.data.response,
+            data: result.data.response,
         });
     } catch (e) {
         yield put({
@@ -78,7 +78,7 @@ function* watchLoadMainPosts() {
 }
 
 
-function loadMyPostAPI({token,lastId=0}) {
+function loadMyPostAPI({token, lastId = 0}) {
     return axios.get(`user/me/post/list?lastId=${lastId}&size=${SIZE}`, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -91,7 +91,7 @@ function* loadMyPost(action) {
         const result = yield call(loadMyPostAPI, action.data);
         yield put({
             type: LOAD_MY_POSTS_SUCCESS,
-            data : result.data.response,
+            data: result.data.response,
         });
     } catch (e) {
         yield put({
@@ -105,10 +105,10 @@ function* loadMyPost(action) {
 }
 
 function* watchLoadMyPosts() {
-    yield throttle(1000,LOAD_MY_POSTS_REQUEST,loadMyPost);
+    yield throttle(1000, LOAD_MY_POSTS_REQUEST, loadMyPost);
 }
 
-function loadUserPostAPI({userId,token,lastId=0}) {
+function loadUserPostAPI({userId, token, lastId = 0}) {
     return axios.get(`user/${userId}/post/list?lastId=${lastId}&size=${SIZE}`, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -121,7 +121,7 @@ function* loadUserPost(action) {
         const result = yield call(loadUserPostAPI, action.data);
         yield put({
             type: LOAD_USER_POSTS_SUCCESS,
-            data : result.data.response,
+            data: result.data.response,
         });
     } catch (e) {
         yield put({
@@ -135,10 +135,10 @@ function* loadUserPost(action) {
 }
 
 function* watchLoadUserPosts() {
-    yield takeLatest(LOAD_USER_POSTS_REQUEST,loadUserPost);
+    yield takeLatest(LOAD_USER_POSTS_REQUEST, loadUserPost);
 }
 
-function loadHashtagAPI({tag,lastId=0}) {
+function loadHashtagAPI({tag, lastId = 0}) {
     return axios.get(`/post/${encodeURIComponent(tag)}/list?lastId=${lastId}&size=${SIZE}`);
 }
 
@@ -148,7 +148,7 @@ function* loadHashtag(action) {
         const result = yield call(loadHashtagAPI, action.data);
         yield put({
             type: LOAD_HASHTAG_POSTS_SUCCESS,
-            data : result.data.response,
+            data: result.data.response,
         });
     } catch (e) {
         yield put({
@@ -163,10 +163,10 @@ function* loadHashtag(action) {
 
 
 function* watchLoadHashtagPosts() {
-    yield throttle(1000,LOAD_HASHTAG_POSTS_REQUEST,loadHashtag);
+    yield throttle(1000, LOAD_HASHTAG_POSTS_REQUEST, loadHashtag);
 }
 
-function loadSearchPostsAPI({keyword,lastId=0}) {
+function loadSearchPostsAPI({keyword, lastId = 0}) {
     return axios.get(`/search/${encodeURIComponent(keyword)}?lastId=${lastId}&size=${SIZE}`);
 }
 
@@ -176,7 +176,7 @@ function* loadSearchPosts(action) {
         const result = yield call(loadSearchPostsAPI, action.data);
         yield put({
             type: LOAD_SEARCH_POSTS_SUCCESS,
-            data : result.data.response,
+            data: result.data.response,
         });
     } catch (e) {
         yield put({
@@ -191,10 +191,10 @@ function* loadSearchPosts(action) {
 
 
 function* watchLoadSearchPosts() {
-    yield throttle(1000,LOAD_SEARCH_POSTS_REQUEST,loadSearchPosts);
+    yield throttle(1000, LOAD_SEARCH_POSTS_REQUEST, loadSearchPosts);
 }
 
-function loadCommentsAPI({userId,postId,token}) {
+function loadCommentsAPI({userId, postId, token}) {
     return axios.get(`user/${userId}/post/${postId}/comment/list`, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -207,7 +207,7 @@ function* loadComments(action) {
         const result = yield call(loadCommentsAPI, action.data);
         yield put({
             type: LOAD_COMMENTS_SUCCESS,
-            data : {
+            data: {
                 postId: action.data.postId,
                 comments: result.data.response,
             },
@@ -241,7 +241,7 @@ function* addPost(action) {
         const result = yield call(addPostAPI, action.data);
         yield put({
             type: ADD_POST_SUCCESS,
-            data : result.data.response,
+            data: result.data.response,
         });
     } catch (e) {
         yield put({
@@ -255,11 +255,11 @@ function* addPost(action) {
 }
 
 function* watchAddPost() {
-    
+
     yield takeLatest(ADD_POST_REQUEST, addPost);
 }
 
-function uploadImagesAPI({imageFormData,token}) {
+function uploadImagesAPI({imageFormData, token}) {
     return axios.post(`post/images`, imageFormData, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -272,7 +272,7 @@ function* uploadImages(action) {
         const result = yield call(uploadImagesAPI, action.data);
         yield put({
             type: UPLOAD_IMAGES_SUCCESS,
-            data : result.data.response
+            data: result.data.response
         });
     } catch (e) {
         yield put({
@@ -289,7 +289,7 @@ function* watchUploadImages() {
     yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
 }
 
-function addCommentAPI({userId,postId,comment,token}) {
+function addCommentAPI({userId, postId, comment, token}) {
     return axios.post(`user/${userId}/post/${postId}/comment`, {content: comment}, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -302,7 +302,7 @@ function* addComment(action) {
         const result = yield call(addCommentAPI, action.data);
         yield put({
             type: ADD_COMMENT_SUCCESS,
-            data : {
+            data: {
                 postId: action.data.postId,  //??
                 comment: result.data.response,
             }
@@ -323,8 +323,8 @@ function* watchAddComment() {
 }
 
 
-function retweetAPI({postId,token}) {
-    return axios.post(`/retweet/post/${postId}`,{}, {
+function retweetAPI({postId, token}) {
+    return axios.post(`/retweet/post/${postId}`, {}, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -336,14 +336,14 @@ function* retweet(action) {
         const result = yield call(retweetAPI, action.data);
         yield put({
             type: RETWEET_SUCCESS,
-            data : result.data.response
+            data: result.data.response
         });
     } catch (e) {
         yield put({
             type: RETWEET_FAILURE,
             error: {
-                status : e.response.data.error.status,
-                message : e.response.data.error.message
+                status: e.response.data.error.status,
+                message: e.response.data.error.message
             },
         });
     }
@@ -367,7 +367,7 @@ function* editPost(action) {
         const result = yield call(editPostAPI, action.data);
         yield put({
             type: EDIT_POST_SUCCESS,
-            data : result.data.response,
+            data: result.data.response,
         });
     } catch (e) {
         yield put({
@@ -384,7 +384,7 @@ function* watchEditPost() {
     yield takeLatest(EDIT_POST_REQUEST, editPost);
 }
 
-function likePostAPI({postId,userId,token}) {
+function likePostAPI({postId, userId, token}) {
     return axios.patch(`user/${userId}/post/${postId}/like`, {}, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -397,7 +397,7 @@ function* likePost(action) {
         const result = yield call(likePostAPI, action.data);
         yield put({
             type: LIKE_POST_SUCCESS,
-            data : result.data.response
+            data: result.data.response
         });
     } catch (e) {
         yield put({
@@ -415,7 +415,7 @@ function* watchLikePost() {
 }
 
 
-function unlikePostAPI({postId,userId,token}) {
+function unlikePostAPI({postId, userId, token}) {
     return axios.delete(`user/${userId}/post/${postId}/unlike`, {
         headers: {
             'api_key': 'Bearer ' + token,
@@ -428,7 +428,7 @@ function* unlikePost(action) {
         const result = yield call(unlikePostAPI, action.data);
         yield put({
             type: UNLIKE_POST_SUCCESS,
-            data : result.data.response
+            data: result.data.response
         });
     } catch (e) {
         yield put({
@@ -446,9 +446,9 @@ function* watchUnLikePost() {
 }
 
 
-function removePostAPI({postId,token}) {
+function removePostAPI({postId, token}) {
 
-    return axios.delete(`post/${postId}`,{
+    return axios.delete(`post/${postId}`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -460,7 +460,7 @@ function* removePost(action) {
         const result = yield call(removePostAPI, action.data);
         yield put({
             type: REMOVE_POST_SUCCESS,
-            data : result.data.response,
+            data: result.data.response,
         });
     } catch (e) {
         yield put({

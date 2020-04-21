@@ -1,24 +1,23 @@
 import React, {useEffect, useCallback, useRef} from 'react';
-import MarkDown from 'react-mark';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {LOAD_SEARCH_POSTS_REQUEST} from '../reducers/post';
 import PostCards from '../components/post/PostCards';
 import CenterAlignment from "../components/CenterAlignment";
 
-const Search = ({ keyword }) => {
+const Search = ({keyword}) => {
     const dispatch = useDispatch();
-    const { posts, hasMorePost} = useSelector((state) => state.post);
+    const {posts, hasMorePost} = useSelector((state) => state.post);
     const usedLastIds = useRef([]);
 
     const onScroll = useCallback(() => {
         console.log(hasMorePost);
-        if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 200 && hasMorePost) {
-            const lastId = posts[posts.length-1].id;
-            if(!usedLastIds.current.includes(lastId)) {
+        if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 200 && hasMorePost) {
+            const lastId = posts[posts.length - 1].id;
+            if (!usedLastIds.current.includes(lastId)) {
                 dispatch({
                     type: LOAD_SEARCH_POSTS_REQUEST,
-                    data : {
+                    data: {
                         keyword,
                         lastId: lastId,
                     }
@@ -64,7 +63,7 @@ Search.getInitialProps = async (context) => {
         data: {keyword},
     });
 
-    return { keyword: context.query.keyword };
+    return {keyword: context.query.keyword};
 };
 
 export default Search;

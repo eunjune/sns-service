@@ -1,14 +1,13 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import { Form, Button, Input, Checkbox } from 'antd';
+import {Form, Button, Input, Checkbox} from 'antd';
 import {
     EMAIL_CHECK_REQUEST, NAME_CHECK_REQUEST,
     SIGN_UP_REQUEST,
 } from '../reducers/user';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Router from 'next/router';
 import {DivWrap} from "../components/styles/ContainerStyle";
 import CenterAlignment from "../components/CenterAlignment";
-import {LockOutlined, UserOutlined} from "@ant-design/icons";
 
 const Signup = () => {
 
@@ -21,10 +20,10 @@ const Signup = () => {
     const [termError, setTermError] = useState(false);
 
     const dispatch = useDispatch();
-    const { isEmailOk, emailCheckingError } = useSelector((state) => state.user);
-    const { isNameOk,  nameCheckingError } = useSelector((state) => state.user);
-    const { isSigningUp} = useSelector((state) => state.user);
-    const { me, signUpError } = useSelector((state) => state.user);
+    const {isEmailOk, emailCheckingError} = useSelector((state) => state.user);
+    const {isNameOk, nameCheckingError} = useSelector((state) => state.user);
+    const {isSigningUp} = useSelector((state) => state.user);
+    const {me, signUpError} = useSelector((state) => state.user);
 
     useEffect(() => {
         if (me) {
@@ -38,25 +37,25 @@ const Signup = () => {
         e.preventDefault();
 
         if (!isEmailOk) {
-                return;
-            }
+            return;
+        }
 
         if (password !== passwordCheck) {
-                return setPasswordError(true);
-            }
+            return setPasswordError(true);
+        }
 
         if (!term) {
-                return setTermError(true);
-            }
+            return setTermError(true);
+        }
 
         dispatch({
-                type: SIGN_UP_REQUEST,
-                data: {
-                    name,
-                    address: email,
-                    password,
-                },
-    });
+            type: SIGN_UP_REQUEST,
+            data: {
+                name,
+                address: email,
+                password,
+            },
+        });
     }, [password, passwordCheck, term]);
 
     const onChangeEmail = useCallback((e) => {
@@ -88,7 +87,7 @@ const Signup = () => {
         dispatch({
             type: EMAIL_CHECK_REQUEST,
             data: email,
-    });
+        });
     }, [email]);
 
     const onBlurName = useCallback((e) => {
@@ -101,10 +100,9 @@ const Signup = () => {
         });
     }, [name]);
 
-    if(me) {
+    if (me) {
         return null;
     }
-
 
 
     return (
@@ -121,7 +119,8 @@ const Signup = () => {
                         ]}>
                         <Input name="user-email" value={email} required onChange={onChangeEmail} onBlur={onBlurEmail}/>
                         {isEmailOk === true ? <div style={{color: 'green'}}>사용 가능한 이메일입니다.</div> :
-                            (isEmailOk === false && emailCheckingError ? <div style={{color: 'red'}}>{emailCheckingError.message}</div> : null)}
+                            (isEmailOk === false && emailCheckingError ?
+                                <div style={{color: 'red'}}>{emailCheckingError.message}</div> : null)}
                     </Form.Item>
 
                     <Form.Item
@@ -134,7 +133,8 @@ const Signup = () => {
                         ]}>
                         <Input name="user-name" value={name} required onChange={onChangeName} onBlur={onBlurName}/>
                         {isNameOk === true ? <div style={{color: 'green'}}>사용 가능한 이름입니다.</div> :
-                            (isNameOk === false && nameCheckingError ? <div style={{color: 'red'}}>{nameCheckingError.message}</div> : null)}
+                            (isNameOk === false && nameCheckingError ?
+                                <div style={{color: 'red'}}>{nameCheckingError.message}</div> : null)}
                     </Form.Item>
 
                     <Form.Item
@@ -145,7 +145,8 @@ const Signup = () => {
                                 message: '비밀번호를 입력해주세요!',
                             }
                         ]}>
-                        <Input name="user-password" value={password} type="password" required onChange={onChangePassword}/>
+                        <Input name="user-password" value={password} type="password" required
+                               onChange={onChangePassword}/>
                     </Form.Item>
 
                     <Form.Item
@@ -156,7 +157,8 @@ const Signup = () => {
                                 message: '비밀번호를 입력해주세요!',
                             }
                         ]}>
-                        <Input name="user-password-check" value={passwordCheck} type="password" required onChange={onChangePasswordCheck}/>
+                        <Input name="user-password-check" value={passwordCheck} type="password" required
+                               onChange={onChangePasswordCheck}/>
                         {passwordError && <div style={{color: 'red'}}>비밀번호가 일치하지 않습니다.</div>}
                     </Form.Item>
 
@@ -166,7 +168,8 @@ const Signup = () => {
                     </Form.Item>
 
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" loading={isSigningUp} style={{width: '100%'}}>가입하기</Button>
+                        <Button type="primary" htmlType="submit" loading={isSigningUp}
+                                style={{width: '100%'}}>가입하기</Button>
                     </Form.Item>
                     {signUpError && <div style={{color: 'red'}}>{signUpError.message}</div>}
                 </Form>

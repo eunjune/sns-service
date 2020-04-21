@@ -6,9 +6,9 @@ import cookie from "react-cookies";
 import PropTypes from 'prop-types';
 
 const CommentForm = ({post}) => {
-    const { isAddingComment,addedComment } = useSelector(state => state.post);
+    const {isAddingComment, addedComment} = useSelector(state => state.post);
     const [commentText, setCommentText] = useState('');
-    const { me } = useSelector(state => state.user);
+    const {me} = useSelector(state => state.user);
     const token = cookie.load('token');
     const dispatch = useDispatch();
 
@@ -18,11 +18,11 @@ const CommentForm = ({post}) => {
 
     const onChangeCommentText = useCallback((e) => {
         setCommentText(e.target.value);
-    },[]);
+    }, []);
 
     const onSubmitComment = useCallback((e) => {
         e.preventDefault();
-        if(!me) {
+        if (!me) {
             alert('로그인이 필요합니다.');
         }
         dispatch({
@@ -34,12 +34,12 @@ const CommentForm = ({post}) => {
                 token,
             }
         })
-    },[me && me.id, commentText]);
+    }, [me && me.id, commentText]);
 
     return (
         <Form onSubmit={onSubmitComment}>
             <Form.Item>
-                <Input.TextArea rows={4} value={commentText} onChange={onChangeCommentText} />
+                <Input.TextArea rows={4} value={commentText} onChange={onChangeCommentText}/>
             </Form.Item>
             <Button type="primary" htmlType="submit" loading={isAddingComment}>댓글작성</Button>
         </Form>

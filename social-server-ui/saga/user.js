@@ -50,10 +50,10 @@ import {
     EMAIL_LOG_IN_SUCCESS,
     EMAIL_LOG_IN_FAILURE
 } from '../reducers/user';
-import { call,fork,takeEvery,takeLatest,delay,put,all } from 'redux-saga/effects';
+import {call, fork, takeEvery, takeLatest, delay, put, all} from 'redux-saga/effects';
 
 function loadMeAPI(token) {
-    return axios.get('user/me',{
+    return axios.get('user/me', {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -63,7 +63,7 @@ function loadMeAPI(token) {
 function* loadMe(action) {
 
     try {
-        const result = yield call(loadMeAPI,action.data);
+        const result = yield call(loadMeAPI, action.data);
         yield put({
             type: LOAD_ME_SUCCESS,
             data: result.data.response,
@@ -80,11 +80,11 @@ function* loadMe(action) {
 }
 
 function* watchLoadMe() {
-    yield takeLatest(LOAD_ME_REQUEST,loadMe);
+    yield takeLatest(LOAD_ME_REQUEST, loadMe);
 }
 
-function loadUserAPI({userId,token}) {
-    return axios.get(`user/${userId}`,{
+function loadUserAPI({userId, token}) {
+    return axios.get(`user/${userId}`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -115,8 +115,8 @@ function* watchLoadUser() {
     yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
 
-function loadFollowingAPI({token, offset=0}) {
-    return axios.get(`user/followings?page=${offset}&size=3`,{
+function loadFollowingAPI({token, offset = 0}) {
+    return axios.get(`user/followings?page=${offset}&size=3`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -126,7 +126,7 @@ function loadFollowingAPI({token, offset=0}) {
 function* loadFollowing(action) {
 
     try {
-        const result = yield call(loadFollowingAPI,action.data);
+        const result = yield call(loadFollowingAPI, action.data);
         yield put({
             type: LOAD_FOLLOWING_SUCCESS,
             data: result.data.response,
@@ -143,12 +143,12 @@ function* loadFollowing(action) {
 }
 
 function* watchLoadfollowing() {
-    yield takeLatest(LOAD_FOLLOWING_REQUEST,loadFollowing);
+    yield takeLatest(LOAD_FOLLOWING_REQUEST, loadFollowing);
 }
 
-function loadFollowerAPI({token, offset=0}) {
+function loadFollowerAPI({token, offset = 0}) {
 
-    return axios.get(`user/followers?page=${offset}&size=3`,{
+    return axios.get(`user/followers?page=${offset}&size=3`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -158,7 +158,7 @@ function loadFollowerAPI({token, offset=0}) {
 function* loadFollower(action) {
 
     try {
-        const result = yield call(loadFollowerAPI,action.data);
+        const result = yield call(loadFollowerAPI, action.data);
         yield put({
             type: LOAD_FOLLOWER_SUCCESS,
             data: result.data.response,
@@ -175,11 +175,11 @@ function* loadFollower(action) {
 }
 
 function* watchLoadfollower() {
-    yield takeLatest(LOAD_FOLLOWER_REQUEST,loadFollower,);
+    yield takeLatest(LOAD_FOLLOWER_REQUEST, loadFollower,);
 }
 
 function resendEmailAPI(token) {
-    return axios.get('user/resend-email',{
+    return axios.get('user/resend-email', {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -189,7 +189,7 @@ function resendEmailAPI(token) {
 
 function* resendEmail(action) {
     try {
-        const result = yield call(resendEmailAPI,action.data);
+        const result = yield call(resendEmailAPI, action.data);
         yield put({
             type: EMAIL_RESEND_SUCCESS,
             data: result.data.response,
@@ -272,7 +272,7 @@ function emailCertificateAPI(data) {
 
 function* emailCertificate(action) {
     try {
-        const result = yield call(emailCertificateAPI,action.data);
+        const result = yield call(emailCertificateAPI, action.data);
         yield put({
             type: EMAIL_CERTIFICATION_SUCCESS,
             data: result.data.response,
@@ -292,7 +292,7 @@ function* watchEmailCertificate() {
     yield takeLatest(EMAIL_CERTIFICATION_REQUEST, emailCertificate);
 }
 
-function signUpAPI({name,address,password}) {
+function signUpAPI({name, address, password}) {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('address', address);
@@ -305,7 +305,7 @@ function signUpAPI({name,address,password}) {
 
 function* signUp(action) {
     try {
-        const result = yield call(signUpAPI,action.data);
+        const result = yield call(signUpAPI, action.data);
         yield put({
             type: SIGN_UP_SUCCESS,
             data: result.data,
@@ -379,9 +379,8 @@ function* watchEmailLogin() {
 }
 
 
-
-function followAPI({userId,token}) {
-    return axios.post(`user/follow/${userId}`,{},{
+function followAPI({userId, token}) {
+    return axios.post(`user/follow/${userId}`, {}, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -408,12 +407,11 @@ function* follow(action) {
 }
 
 function* watchFollow() {
-    yield takeLatest(FOLLOW_USER_REQUEST,follow);
+    yield takeLatest(FOLLOW_USER_REQUEST, follow);
 }
 
 
-
-function editProfileAPI({profileRequest,token}) {
+function editProfileAPI({profileRequest, token}) {
 
     return axios.put(`user/profile`, profileRequest, {
         headers: {
@@ -442,10 +440,10 @@ function* editProfile(action) {
 }
 
 function* watchEditProfile() {
-    yield takeLatest(EDIT_PROFILE_REQUEST,editProfile);
+    yield takeLatest(EDIT_PROFILE_REQUEST, editProfile);
 }
 
-function editProfileImageAPI({file,token}) {
+function editProfileImageAPI({file, token}) {
     const formData = new FormData();
 
     formData.append('file', file);
@@ -477,11 +475,11 @@ function* editProfileImage(action) {
 }
 
 function* watchEditProfileImage() {
-    yield takeLatest(UPLOAD_IMAGE_REQUEST,editProfileImage);
+    yield takeLatest(UPLOAD_IMAGE_REQUEST, editProfileImage);
 }
 
-function unfollowAPI({userId,token}) {
-    return axios.delete(`user/follow/${userId}`,{
+function unfollowAPI({userId, token}) {
+    return axios.delete(`user/follow/${userId}`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -508,11 +506,11 @@ function* unfollow(action) {
 }
 
 function* watchUnfollow() {
-    yield takeLatest(UNFOLLOW_USER_REQUEST,unfollow);
+    yield takeLatest(UNFOLLOW_USER_REQUEST, unfollow);
 }
 
-function removeFollowerAPI({userId,token}) {
-    return axios.delete(`user/follower/${userId}`,{
+function removeFollowerAPI({userId, token}) {
+    return axios.delete(`user/follower/${userId}`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
@@ -539,7 +537,7 @@ function* removeFollower(action) {
 }
 
 function* watchRemovefollower() {
-    yield takeLatest(REMOVE_FOLLOWER_REQUEST,removeFollower);
+    yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
 }
 
 export default function* userSaga() {

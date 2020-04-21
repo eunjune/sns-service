@@ -1,12 +1,10 @@
 import produce from 'immer'
-import cookie from "react-cookies";
-import {LOG_OUT} from "./user";
 
 export const initialState = {
     posts: [],
     imagePaths: [],
     editPostImages: [],
-    editPostId:null,
+    editPostId: null,
 
     isAddingPost: false,
     addedPost: false,
@@ -21,7 +19,6 @@ export const initialState = {
     loadUserPostError: null,
     addPostError: null,
 };
-
 
 
 export const LOAD_MAIN_POSTS_REQUEST = 'LOAD_MAIN_POSTS_REQUEST';
@@ -92,7 +89,7 @@ const reducer = (state = initialState, action) => {
     return produce(state, (draft) => {
         switch (action.type) {
 
-    
+
             case LOAD_MAIN_POSTS_REQUEST: {
                 draft.posts = action.data.lastId === 0 ? [] : draft.posts;
                 draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
@@ -129,7 +126,7 @@ const reducer = (state = initialState, action) => {
 
                 break;
             }
-    
+
             case LOAD_HASHTAG_POSTS_REQUEST: {
                 draft.posts = !action.data.lastId ? [] : draft.posts;
                 draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
@@ -169,11 +166,11 @@ const reducer = (state = initialState, action) => {
             case LOAD_USER_POSTS_REQUEST: {
                 console.log(action.data.lastId ? draft.hasMorePost : true);
                 console.log(LOAD_USER_POSTS_REQUEST);
-                draft.posts = !action.data.lastId? [] : draft.posts;
+                draft.posts = !action.data.lastId ? [] : draft.posts;
                 draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
                 break;
             }
-    
+
             case LOAD_USER_POSTS_SUCCESS: {
                 draft.posts = draft.posts.concat(action.data);
                 draft.hasMorePost = action.data.length === SIZE;
@@ -204,7 +201,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case ADD_POST_REQUEST: {
-                draft.isAddingPost =  true;
+                draft.isAddingPost = true;
                 draft.addedPost = false;
                 draft.addPostError = null;
                 break;
@@ -232,7 +229,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case UPLOAD_IMAGES_SUCCESS: {
-                if(draft.isEditPost === true) {
+                if (draft.isEditPost === true) {
                     action.data.forEach(v => {
                         draft.editPostImages.push(v)
                     });
@@ -335,11 +332,11 @@ const reducer = (state = initialState, action) => {
 
                 break;
             }
-    
+
             case REMOVE_POST_REQUEST: {
                 break;
             }
-    
+
             case REMOVE_POST_SUCCESS: {
                 draft.posts = draft.posts.filter(v => v.id !== action.data);
                 break;
@@ -352,7 +349,7 @@ const reducer = (state = initialState, action) => {
             }
 
             case UNLIKE_POST_REQUEST: {
-    
+
                 break;
             }
             case UNLIKE_POST_SUCCESS: {
@@ -384,12 +381,12 @@ const reducer = (state = initialState, action) => {
             }
 
             case REMOVE_IMAGE: {
-                if(draft.isEditPost === true) {
-                    const index = draft.editPostImages.findIndex((v,i) => i === action.index);
-                    draft.editPostImages.splice(index,1);
+                if (draft.isEditPost === true) {
+                    const index = draft.editPostImages.findIndex((v, i) => i === action.index);
+                    draft.editPostImages.splice(index, 1);
                 } else {
-                    const index = draft.imagePaths.findIndex((v,i) => i === action.index);
-                    draft.imagePaths.splice(index,1);
+                    const index = draft.imagePaths.findIndex((v, i) => i === action.index);
+                    draft.imagePaths.splice(index, 1);
                 }
                 break;
             }
@@ -401,7 +398,7 @@ const reducer = (state = initialState, action) => {
         }
     });
 
-    
+
 };
 
 export default reducer;

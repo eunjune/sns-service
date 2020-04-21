@@ -7,7 +7,7 @@ const MyError = (props) => {
     return (
         <div>
             {
-                props.statusCode === 404 && <NotFoundError />
+                props.statusCode === 404 && <NotFoundError/>
             }
             {
                 props.statusCode !== 404 && <Error statusCode={props.statusCode}/>
@@ -24,7 +24,7 @@ MyError.defaultProps = {
     statusCode: 400,
 }
 
-MyError.getInitialProps = async(context) => {
+MyError.getInitialProps = async (context) => {
     const statusCode = context.res ? context.res.statusCode : context.err ? err.statusCode : null;
     return {statusCode};
 }
