@@ -174,7 +174,7 @@ const Profile = () => {
 
         <Row gutter={8}>
             <Col xs={24} md={8}>
-                <div style={{padding: 50}}>
+                <div style={{margin: 50}}>
 
 
                     <Card

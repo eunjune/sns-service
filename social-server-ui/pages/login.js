@@ -59,7 +59,7 @@ const Login = () => {
         <DivWrap>
             <CenterAlignment children={
 
-                <Form onSubmit={onSubmitForm} style={{maxWidth: '500px', padding: 50}}>
+                <Form onSubmit={onSubmitForm} style={{maxWidth: '500px',marginTop: 50}}>
                     {forgotPassword === true ? <h1>이메일 로그인</h1> : null}
                     <Form.Item
                         label='이메일'

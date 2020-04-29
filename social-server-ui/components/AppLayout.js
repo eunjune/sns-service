@@ -2,7 +2,7 @@ import React, {useCallback} from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import {
-    Menu, Input, Dropdown,
+    Menu, Input, Dropdown, Badge,
 } from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import Router from 'next/router';
@@ -10,6 +10,7 @@ import {LOG_OUT} from "../reducers/user";
 import {DownOutlined, BellOutlined} from '@ant-design/icons';
 import {MenuItem} from "./styles/MenuItemStyle";
 import AvartarCustom from "./profile/AvartarCustom";
+import NotificationOutlined from "@ant-design/icons/lib/icons/NotificationOutlined";
 
 const AppLayout = ({children}) => {
     const {me} = useSelector((state) => state.user);
@@ -80,7 +81,11 @@ const AppLayout = ({children}) => {
                 {
                     me &&
                     <MenuItem key="notification" style={{float: 'right', padding: 0}}>
-                        <BellOutlined style={{margin: 'auto'}}/>
+                        <div>
+                            <Badge count={0} dot>
+                                <Link href="/notification" prefetch><NotificationOutlined /></Link>
+                            </Badge>
+                        </div>
                     </MenuItem>
                 }
 

@@ -72,7 +72,7 @@ public class Swagger2Configure implements WebMvcConfigurer {
     }
 
     private ApiKey apiKey() {
-        return new ApiKey("apiKesdfy", tokenHeader, "header");
+        return new ApiKey("apiKey", tokenHeader, "header");
     }
 
     private SecurityContext securityContext() {

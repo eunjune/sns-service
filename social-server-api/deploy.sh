@@ -4,11 +4,6 @@ REPOSITORY=/home/ec2-user/app/step2
 PROJECT_NAME=sns-service
 PROJECT_SUB_NAME=social-server-api
 
-echo "> move spring properties"
-cp $REPOSITORY/properties/application.yml $REPOSITORY/zip/src/main/resources
-cp $REPOSITORY/properties/application-prod.yml $REPOSITORY/zip/src/main/resources
-cp -r $REPOSITORY/properties/.mvn $REPOSITORY/zip
-
 echo "> Build"
 cd $REPOSITORY/zip
 chmod +x mvnw

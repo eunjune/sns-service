@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types'
-import {Overlay, Header, CloseButton, ImgWrapper} from '../styles/imagesZoomStyle';
+import {Overlay, Header, CloseButton, ImgWrapper, SlickWrapper, Indicator} from '../styles/imagesZoomStyle';
 import {Carousel} from "antd";
+import Slick from 'react-slick';
 
 const ImagesZoom = ({images, onClose}) => {
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     return (
         <Overlay>

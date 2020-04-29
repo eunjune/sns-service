@@ -51,7 +51,7 @@ const Home = ({isEmailLogin, usedLastIds}) => {
 
     return (
         <CenterAlignment children={
-            <div className='index' style={{padding: 50}}>
+            <div className='index' style={{marginTop: 50}}>
                 {
                     me && me.isEmailCertification === false ?
                         <div style={{paddingBottom: 40}}>
