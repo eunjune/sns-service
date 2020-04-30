@@ -2,6 +2,7 @@ package com.github.prgrms.social.api.service.user;
 
 import com.github.prgrms.social.api.aws.S3Client;
 import com.github.prgrms.social.api.error.NotFoundException;
+import com.github.prgrms.social.api.event.FollowEvent;
 import com.github.prgrms.social.api.event.JoinEvent;
 import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.user.Email;
@@ -12,8 +13,10 @@ import com.github.prgrms.social.api.service.FileServiceLocal;
 import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.mapping.Join;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,7 +49,7 @@ public class UserService {
 
     private final ModelMapper modelMapper;
 
-    private final EventBus eventBus;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
     public Optional<User> getUser(Long userId) {
@@ -106,8 +109,7 @@ public class UserService {
         User saved = userRepository.save(user);
         saved.newEmailToken();
 
-        // raise event
-        eventBus.post(new JoinEvent(saved));
+        applicationEventPublisher.publishEvent(new JoinEvent(saved));
 
         return saved;
     }
@@ -152,11 +154,12 @@ public class UserService {
         checkNotNull(meId, "meId must be provided.");
         checkNotNull(userId, "userId must be provided.");
 
-        User targetUser = getUser(userId).orElseThrow(() -> new NotFoundException(User.class, meId));
+        User targetUser = getUser(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
 
         return userRepository.findUserWithUserWithPostById(meId)
                 .map(user -> {
                     user.addFollowing(targetUser);
+                    applicationEventPublisher.publishEvent(new FollowEvent(user, targetUser));
                    return user;
                 })
                 .orElseThrow(() -> new NotFoundException(User.class, meId));

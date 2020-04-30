@@ -70,20 +70,18 @@ const ProfileEditForm = ({me}) => {
                         message: '이름(닉네임)을 입력해주세요!',
                     }
                 ]}>
-                <Input name="user-name" value={editName} required onChange={onChangeName}/>
-                {editError && <div style={{color: 'red'}}>{editError.message}</div>}
+                <Input name="user-name" value={editName} required onChange={onChangeName} pattern="^[ㄱ-ㅎ가-힣a-z0-9_-]{3,20}$"/>
             </Form.Item>
 
             <Form.Item
                 label='비밀번호'>
-                <Input name="user-password" value={editPassword} type="password" onChange={onChangePassword}/>
+                <Input name="user-password" value={editPassword} type="password" onChange={onChangePassword} pattern="^.{8,50}$"/>
             </Form.Item>
 
             <Form.Item
                 label='비밀번호 확인'
             >
-                <Input name="user-password-check" value={editPasswordCheck} type="password"
-                       onChange={onChangePasswordCheck}/>
+                <Input name="user-password-check" value={editPasswordCheck} type="password" required onChange={onChangePasswordCheck}/>
                 {editPasswordError && <div style={{color: 'red'}}>비밀번호가 일치하지 않습니다.</div>}
             </Form.Item>
 
@@ -104,7 +102,7 @@ const ProfileEditForm = ({me}) => {
 
             <Form.Item>
                 <Button type="primary" htmlType="submit" loading={isEditing} style={{width: '100%'}}>수정</Button>
-                {editError && <div style={{color: 'red'}}>{editErrorReason}</div>}
+                {editError && <div style={{color: 'red'}}>{editError.message}</div>}
             </Form.Item>
         </Form>
 

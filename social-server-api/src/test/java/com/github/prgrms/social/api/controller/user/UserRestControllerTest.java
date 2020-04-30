@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prgrms.social.api.model.api.request.user.EmailAuthenticationRequest;
 import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.user.Email;
+import com.github.prgrms.social.api.model.user.Notification;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
+import com.github.prgrms.social.api.repository.user.NotificationRepository;
 import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.user.EmailService;
@@ -23,6 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,6 +56,9 @@ class UserRestControllerTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    NotificationRepository notificationRepository;
+
     @Value("${jwt.token.issuer}") String issuer;
 
     @Value("${jwt.token.clientSecret}") String clientSecret;
@@ -73,6 +80,7 @@ class UserRestControllerTest {
 
     @AfterEach
     void after() {
+        notificationRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -311,6 +319,9 @@ class UserRestControllerTest {
         assertNotNull(resultUser2);
         assertEquals(user.getFollowings().size() + 1, resultUser1.getFollowings().size());
         assertEquals(user2.getFollowers().size() + 1, resultUser2.getFollowers().size());
+
+        List<Notification> notificationAll = notificationRepository.findAll();
+        assertEquals(1, notificationAll.size());
     }
 
 

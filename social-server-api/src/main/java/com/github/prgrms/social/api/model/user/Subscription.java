@@ -1,3 +1,4 @@
+/*
 package com.github.prgrms.social.api.model.user;
 
 import lombok.*;
@@ -52,3 +53,4 @@ public class Subscription {
         this.createAt = defaultIfNull(createAt, now());
     }
 }
+*/

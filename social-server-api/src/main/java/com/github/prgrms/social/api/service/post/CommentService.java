@@ -1,15 +1,15 @@
 package com.github.prgrms.social.api.service.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
-import com.github.prgrms.social.api.event.CommentCreatedEvent;
+import com.github.prgrms.social.api.event.CommentEvent;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.CommentRepository;
 import com.github.prgrms.social.api.repository.post.PostRepository;
 import com.github.prgrms.social.api.repository.user.UserRepository;
-import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +27,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    private final EventBus eventBus;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     // TODO : postWriterId 삭제해도 무방할듯
     @Transactional(readOnly = true)
@@ -47,7 +47,8 @@ public class CommentService {
                 post.addComment(comment);
                 comment.setUser(user);
                 Comment saveComment = commentRepository.save(comment);
-                eventBus.post(new CommentCreatedEvent(saveComment, postWriterId));
+
+                applicationEventPublisher.publishEvent(new CommentEvent(user, post, comment.getContent()));
                 return saveComment;
             }).orElseThrow(() -> new NotFoundException(Post.class, postId, userId));
     }

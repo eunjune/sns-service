@@ -5,9 +5,11 @@ import com.github.prgrms.social.api.model.api.request.post.CommentRequest;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
+import com.github.prgrms.social.api.model.user.Notification;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.*;
+import com.github.prgrms.social.api.repository.user.NotificationRepository;
 import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.post.CommentService;
@@ -89,6 +91,9 @@ class CommentRestControllerTest {
     @Autowired
     ImageRepository imageRepository;
 
+    @Autowired
+    NotificationRepository notificationRepository;
+
     @BeforeEach
     void setup() {
         JWT jwt = new JWT(issuer, clientSecret, expirySeconds);
@@ -103,6 +108,7 @@ class CommentRestControllerTest {
         commentRepository.deleteAll();
         postLikeRepository.deleteAll();
         postRepository.deleteAll();
+        notificationRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -133,5 +139,7 @@ class CommentRestControllerTest {
         assertNotNull(comments);
         assertEquals(comments.size(),1);
 
+        List<Notification> notificationList = notificationRepository.findAll();
+        assertEquals(1, notificationList.size());
     }
 }

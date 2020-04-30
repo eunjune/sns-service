@@ -1,3 +1,4 @@
+/*
 package com.github.prgrms.social.api.model.api.request.user;
 
 import com.github.prgrms.social.api.model.user.Subscription;
@@ -26,3 +27,4 @@ public class SubscribeRequest {
                 .build();
     }
 }
+*/

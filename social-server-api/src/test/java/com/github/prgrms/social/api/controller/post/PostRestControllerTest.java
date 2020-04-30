@@ -8,9 +8,11 @@ import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
+import com.github.prgrms.social.api.model.user.Notification;
 import com.github.prgrms.social.api.model.user.Role;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.post.*;
+import com.github.prgrms.social.api.repository.user.NotificationRepository;
 import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.service.post.CommentService;
@@ -78,6 +80,9 @@ class PostRestControllerTest {
     @Autowired
     ImageRepository imageRepository;
 
+    @Autowired
+    NotificationRepository notificationRepository;
+
     @Value("${jwt.token.issuer}") String issuer;
 
     @Value("${jwt.token.clientSecret}") String clientSecret;
@@ -105,6 +110,7 @@ class PostRestControllerTest {
         commentRepository.deleteAll();
         postLikeRepository.deleteAll();
         postRepository.deleteAll();
+        notificationRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -381,6 +387,9 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.likeCount").value(1))
                 .andDo(print());
 
+        List<Notification> notificationList = notificationRepository.findAll();
+        assertEquals(1, notificationList.size());
+
     }
 
     @DisplayName("좋아요 취소")
@@ -419,6 +428,9 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.response.isRetweet").value(true))
                 .andExpect(jsonPath("$.response.retweetPost.id").value(savedPost.getId()))
                 .andDo(print());
+
+        List<Notification> notificationList = notificationRepository.findAll();
+        assertEquals(1, notificationList.size());
     }
 
     @DisplayName("리트윗 - 이미 리트윗한 포스트")

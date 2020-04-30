@@ -2,6 +2,8 @@ package com.github.prgrms.social.api.service.post;
 
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.error.UnauthorizedException;
+import com.github.prgrms.social.api.event.LikeEvent;
+import com.github.prgrms.social.api.event.RetweetEvent;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
 import com.github.prgrms.social.api.model.post.HashTag;
 import com.github.prgrms.social.api.model.post.Image;
@@ -17,6 +19,7 @@ import com.github.prgrms.social.api.service.FileService;
 import com.github.prgrms.social.api.service.FileServiceLocal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,8 @@ public class PostService {
     private final HashTagRepository hashTagRepository;
 
     private final ImageRepository imageRepository;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     @Transactional(readOnly = true)
@@ -183,6 +188,8 @@ public class PostService {
                     LikeInfo likeInfo = LikeInfo.builder().build();
                     post.incrementAndGetLikes(likeInfo);
                     likeInfo.setUser(user);
+
+                    applicationEventPublisher.publishEvent(new LikeEvent(user,post));
                 }
                 return post;
             })
@@ -236,6 +243,8 @@ public class PostService {
 
                     retweetPost.setUser(user);
                     retweetPost.addRetweet(post);
+
+                    applicationEventPublisher.publishEvent(new RetweetEvent(user,post));
 
                     return retweetPost;
                 })
