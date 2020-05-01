@@ -24,12 +24,12 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
 
     private final RequestMatcher requiresAuthorizationRequestMatcher;
 
-    private final Function<String, Id<User, Long>> idExtractor;
+    private final Function<String, Long> idExtractor;
 
     @Autowired
     private UserRepository userRepository;
 
-    public ConnectionBasedVoter(RequestMatcher requiresAuthorizationRequestMatcher, Function<String, Id<User, Long>> idExtractor) {
+    public ConnectionBasedVoter(RequestMatcher requiresAuthorizationRequestMatcher, Function<String, Long> idExtractor) {
         checkNotNull(requiresAuthorizationRequestMatcher, "requiresAuthorizationRequestMatcher must be provided.");
         checkNotNull(idExtractor, "idExtractor must be provided.");
 
@@ -42,7 +42,7 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
 
         HttpServletRequest request = fi.getRequest();
         String uri = request.getRequestURI();
-        Id<User,Long> uriId = idExtractor.apply(uri);
+        Long uriId = idExtractor.apply(uri);
 
         if (!isAssignable(JwtAuthenticationToken.class, authentication.getClass())) {
             return ACCESS_ABSTAIN;
@@ -61,17 +61,17 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
         }
 
         // 본인인 경우 승인
-        if (jwtAuthentication.id.equals(uriId) || uriId.getValue() == 0L) {
+        if (jwtAuthentication.id.equals(uriId) || uriId == 0L) {
             return ACCESS_GRANTED;
         }
 
         // 공개 계정인 경우 승인
-        if(!userRepository.findPrivateById(uriId.getValue()).getIsPrivate()) {
+        if(!userRepository.findPrivateById(uriId).getIsPrivate()) {
             return ACCESS_GRANTED;
         }
 
         // 비공개 계정인 경우 팔로워만 승인
-        List<User> followers = userRepository.findFollowersAllById(uriId.getValue()).getFollowers();
+        List<User> followers = userRepository.findFollowersAllById(uriId).getFollowers();
         for(User follower : followers) {
             if(follower.getId().equals(jwtAuthentication.id.getValue())) {
                 return ACCESS_GRANTED;
@@ -92,7 +92,7 @@ public class ConnectionBasedVoter implements AccessDecisionVoter<FilterInvocatio
     }
 
     @Autowired
-    public void setUserService(UserRepository userRepository) {
+    public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

@@ -4,9 +4,11 @@ import com.github.prgrms.social.api.model.api.response.post.CommentResponse;
 import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.model.api.response.user.AuthenticationResponse;
 import com.github.prgrms.social.api.model.api.response.user.MeResponse;
+import com.github.prgrms.social.api.model.api.response.user.NotificationResponse;
 import com.github.prgrms.social.api.model.api.response.user.UserResponse;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.Post;
+import com.github.prgrms.social.api.model.user.Notification;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.AuthenticationResult;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +62,11 @@ public class DtoUtils {
 
         commentResponse.setUser(this.convertUserResponse(comment.getUser()));
         return commentResponse;
+    }
+
+    public NotificationResponse convertNotificationResponse(Notification notification) {
+        NotificationResponse notificationResponse = new NotificationResponse();
+        modelMapper.map(notification, notificationResponse);
+        return notificationResponse;
     }
 }

@@ -87,7 +87,6 @@ public class UserRestController {
         );
     }
 
-    // TODO: 팔로우, 게시글 데이터 확인
     @GetMapping(path = "user/{id}")
     @ApiOperation(value = "다른 사람 정보 (API 토큰 필요없음)")
     public ApiResult<UserResponse> findUser(
@@ -97,7 +96,6 @@ public class UserRestController {
         return OK(dtoUtils.convertUserResponse(user));
     }
 
-    // TODO : LONG으로 바꿀 수 있음
     @GetMapping(path = "user/followings")
     @ApiOperation(value = "팔로잉 리스트")
     public ApiResult<List<UserResponse>> followings(
@@ -111,7 +109,6 @@ public class UserRestController {
                             .collect(Collectors.toList()));
     }
 
-    // TODO : LONG으로 바꿀 수 있음
     @GetMapping(path = "user/followers")
     @ApiOperation(value = "팔로워 리스트")
     public ApiResult<List<UserResponse>> followers(
@@ -254,33 +251,4 @@ public class UserRestController {
     ) {
         return OK(userService.removeFollower(authentication.id.getValue(), userId));
     }
-
-
-    // Subscribe 요청 처리.(카프카에게 Subscribe 정보 전송 후 응답 처리)
-   /* @PostMapping(path = "subscribe")
-    public ApiResult<Subscription> subscribe(
-            @RequestBody SubscribeRequest subscribeRequest,
-            @AuthenticationPrincipal JwtAuthentication authentication
-    ) throws InterruptedException, ExecutionException, IOException {
-
-
-        Subscription subscription = subscribeRequest.newSubscription(
-                authentication.id.getValue(),
-                subscribeRequest.getNotificationEndPoint(),
-                subscribeRequest.getPublicKey(),
-                subscribeRequest.getAuth()
-        );
-
-        ProducerRecord<String, Subscription> record = new ProducerRecord<>(requestTopic,subscription);
-        record.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, responseTopic.getBytes()));
-
-
-        RequestReplyFuture<String, Subscription, Subscription> replyFuture = replyingKafkaTemplate.sendAndReceive(record);
-
-        ConsumerRecord<String, Subscription> consumerRecord = replyFuture.get();
-
-        log.info("success to subscribe {}",consumerRecord.value());
-
-        return OK(consumerRecord.value());
-    }*/
 }

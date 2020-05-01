@@ -144,18 +144,6 @@ public class PostRestController {
         return OK(dtoUtils.convertPostResponse(postService.write(request.newPost(), authentication.id.getValue(), request.getImagePaths())));
     }
 
-    @PutMapping(path = "post/{postId}")
-    @ApiOperation(value = "포스트 수정")
-    public ApiResult<PostResponse> editPost(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @ApiParam(value = "대상 포스트 PK",example = "1",required = true) @PathVariable Long postId,
-            @RequestBody PostingRequest request
-    ) {
-        return OK(dtoUtils.convertPostResponse(postService.updatePost(postId,request)));
-    }
-
-
-
 
     @PostMapping(path = "post/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "포스트 이미지 업로드")
@@ -178,6 +166,15 @@ public class PostRestController {
         return OK(dtoUtils.convertPostResponse(postService.retweet(postId,authentication.id.getValue())));
     }
 
+    @PutMapping(path = "post/{postId}")
+    @ApiOperation(value = "포스트 수정")
+    public ApiResult<PostResponse> editPost(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @ApiParam(value = "대상 포스트 PK",example = "1",required = true) @PathVariable Long postId,
+            @RequestBody PostingRequest request
+    ) {
+        return OK(dtoUtils.convertPostResponse(postService.updatePost(postId,request)));
+    }
 
     @PatchMapping(path = "user/{userId}/post/{postId}/like")
     @ApiOperation(value = "포스트 좋아요")

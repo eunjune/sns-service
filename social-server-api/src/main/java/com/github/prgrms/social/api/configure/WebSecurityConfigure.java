@@ -1,9 +1,11 @@
 package com.github.prgrms.social.api.configure;
 
 import com.github.prgrms.social.api.model.commons.Id;
+import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.*;
 import com.github.prgrms.social.api.security.voter.ConnectionBasedVoter;
+import com.github.prgrms.social.api.security.voter.NotificationVoter;
 import com.github.prgrms.social.api.security.voter.PostEditVoter;
 import com.github.prgrms.social.api.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -78,21 +80,31 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
         return new ConnectionBasedVoter(requestMatcher, (url) -> {
             Matcher matcher = pattern.matcher(url);
-            long id = matcher.find() ? toLong(matcher.group(1), -1) : -1;
-            return Id.of(User.class, id);
+            return matcher.find() ? toLong(matcher.group(1), -1) : -1;
         });
     }
 
     @Bean
     public PostEditVoter postEditVoter() {
-        Pattern pattern = Pattern.compile( "/api/post/(\\d+).*");
+        Pattern pattern = Pattern.compile( "/api/post/(\\d+)");
         RequestMatcher requestMatcher = new RegexRequestMatcher(pattern.pattern(),null);
 
         return new PostEditVoter(requestMatcher, (url) -> {
             Matcher matcher = pattern.matcher(url);
-            long id = matcher.find() ? toLong(matcher.group(1), -1) : -1;
-            return Id.of(User.class, id);
+            return matcher.find() ? toLong(matcher.group(1), -1) : -1;
         });
+    }
+
+    @Bean
+    public NotificationVoter notificationVoter() {
+        Pattern pattern = Pattern.compile( "/api/user/notification/(\\d+)");
+        RequestMatcher requestMatcher = new RegexRequestMatcher(pattern.pattern(),null);
+
+        return new NotificationVoter(requestMatcher, (url) -> {
+            Matcher matcher = pattern.matcher(url);
+            return matcher.find() ? toLong(matcher.group(1), -1) : -1;
+        });
+
     }
 
     @Bean
@@ -101,6 +113,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         decisionVoters.add(new WebExpressionVoter());
         decisionVoters.add(connectionBasedVoter());
         decisionVoters.add(postEditVoter());
+        decisionVoters.add(notificationVoter());
         // 모든 voter가 승인해야 해야한다.
         return new UnanimousBased(decisionVoters);
     }

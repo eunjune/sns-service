@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("api")
+@RequiredArgsConstructor
 @Api(tags = "검색 APIs")
 public class SearchController {
 
@@ -36,7 +36,7 @@ public class SearchController {
             @ApiImplicitParam(name = "size", dataType = "integer", paramType = "query", defaultValue = "4", value = "최대 조회 갯수")
     })
     public ApiResult<List<PostResponse>> search(
-            @ApiParam(value = "검색 키워드") @PathVariable String keyword,
+            @ApiParam(value = "검색 키워드", example = "1", required = true) @PathVariable String keyword,
             @RequestParam Long lastId,
             @ApiIgnore @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
 
