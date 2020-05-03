@@ -260,7 +260,7 @@ public class PostService {
                 .map(post -> {
                     post.setContent(postingRequest.getContent());
 
-                    Map<String,Image> removeImageMap = new HashMap();
+                    Map<String,Image> removeImageMap = new HashMap<>();
                     for(Image image : post.getImages()){
                         removeImageMap.put(image.getPath(),image);
                     }

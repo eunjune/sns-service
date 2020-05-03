@@ -79,6 +79,9 @@ public class User extends BaseTimeEntity{
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Post> posts = new HashSet<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private Set<Notification> notifications = new HashSet<>();
+
     @Builder(toBuilder = true)
     private User(Long id, String name, Email email, String password, String profileImageUrl, boolean isPrivate, boolean isEmailCertification, String emailCertificationToken, int loginCount, LocalDateTime lastLoginAt) {
         checkArgument(isNotEmpty(name), "name must be provided.");

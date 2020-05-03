@@ -1,5 +1,6 @@
 package com.github.prgrms.social.api.controller.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.prgrms.social.api.model.api.request.post.CommentRequest;
 import com.github.prgrms.social.api.model.post.Comment;
 import com.github.prgrms.social.api.model.post.LikeInfo;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -41,6 +43,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class NotificationControllerTest {
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Autowired
     MockMvc mockMvc;
@@ -128,6 +133,7 @@ public class NotificationControllerTest {
     @Test
     @DisplayName("알림 읽음")
     void read() throws Exception {
+
         mockMvc.perform(patch("/api/user/notification/1")
                 .header(tokenHeader,apiToken))
                 .andExpect(status().isOk())

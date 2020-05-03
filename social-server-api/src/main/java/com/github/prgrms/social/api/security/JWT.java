@@ -65,7 +65,7 @@ public final class JWT {
         return new Claims(jwtVerifier.verify(token));
     }
 
-   /* public String getIssuer() {
+    public String getIssuer() {
         return issuer;
     }
 
@@ -83,7 +83,7 @@ public final class JWT {
 
     public JWTVerifier getJwtVerifier() {
         return jwtVerifier;
-    }*/
+    }
 
     // JWT Payload에 사용되는 클래스
     static public class Claims {

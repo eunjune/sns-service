@@ -15,5 +15,5 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
     Optional<Comment> findById(Long id);
 
     @Transactional(readOnly = true)
-    List<Comment> findByPost_IdAndUser_IdOrderByIdDesc(Long postId,Long userId);
+    List<Comment> findByPost_IdOrderByIdDesc(Long postId);
 }

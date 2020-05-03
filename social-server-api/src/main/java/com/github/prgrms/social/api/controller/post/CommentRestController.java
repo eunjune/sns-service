@@ -29,15 +29,13 @@ public class CommentRestController {
 
     private final CommentService commentService;
 
-    @GetMapping(path = "user/{userId}/post/{postId}/comment/list")
+    @GetMapping(path = "post/{postId}/comment/list")
     @ApiOperation(value = "댓글 조회")
     public ApiResult<List<CommentResponse>> comments(
-            @AuthenticationPrincipal JwtAuthentication authentication,
-            @ApiParam(value = "공개 유저 PK(비공개 유저인 경우 팔로워만 가능)", example = "1", required = true) @PathVariable Long userId,
             @ApiParam(value = "대상 포스트 PK", example = "1", required = true) @PathVariable Long postId
     ) {
         return OK(
-                commentService.findAll(postId, authentication.id.getValue(), userId)
+                commentService.findAll(postId)
                         .stream()
                         .map(dtoUtils::convertCommentResponse)
                         .collect(Collectors.toList())

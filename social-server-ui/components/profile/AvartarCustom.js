@@ -1,14 +1,15 @@
 import {Avatar} from "antd";
 import React from "react";
+import Link from "next/link";
 
 
-const AvartarCustom = ({shape, size, profileImageUrl, name}) => {
+const AvartarCustom = ({shape, size, profileImageUrl,id}) => {
 
     return (
-        <Avatar style={{cursor: 'pointer'}} shape={shape} size={size} icon={<img src={`${profileImageUrl}`} alt=""/>}>
-            {name && name[0]}
-        </Avatar>
 
+        <Link href={{pathname: '/user', query: {id: id}}} as={`/user/${id}`}>
+            <Avatar style={{cursor: 'pointer'}} shape={shape} size={size} icon={<img src={`${profileImageUrl}`} alt=""/>} />
+        </Link>
     );
 };
 

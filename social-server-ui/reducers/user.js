@@ -6,6 +6,8 @@ export const initialState = {
     user: null,
     followings: [],
     followers: [],
+    newNotifications: [],
+    readNotifications: [],
 
     isEmailOk: false,
     isCertificated: false,
@@ -39,6 +41,14 @@ export const LOAD_FOLLOWING_FAILURE = 'LOAD_FOLLOWING_FAILURE';
 export const LOAD_FOLLOWER_REQUEST = 'LOAD_FOLLOWER_REQUEST';
 export const LOAD_FOLLOWER_SUCCESS = 'LOAD_FOLLOWER_SUCCESS';
 export const LOAD_FOLLOWER_FAILURE = 'LOAD_FOLLOWER_FAILURE';
+
+export const LOAD_NEW_NOTIFICATION_REQUEST = 'LOAD_NEW_NOTIFICATION_REQUEST';
+export const LOAD_NEW_NOTIFICATION_SUCCESS = 'LOAD_NEW_NOTIFICATION_SUCCESS';
+export const LOAD_NEW_NOTIFICATION_FAILURE = 'LOAD_NEW_NOTIFICATION_FAILURE';
+
+export const LOAD_READ_NOTIFICATION_REQUEST = 'LOAD_READ_NOTIFICATION_REQUEST';
+export const LOAD_READ_NOTIFICATION_SUCCESS = 'LOAD_READ_NOTIFICATION_SUCCESS';
+export const LOAD_READ_NOTIFICATION_FAILURE = 'LOAD_READ_NOTIFICATION_FAILURE';
 
 export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
 export const EMAIL_CHECK_SUCCESS = 'EMAIL_CHECK_SUCCESS';
@@ -80,9 +90,17 @@ export const UPLOAD_IMAGE_REQUEST = 'UPLOAD_IMAGE_REQUEST';
 export const UPLOAD_IMAGE_SUCCESS = 'UPLOAD_IMAGE_SUCCESS';
 export const UPLOAD_IMAGE_FAILURE = 'UPLOAD_IMAGE_FAILURE';
 
+export const READ_NOTIFICATION_REQUEST = 'READ_NOTIFICATION_REQUEST';
+export const READ_NOTIFICATION_SUCCESS = 'READ_NOTIFICATION_SUCCESS';
+export const READ_NOTIFICATION_FAILURE = 'READ_NOTIFICATION_FAILURE';
+
 export const UNFOLLOW_USER_REQUEST = 'UNFOLLOW_USER_REQUEST';
 export const UNFOLLOW_USER_SUCCESS = 'UNFOLLOW_USER_SUCCESS';
 export const UNFOLLOW_USER_FAILURE = 'UNFOLLOW_USER_FAILURE';
+
+export const REMOVE_NOTIFICATION_REQUEST = 'REMOVE_NOTIFICATION_REQUEST';
+export const REMOVE_NOTIFICATION_SUCCESS = 'REMOVE_NOTIFICATION_SUCCESS';
+export const REMOVE_NOTIFICATION_FAILURE = 'REMOVE_NOTIFICATION_FAILURE';
 
 export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST';
 export const REMOVE_FOLLOWER_SUCCESS = 'REMOVE_FOLLOWER_SUCCESS';
@@ -154,6 +172,36 @@ const reducer = (state = initialState, action) => {
             }
 
             case LOAD_FOLLOWER_FAILURE: {
+                console.error(action.error);
+                break;
+            }
+
+            case LOAD_NEW_NOTIFICATION_REQUEST: {
+                draft.newNotifications = [];
+                break;
+            }
+
+            case LOAD_NEW_NOTIFICATION_SUCCESS: {
+                draft.newNotifications = action.data;
+                break;
+            }
+
+            case LOAD_NEW_NOTIFICATION_FAILURE: {
+                console.error(action.error);
+                break;
+            }
+
+            case LOAD_READ_NOTIFICATION_REQUEST: {
+                draft.readNotifications = [];
+                break;
+            }
+
+            case LOAD_READ_NOTIFICATION_SUCCESS: {
+                draft.readNotifications = action.data;
+                break;
+            }
+
+            case LOAD_READ_NOTIFICATION_FAILURE: {
                 console.error(action.error);
                 break;
             }
@@ -361,6 +409,21 @@ const reducer = (state = initialState, action) => {
                 break;
             }
 
+            case READ_NOTIFICATION_REQUEST: {
+                break;
+            }
+
+            case READ_NOTIFICATION_SUCCESS: {
+                --draft.me.notificationCount;
+                break;
+            }
+
+            case READ_NOTIFICATION_FAILURE: {
+                console.error(action.error);
+
+                break;
+            }
+
             case UNFOLLOW_USER_REQUEST: {
                 break;
             }
@@ -377,6 +440,22 @@ const reducer = (state = initialState, action) => {
             case UNFOLLOW_USER_FAILURE: {
                 console.error(action.error);
 
+                break;
+            }
+
+            case REMOVE_NOTIFICATION_REQUEST: {
+
+                break;
+            }
+
+            case REMOVE_NOTIFICATION_SUCCESS: {
+                draft.readNotifications = draft.readNotifications.filter(v => v.id !== action.data);
+                draft.newNotifications = draft.newNotifications.filter(v => v.id !== action.data);
+                break;
+            }
+
+            case REMOVE_NOTIFICATION_FAILURE: {
+                console.error(action.error);
                 break;
             }
 

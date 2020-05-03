@@ -38,10 +38,6 @@ const PostCards = memo(({post, keyword}) => {
 
     const onToggleComment = useCallback(() => {
 
-        if (!meId) {
-            return alert('로그인이 필요합니다.');
-        }
-
         setCommentFormOpened(prev => !prev);
 
         if (!commentFormOpened) {
@@ -49,8 +45,6 @@ const PostCards = memo(({post, keyword}) => {
                 type: LOAD_COMMENTS_REQUEST,
                 data: {
                     postId: post.id,
-                    userId: meId,
-                    token,
                 },
             })
         }
@@ -193,15 +187,8 @@ const PostCards = memo(({post, keyword}) => {
                     >
                         <Card.Meta
 
-                            avatar={
-                                <Link href={{pathname: '/user', query: {id: post.retweetPost.user.id}}}
-                                      as={`/user/${post.retweetPost.user.id}`}>
-                                    <a>
-                                        <AvartarCustom shape={"circle"} size={"default"}
-                                                       profileImageUrl={post.retweetPost.user.profileImageUrl}
-                                                       name={post.retweetPost.user.name}/>
-                                    </a>
-                                </Link>}
+                            avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={post.retweetPost.user.profileImageUrl}
+                                                   id={post.retweetPost.user.id}/>}
                             title={post.retweetPost.user.name}
                             description={<PostCardContent postData={post.retweetPost.content} keyword={keyword}/>}
                         />
@@ -209,15 +196,7 @@ const PostCards = memo(({post, keyword}) => {
                     :
                     (
                         <Card.Meta
-                            avatar={
-                                <Link href={{pathname: '/user', query: {id: post.user.id}}}
-                                      as={`/user/${post.user.id}`}>
-                                    <a>
-                                        <AvartarCustom shape={"circle"} size={"default"}
-                                                       profileImageUrl={post.user.profileImageUrl}
-                                                       name={post.user.name}/>
-                                    </a>
-                                </Link>}
+                            avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={post.user.profileImageUrl} id={post.user.id}/>}
                             title={post.user.name}
                             description={isEditPost === true && editPostId === post.id ?
                                 <PostEditForm key={post.id} post={post}/> : <
@@ -233,7 +212,7 @@ const PostCards = memo(({post, keyword}) => {
 
             {commentFormOpened && (
                 <>
-                    <CommentForm post={post}/>
+                    {meId && <CommentForm post={post}/>}
                     <List
                         header={` 댓글`}
                         itemLayout="horizontal"
@@ -243,15 +222,7 @@ const PostCards = memo(({post, keyword}) => {
                             <Comment
                                 author={item.user.name}
                                 avatar={
-                                    <Link href={{pathname: '/user', query: {id: post.user.id}}}
-                                          as={`/user/${post.user.id}`}>
-                                        <a>
-                                            <Avatar shape="circle" icon={post.user.profileImageUrl &&
-                                            <img src={`${post.user.profileImageUrl}`} alt=""/>}>
-                                                {post.user.name[0]}
-                                            </Avatar>
-                                        </a>
-                                    </Link>
+                                    <AvartarCustom shape="circle" size={"default"} profileImageUrl={item.user.profileImageUrl} id={item.user.id}/>
                                 }
                                 content={item.content}
                                 datetime={

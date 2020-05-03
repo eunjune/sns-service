@@ -135,7 +135,7 @@ class CommentRestControllerTest {
                 .andExpect(jsonPath("$.response.user").isNotEmpty())
                 .andDo(print());
 
-        List<Comment> comments = commentService.findAll(savedPost.getId(),user.getId(),null);
+        List<Comment> comments = commentService.findAll(savedPost.getId());
         assertNotNull(comments);
         assertEquals(comments.size(),1);
 

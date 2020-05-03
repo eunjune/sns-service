@@ -58,7 +58,7 @@ const User = ({id}) => {
                     >
                         <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"}
                                                           profileImageUrl={user && user.profileImageUrl}
-                                                          name={user && user.name}/>}
+                                                          id={user && user.id}/>}
                                    title={user && user.name}/>
                     </Card>
                 </div>

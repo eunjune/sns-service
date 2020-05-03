@@ -1,19 +1,17 @@
 package com.github.prgrms.social.api.service.user;
 
-import com.github.prgrms.social.api.aws.S3Client;
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.event.FollowEvent;
 import com.github.prgrms.social.api.event.JoinEvent;
 import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
 import com.github.prgrms.social.api.model.user.Email;
+import com.github.prgrms.social.api.model.user.Notification;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.user.UserRepository;
 import com.github.prgrms.social.api.service.FileService;
 import com.github.prgrms.social.api.service.FileServiceLocal;
-import com.google.common.eventbus.EventBus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.mapping.Join;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,11 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -156,7 +151,7 @@ public class UserService {
 
         User targetUser = getUser(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
 
-        return userRepository.findUserWithUserWithPostById(meId)
+        return userRepository.findWithUserAllById(meId)
                 .map(user -> {
                     user.addFollowing(targetUser);
                     applicationEventPublisher.publishEvent(new FollowEvent(user, targetUser));
@@ -206,7 +201,7 @@ public class UserService {
 
         User targetUser = getUser(userId).orElseThrow(() -> new NotFoundException(User.class, userId));
 
-        return userRepository.findUserWithUserWithPostById(meId)
+        return userRepository.findWithUserAllById(meId)
                 .map(user -> {
                     user.removeFollowing(targetUser);
                     return userId;
@@ -221,7 +216,7 @@ public class UserService {
 
         User me = getUser(meId).orElseThrow(() -> new NotFoundException(User.class, meId));
 
-        return userRepository.findUserWithUserWithPostById(userId)
+        return userRepository.findWithUserAllById(userId)
                 .map(targetUser -> {
                     targetUser.removeFollowing(me);
                     return userId;

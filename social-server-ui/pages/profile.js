@@ -191,7 +191,7 @@ const Profile = () => {
                         <FileImageOutlined onClick={onClickSelectImage}/>}</span>
                         <Card.Meta avatar={<AvartarCustom shape={"circle"} size={"default"}
                                                           profileImageUrl={me && me.profileImageUrl}
-                                                          name={me && me.name}/>}
+                                                          id={me && me.id}/>}
                                    title={me &&
                                    <div>
                                        <span style={{cursor: 'pointer'}}>{me.name}</span>

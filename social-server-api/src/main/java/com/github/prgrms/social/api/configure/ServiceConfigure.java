@@ -16,6 +16,7 @@ import com.github.prgrms.social.api.model.post.Image;
 import com.github.prgrms.social.api.model.post.LikeInfo;
 import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.model.user.Email;
+import com.github.prgrms.social.api.model.user.Notification;
 import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.security.JWT;
 import com.github.prgrms.social.api.util.MessageUtils;
@@ -121,6 +122,16 @@ public class ServiceConfigure {
             return definition;
         };
         Converter<Set<Post>, Integer> toPostCount = context -> context.getSource().size();
+        Converter<Set<Notification>, Integer> toNotificationCount = context -> {
+
+            int count = 0;
+            for(Notification notification : context.getSource()) {
+                if(!notification.isReadMark()) {
+                    ++count;
+                }
+            }
+            return count;
+        };
         Converter<Set<LikeInfo>, Integer> toLikeCount = context -> context.getSource().size();
         Converter<Set<Comment>, Integer> toCommentCount = context -> context.getSource().size();
         Converter<Set<Image>, Set<String>> setImages = context -> {
@@ -152,7 +163,8 @@ public class ServiceConfigure {
                 .addMappings(mapper -> mapper.using(toEmail).map(User::getEmail, MeResponse::setEmail))
                 .addMappings(mapper -> mapper.using(toUserLong).map(User::getFollowings, MeResponse::setFollowings))
                 .addMappings(mapper -> mapper.using(toUserLong).map(User::getFollowers, MeResponse::setFollowers))
-                .addMappings(mapper -> mapper.using(toPostCount).map(User::getPosts, MeResponse::setPostCount));
+                .addMappings(mapper -> mapper.using(toPostCount).map(User::getPosts, MeResponse::setPostCount))
+                .addMappings(mapper -> mapper.using(toNotificationCount).map(User::getNotifications, MeResponse::setNotificationCount));
 
         modelMapper
                 .typeMap(User.class, UserResponse.class)

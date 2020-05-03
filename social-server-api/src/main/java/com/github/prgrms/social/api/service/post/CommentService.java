@@ -29,10 +29,9 @@ public class CommentService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    // TODO : postWriterId 삭제해도 무방할듯
     @Transactional(readOnly = true)
-    public List<Comment> findAll(Long postId, Long userId, Long postWriterId) {
-        return commentRepository.findByPost_IdAndUser_IdOrderByIdDesc(postId, userId);
+    public List<Comment> findAll(Long postId) {
+        return commentRepository.findByPost_IdOrderByIdDesc(postId);
     }
 
     @Transactional

@@ -48,7 +48,18 @@ import {
     EMAIL_RESEND_SUCCESS,
     EMAIL_LOG_IN_REQUEST,
     EMAIL_LOG_IN_SUCCESS,
-    EMAIL_LOG_IN_FAILURE
+    EMAIL_LOG_IN_FAILURE,
+    LOAD_NEW_NOTIFICATION_REQUEST,
+    LOAD_NEW_NOTIFICATION_SUCCESS,
+    LOAD_NEW_NOTIFICATION_FAILURE,
+    LOAD_READ_NOTIFICATION_SUCCESS,
+    LOAD_READ_NOTIFICATION_FAILURE,
+    LOAD_READ_NOTIFICATION_REQUEST,
+    READ_NOTIFICATION_REQUEST,
+    READ_NOTIFICATION_SUCCESS,
+    READ_NOTIFICATION_FAILURE,
+    REMOVE_NOTIFICATION_REQUEST,
+    REMOVE_NOTIFICATION_FAILURE, REMOVE_NOTIFICATION_SUCCESS
 } from '../reducers/user';
 import {call, fork, takeEvery, takeLatest, delay, put, all} from 'redux-saga/effects';
 
@@ -177,6 +188,71 @@ function* loadFollower(action) {
 function* watchLoadfollower() {
     yield takeLatest(LOAD_FOLLOWER_REQUEST, loadFollower,);
 }
+
+function loadNewNotificationAPI(token) {
+
+    return axios.get(`user/notification/new`, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadNewNotification(action) {
+
+    try {
+        const result = yield call(loadNewNotificationAPI, action.data);
+        yield put({
+            type: LOAD_NEW_NOTIFICATION_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: LOAD_NEW_NOTIFICATION_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchLoadNewNotification() {
+    yield takeLatest(LOAD_NEW_NOTIFICATION_REQUEST, loadNewNotification);
+}
+
+function loadReadNotificationAPI(token) {
+
+    return axios.get(`user/notification/read`, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadReadNotification(action) {
+
+    try {
+        const result = yield call(loadReadNotificationAPI, action.data);
+        yield put({
+            type: LOAD_READ_NOTIFICATION_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: LOAD_READ_NOTIFICATION_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchLoadReadNotification() {
+    yield takeLatest(LOAD_READ_NOTIFICATION_REQUEST, loadReadNotification);
+}
+
 
 function resendEmailAPI(token) {
     return axios.get('user/resend-email', {
@@ -478,6 +554,38 @@ function* watchEditProfileImage() {
     yield takeLatest(UPLOAD_IMAGE_REQUEST, editProfileImage);
 }
 
+function readNotificationAPI({id, token}) {
+    return axios.patch(`user/notification/${id}`, null,{
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* readNotification(action) {
+
+    try {
+        const result = yield call(readNotificationAPI, action.data);
+        yield put({
+            type: READ_NOTIFICATION_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: READ_NOTIFICATION_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchReadNotification() {
+    yield takeLatest(READ_NOTIFICATION_REQUEST, readNotification);
+}
+
+
 function unfollowAPI({userId, token}) {
     return axios.delete(`user/follow/${userId}`, {
         headers: {
@@ -507,6 +615,36 @@ function* unfollow(action) {
 
 function* watchUnfollow() {
     yield takeLatest(UNFOLLOW_USER_REQUEST, unfollow);
+}
+function removeNotificationAPI({id, token}) {
+    return axios.delete(`user/notification/${id}`, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* removeNotification(action) {
+
+    try {
+        const result = yield call(removeNotificationAPI, action.data);
+        yield put({
+            type: REMOVE_NOTIFICATION_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) { // 실패
+        yield put({
+            type: REMOVE_NOTIFICATION_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            }
+        });
+    }
+}
+
+function* watchRemoveNotification() {
+    yield takeLatest(REMOVE_NOTIFICATION_REQUEST, removeNotification);
 }
 
 function removeFollowerAPI({userId, token}) {
@@ -548,6 +686,8 @@ export default function* userSaga() {
         fork(watchLoadfollowing),
         fork(watchLoadfollower),
         fork(watchResendEmail),
+        fork(watchLoadNewNotification),
+        fork(watchLoadReadNotification),
 
         //POST
         fork(watchEmailCheck),
@@ -562,8 +702,12 @@ export default function* userSaga() {
         fork(watchEditProfile),
         fork(watchEditProfileImage),
 
+        //PATCH
+        fork(watchReadNotification),
+
         //DELETE
         fork(watchUnfollow),
         fork(watchRemovefollower),
+        fork(watchRemoveNotification),
     ]);
 }

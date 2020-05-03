@@ -27,7 +27,7 @@ public class RetweetEventListener {
         log.info("user{} retweet post{}", retweetEvent.getMe().getId(), retweetEvent.getTargetPost().getId());
 
         Notification notification = Notification.builder()
-                .message(retweetEvent.getMe().getName() + "님이 포스트(" + retweetEvent.getTargetPost().getId() + ")을 리트윗 하셨습니다.")
+                .message(retweetEvent.getMe().getName() + "님이 게시글(" + retweetEvent.getTargetPost().getId() + ")을 리트윗 하셨습니다.")
                 .subMessage(retweetEvent.getTargetPost().getId() + "")
                 .sender(retweetEvent.getMe().getId())
                 .senderProfileImage(retweetEvent.getMe().getProfileImageUrl())

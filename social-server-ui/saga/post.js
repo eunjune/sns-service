@@ -194,12 +194,8 @@ function* watchLoadSearchPosts() {
     yield throttle(1000, LOAD_SEARCH_POSTS_REQUEST, loadSearchPosts);
 }
 
-function loadCommentsAPI({userId, postId, token}) {
-    return axios.get(`user/${userId}/post/${postId}/comment/list`, {
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
+function loadCommentsAPI({postId}) {
+    return axios.get(`/post/${postId}/comment/list`);
 }
 
 function* loadComments(action) {

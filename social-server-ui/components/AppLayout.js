@@ -2,7 +2,7 @@ import React, {useCallback} from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import {
-    Menu, Input, Dropdown, Badge,
+    Menu, Input, Dropdown, Badge, Avatar,
 } from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import Router from 'next/router';
@@ -13,7 +13,7 @@ import AvartarCustom from "./profile/AvartarCustom";
 import NotificationOutlined from "@ant-design/icons/lib/icons/NotificationOutlined";
 
 const AppLayout = ({children}) => {
-    const {me} = useSelector((state) => state.user);
+    const {me,newNotifications} = useSelector((state) => state.user);
     const dispatch = useDispatch();
     const onSearch = (value) => {
         Router.push({pathname: '/search', query: {keyword: value}}, `/search/${value}`);
@@ -70,8 +70,7 @@ const AppLayout = ({children}) => {
                             </Menu>
                         } trigger={['click']}>
                             <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                                <AvartarCustom shape={"square"} size={"small"} profileImageUrl={me && me.profileImageUrl}
-                                               name={null}/>
+                                <Avatar style={{cursor: 'pointer'}} shape="square" size="small" icon={<img src={me && me.profileImageUrl} alt=""/>} />
                                 <DownOutlined/>
                             </a>
                         </Dropdown>
@@ -82,7 +81,7 @@ const AppLayout = ({children}) => {
                     me &&
                     <MenuItem key="notification" style={{float: 'right', padding: 0}}>
                         <div>
-                            <Badge count={0} dot>
+                            <Badge count={me.notificationCount} dot>
                                 <Link href="/notification" prefetch><NotificationOutlined /></Link>
                             </Badge>
                         </div>

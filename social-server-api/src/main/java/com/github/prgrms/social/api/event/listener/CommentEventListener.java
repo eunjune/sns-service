@@ -28,8 +28,8 @@ public class CommentEventListener{
         log.info("user{} comment post{}", commentEvent.getMe().getId(), commentEvent.getTargetPost().getId());
 
         Notification notification = Notification.builder()
-                .message(commentEvent.getMe().getName() + "님이 포스트(" + commentEvent.getTargetPost().getId() + ")에 대해 댓글을 작성했습니다.")
-                .subMessage(commentEvent.getComment())
+                .message(commentEvent.getMe().getName() + "님이 게시글(" + commentEvent.getTargetPost().getId() + ")에 대해 댓글을 작성했습니다.")
+                .subMessage(commentEvent.getComment() + "," + commentEvent.getTargetPost().getId())
                 .sender(commentEvent.getMe().getId())
                 .senderProfileImage(commentEvent.getMe().getProfileImageUrl())
                 .notificationType(NotificationType.COMMENT)

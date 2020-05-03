@@ -2,9 +2,7 @@ package com.github.prgrms.social.api.service.user;
 
 import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.user.Notification;
-import com.github.prgrms.social.api.model.user.User;
 import com.github.prgrms.social.api.repository.user.NotificationRepository;
-import com.github.prgrms.social.api.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +18,17 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
-    public List<Notification> getNotifications(Long userId) {
+    public List<Notification> getNewNotification(Long userId) {
         checkNotNull(userId, "userId must be provided.");
 
-        return notificationRepository.findByUser_Id(userId);
+        return notificationRepository.findByUser_IdAndReadMarkFalseOrderByIdDesc(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Notification> getReadNotification(Long userId) {
+        checkNotNull(userId, "userId must be provided.");
+
+        return notificationRepository.findByUser_IdAndReadMarkTrueOrderByIdDesc(userId);
     }
 
     @Transactional

@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findWithUserAllById(Long id);
 
     @Transactional(readOnly = true)
-    @EntityGraph(attributePaths = {"followings","followers","posts"})
+    @EntityGraph(attributePaths = {"followings","followers","posts","notifications"})
     Optional<User> findUserWithUserWithPostById(Long id);
 
     @Transactional(readOnly = true)

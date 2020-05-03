@@ -31,4 +31,6 @@ public class MeResponse {
     private Set<Long> followers;
 
     private Integer postCount;
+
+    private Integer notificationCount;
 }
