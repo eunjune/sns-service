@@ -1,6 +1,7 @@
 import produce from 'immer'
 
 export const initialState = {
+    post: {},
     posts: [],
     imagePaths: [],
     editPostImages: [],
@@ -45,6 +46,10 @@ export const LOAD_COMMENTS_REQUEST = 'LOAD_COMMENTS_REQUEST';
 export const LOAD_COMMENTS_SUCCESS = 'LOAD_COMMENTS_SUCCESS';
 export const LOAD_COMMENTS_FAILURE = 'LOAD_COMMENTS_FAILURE';
 
+export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
+export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
+export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
+
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
@@ -88,8 +93,6 @@ export const SIZE = 3;
 const reducer = (state = initialState, action) => {
     return produce(state, (draft) => {
         switch (action.type) {
-
-
             case LOAD_MAIN_POSTS_REQUEST: {
                 draft.posts = action.data.lastId === 0 ? [] : draft.posts;
                 draft.hasMorePost = action.data.lastId ? draft.hasMorePost : true;
@@ -197,6 +200,20 @@ const reducer = (state = initialState, action) => {
             case LOAD_COMMENTS_FAILURE: {
                 console.error(action.error);
 
+                break;
+            }
+
+            case LOAD_POST_REQUEST: {
+                break;
+            }
+
+            case LOAD_POST_SUCCESS: {
+                draft.post = action.data
+                break;
+            }
+
+            case LOAD_POST_FAILURE: {
+                console.error(action.error);
                 break;
             }
 

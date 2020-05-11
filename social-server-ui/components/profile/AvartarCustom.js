@@ -8,7 +8,9 @@ const AvartarCustom = ({shape, size, profileImageUrl,id}) => {
     return (
 
         <Link href={{pathname: '/user', query: {id: id}}} as={`/user/${id}`}>
-            <Avatar style={{cursor: 'pointer'}} shape={shape} size={size} icon={<img src={`${profileImageUrl}`} alt=""/>} />
+            <a target="_blank">
+                <Avatar style={{cursor: 'pointer'}} shape={shape} size={size} icon={<img src={`${profileImageUrl}`} alt=""/>} />
+            </a>
         </Link>
     );
 };

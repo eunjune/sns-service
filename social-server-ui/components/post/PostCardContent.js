@@ -23,8 +23,7 @@ const PostCardContent = ({postData, keyword}) => {
                         .map(v => {
                             if (v.match(/#[^\s!@#$%^&*()+-=`~.;'"?<>,./]+/)) {
                                 return (
-                                    <Link href={{pathname: '/hashtag', query: {tag: v.slice(1)}}}
-                                          as={`/hashtag/${v.slice(1)}`} key={v}><a>{v}</a></Link>
+                                    <Link href={{pathname: '/hashtag', query: {tag: v.slice(1)}}} as={`/hashtag/${v.slice(1)}`} key={v}><a target="_blank">{v}</a></Link>
                                 );
                             }
                             return v;

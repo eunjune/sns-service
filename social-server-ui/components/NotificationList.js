@@ -4,15 +4,15 @@ import {Button, Collapse} from "antd";
 import React, {useCallback, useEffect} from "react";
 import Link from "next/link";
 import {
-    LOG_OUT,
-    READ_NOTIFICATION_LIST,
     READ_NOTIFICATION_REQUEST,
     REMOVE_NOTIFICATION_REQUEST
 } from "../reducers/user";
 import cookie from "react-cookies";
 import {useDispatch} from "react-redux";
-import {CloseButton} from "./styles/imagesZoomStyle";
 import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
+import moment from "moment";
+
+moment.locale('ko');
 
 const NotificationList = ({notifications, isRead}) => {
     const { Panel } = Collapse;
@@ -54,6 +54,16 @@ const NotificationList = ({notifications, isRead}) => {
         });
     },[])
 
+    const followAccept = useCallback(() => {
+
+
+    },[]);
+
+    const followRefusal = useCallback(() => {
+
+
+    },[]);
+
     return (
         <Collapse
             bordered={false}
@@ -68,52 +78,55 @@ const NotificationList = ({notifications, isRead}) => {
                         case 'FOLLOW':
                             return (
                                 <Panel header= {v.message} key={v.id} className="site-collapse-custom-panel">
-
-                                    <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage}/>
+                                    <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage} id={v.sender}/>
 
                                     <span style={{marginLeft: 10}}>{v.message}</span>
-                                    <Button style={{marginLeft: 10}}>수락</Button>
-                                    <Button style={{marginLeft: 10}}>거절</Button>
-                                    <CloseOutlined style={{float:'right', cursor: 'pointer'}} onClick={removeNotification(v.id)} />
+                                    <Button style={{marginLeft: 10}} onClick={followAccept}>수락</Button>
+                                    <Button style={{marginLeft: 10}} onClick={followRefusal}>거절</Button>
+                                    <CloseOutlined style={{float:'right', marginLeft: 10, cursor: 'pointer'}} onClick={removeNotification(v.id)} />
+                                    <span style={{float: 'right'}}>{moment(v.createdAt).fromNow()}</span>
                                 </Panel>
                             );
                         case 'COMMENT':
                             return (
                                 <Panel header={v.message} key={v.id} className="site-collapse-custom-panel">
-                                    <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage}/>
+                                    <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage} id={v.sender}/>
                                     <span style={{marginLeft: 10}}>{v.message.substr(0, v.message.indexOf('님'))}님의 댓글 : {v.subMessage.split(',')[0]}</span>
                                     <span style={{marginLeft: 10}}>
                                         <Link href={{pathname: '/post', query: {id: v.subMessage.split(',')[1]}}} as={`/post/${v.subMessage.split(',')[1]}`}>
-                                            <a>게시글 이동</a>
+                                            <a target='_blank'>게시글 이동</a>
                                         </Link>
                                     </span>
-                                    <CloseOutlined style={{float:'right', cursor: 'pointer'}} onClick={removeNotification(v.id)} />
+                                    <CloseOutlined style={{float:'right', marginLeft: 10, cursor: 'pointer'}} onClick={removeNotification(v.id)} />
+                                    <span style={{float: 'right'}}>{moment(v.createdAt).fromNow()}</span>
                                 </Panel>
                             );
                         case 'LIKE':
                             return (
                                 <Panel header={v.message} key={v.id} className="site-collapse-custom-panel">
-                                    <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage}/>
+                                    <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage} id={v.sender}/>
                                     <span style={{marginLeft: 10}}>{v.message}</span>
                                     <span style={{marginLeft: 10}}>
                                         <Link href={{pathname: '/post', query: {id: v.subMessage}}} as={`/post/${v.subMessage}`}>
-                                            <a>게시글 이동</a>
+                                            <a target='_blank'>게시글 이동</a>
                                         </Link>
                                     </span>
-                                    <CloseOutlined style={{float:'right', cursor: 'pointer'}} onClick={removeNotification(v.id)} />
+                                    <CloseOutlined style={{float:'right', marginLeft: 10, cursor: 'pointer'}} onClick={removeNotification(v.id)} />
+                                    <span style={{float: 'right'}}>{moment(v.createdAt).fromNow()}</span>
                                 </Panel>
                             );
                         case 'RETWEET':
                             return (
                                 <Panel header={v.message} key={v.id} className="site-collapse-custom-panel">
-                                    <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage}/>
+                                    <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage} id={v.sender}/>
                                     <span style={{marginLeft: 10}}>{v.message}</span>
                                     <span style={{marginLeft: 10}}>
                                         <Link href={{pathname: '/post', query: {id: v.subMessage}}} as={`/post/${v.subMessage}`}>
-                                            <a>게시글 이동</a>
+                                            <a target='_blank'>게시글 이동</a>
                                         </Link>
                                     </span>
-                                    <CloseOutlined style={{float:'right', cursor: 'pointer'}} onClick={removeNotification(v.id)} />
+                                    <CloseOutlined style={{float:'right', marginLeft: 10, cursor: 'pointer'}} onClick={removeNotification(v.id)} />
+                                    <span style={{float: 'right'}}>{moment(v.createdAt).fromNow()}</span>
                                 </Panel>
                             );
                         default:

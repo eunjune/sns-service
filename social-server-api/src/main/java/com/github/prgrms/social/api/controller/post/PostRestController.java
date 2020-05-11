@@ -1,8 +1,11 @@
 package com.github.prgrms.social.api.controller.post;
 
+import com.github.prgrms.social.api.error.NotFoundException;
 import com.github.prgrms.social.api.model.api.request.post.PostingRequest;
 import com.github.prgrms.social.api.model.api.response.ApiResult;
+import com.github.prgrms.social.api.model.api.response.post.MyPostResponse;
 import com.github.prgrms.social.api.model.api.response.post.PostResponse;
+import com.github.prgrms.social.api.model.post.Post;
 import com.github.prgrms.social.api.security.JwtAuthentication;
 import com.github.prgrms.social.api.service.post.HashTagService;
 import com.github.prgrms.social.api.service.post.PostService;
@@ -36,6 +39,17 @@ public class PostRestController {
     private final PostService postService;
 
     private final HashTagService hashTagService;
+
+    @GetMapping(path="post/{postId}")
+    @ApiOperation(value = "특정 ID 포스트 조회")
+    public ApiResult<MyPostResponse> post(
+            @AuthenticationPrincipal JwtAuthentication authentication,
+            @ApiParam(value = "포스트 PK", example = "1", required = true) @PathVariable Long postId
+    ) {
+        return OK(
+                dtoUtils.convertMyPostResponse(postService.getPost(postId))
+        );
+    }
 
     @GetMapping(path = "user/{userId}/post/list")
     @ApiOperation(value = "특정 유저 포스트 목록 조회")

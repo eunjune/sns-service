@@ -17,6 +17,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     Post save(Post post);
 
     @Transactional(readOnly = true)
+    @EntityGraph(attributePaths = {"images","comments","likeInfos"})
     Optional<Post> findById(Long id);
 
     @Transactional(readOnly = true)

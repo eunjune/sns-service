@@ -199,8 +199,8 @@ const PostCards = memo(({post, keyword}) => {
                             avatar={<AvartarCustom shape={"circle"} size={"default"} profileImageUrl={post.user.profileImageUrl} id={post.user.id}/>}
                             title={post.user.name}
                             description={isEditPost === true && editPostId === post.id ?
-                                <PostEditForm key={post.id} post={post}/> : <
-                                    PostCardContent postData={post.content} keyword={keyword}/>}
+                                <PostEditForm key={post.id} post={post}/> :
+                                <PostCardContent postData={post.content} keyword={keyword}/>}
                         />
 
                     )

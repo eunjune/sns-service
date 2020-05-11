@@ -80,11 +80,13 @@ const AppLayout = ({children}) => {
                 {
                     me &&
                     <MenuItem key="notification" style={{float: 'right', padding: 0}}>
-                        <div>
-                            <Badge count={me.notificationCount} dot>
-                                <Link href="/notification" prefetch><NotificationOutlined /></Link>
-                            </Badge>
-                        </div>
+                        <Link href="/notification" prefetch>
+                            <div>
+                                <Badge count={me.notificationCount} dot>
+                                    <NotificationOutlined />
+                                </Badge>
+                            </div>
+                        </Link>
                     </MenuItem>
                 }
 

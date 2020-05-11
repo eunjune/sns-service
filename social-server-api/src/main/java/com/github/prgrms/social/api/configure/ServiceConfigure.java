@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.github.prgrms.social.api.model.api.request.user.ProfileRequest;
+import com.github.prgrms.social.api.model.api.response.post.MyPostResponse;
 import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.model.api.response.user.MeResponse;
 import com.github.prgrms.social.api.model.api.response.user.UserResponse;
@@ -136,6 +137,8 @@ public class ServiceConfigure {
 
         Converter<Set<LikeInfo>, Integer> toLikeCount = context -> context.getSource().size();
         Converter<Set<Comment>, Integer> toCommentCount = context -> context.getSource().size();
+        Converter<Set<Post>, Integer> toRetweetCount = context -> context.getSource().size();
+
         Converter<Set<Image>, Set<String>> setImages = context -> {
             Set<Image> source = context.getSource();
             Set<String> definition = new HashSet<>();
@@ -183,6 +186,14 @@ public class ServiceConfigure {
                 .addMappings(mapper -> mapper.skip(PostResponse::setRetweetPost))
                 .addMappings(mapping -> mapping.using(setImages).map(Post::getImages, PostResponse::setImages))
                 .addMappings(mapping -> mapping.using(toIsRetweet).map(Post::getRetweetPost, PostResponse::setIsRetweet));
+
+        modelMapper
+                .typeMap(Post.class, MyPostResponse.class)
+                .addMappings(mapper -> mapper.using(toLikeCount).map(Post::getLikeInfos, MyPostResponse::setLikeCount))
+                .addMappings(mapping -> mapping.using(toRetweetCount).map(Post::getPostsRetweetedMe, MyPostResponse::setRetweetCount))
+                .addMappings(mapper -> mapper.skip(MyPostResponse::setComments))
+                .addMappings(mapper -> mapper.skip(MyPostResponse::setUser))
+                .addMappings(mapping -> mapping.using(setImages).map(Post::getImages, MyPostResponse::setImages));
 
 
         return modelMapper;

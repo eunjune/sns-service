@@ -51,10 +51,10 @@ public class PostService {
 
 
     @Transactional(readOnly = true)
-    public Optional<Post> getPost(Long postId) {
+    public Post getPost(Long postId) {
         checkNotNull(postId, "postId must be provided.");
 
-        return postRepository.findById(postId);
+        return postRepository.findById(postId).orElseThrow(() -> new NotFoundException(Post.class,postId));
     }
 
     @Transactional(readOnly = true)

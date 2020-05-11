@@ -1,6 +1,7 @@
 package com.github.prgrms.social.api.util;
 
 import com.github.prgrms.social.api.model.api.response.post.CommentResponse;
+import com.github.prgrms.social.api.model.api.response.post.MyPostResponse;
 import com.github.prgrms.social.api.model.api.response.post.PostResponse;
 import com.github.prgrms.social.api.model.api.response.user.AuthenticationResponse;
 import com.github.prgrms.social.api.model.api.response.user.MeResponse;
@@ -14,6 +15,9 @@ import com.github.prgrms.social.api.security.AuthenticationResult;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -54,6 +58,22 @@ public class DtoUtils {
         }
 
         return postResponse;
+    }
+
+    public MyPostResponse convertMyPostResponse(Post post) {
+        MyPostResponse myPostResponse = new MyPostResponse();
+        modelMapper.map(post,myPostResponse);
+
+        myPostResponse.setUser(this.convertUserResponse(post.getUser()));
+
+        Set<CommentResponse> commentResponseSet = new HashSet<>();
+        for(Comment comment : post.getComments()) {
+            commentResponseSet.add(this.convertCommentResponse(comment));
+        }
+
+        myPostResponse.setComments(commentResponseSet);
+
+        return myPostResponse;
     }
 
     public CommentResponse convertCommentResponse(Comment comment) {

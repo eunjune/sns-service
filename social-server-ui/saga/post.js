@@ -39,7 +39,11 @@ import {
     SIZE,
     EDIT_POST_REQUEST,
     EDIT_POST_SUCCESS,
-    EDIT_POST_FAILURE, LOAD_SEARCH_POSTS_REQUEST, LOAD_SEARCH_POSTS_SUCCESS, LOAD_SEARCH_POSTS_FAILURE
+    EDIT_POST_FAILURE,
+    LOAD_SEARCH_POSTS_REQUEST,
+    LOAD_SEARCH_POSTS_SUCCESS,
+    LOAD_SEARCH_POSTS_FAILURE,
+    LOAD_POST_REQUEST, LOAD_POST_SUCCESS, LOAD_POST_FAILURE
 } from '../reducers/post';
 import axios from 'axios';
 
@@ -223,6 +227,35 @@ function* watchLoadComments() {
     yield takeLatest(LOAD_COMMENTS_REQUEST, loadComments);
 }
 
+function loadPostAPI({postId,token}) {
+    return axios.get(`/post/${postId}`, {
+        headers: {
+            'api_key': 'Bearer ' + token,
+        },
+    });
+}
+
+function* loadPost(action) {
+    try {
+        const result = yield call(loadPostAPI, action.data);
+        yield put({
+            type: LOAD_POST_SUCCESS,
+            data: result.data.response,
+        });
+    } catch (e) {
+        yield put({
+            type: LOAD_POST_FAILURE,
+            error: {
+                status: e.response.data.error.status,
+                message: e.response.data.error.message,
+            },
+        })
+    }
+}
+
+function* watchLoadPost() {
+    yield takeLatest(LOAD_POST_REQUEST, loadPost);
+}
 
 function addPostAPI({post, token}) {
     return axios.post('post', post, {
@@ -483,6 +516,7 @@ export default function* postSaga() {
         fork(watchLoadSearchPosts),
         fork(watchLoadHashtagPosts),
         fork(watchLoadComments),
+        fork(watchLoadPost),
 
         // POST
         fork(watchAddPost),
