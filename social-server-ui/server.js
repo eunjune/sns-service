@@ -22,6 +22,10 @@ app.prepare().then(() => {
   server.use(express.urlencoded({extended: true}));
 
 
+  server.get('/user/:userId/post/:postId', (req,res) => {
+    return app.render(req,res, '/post', {userId : req.params.userId, postId : req.params.postId});
+  });
+
   server.get('/hashtag/:tag', (req,res) => {
     return app.render(req,res, '/hashtag', {tag : req.params.tag});
   });
