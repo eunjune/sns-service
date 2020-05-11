@@ -3,11 +3,12 @@ import {Button, Collapse, Menu} from "antd";
 import CaretRightOutlined from "@ant-design/icons/lib/icons/CaretRightOutlined";
 import CenterAlignment from "../components/CenterAlignment";
 import cookie from "react-cookies";
-import {LOAD_NEW_NOTIFICATION_REQUEST, LOAD_READ_NOTIFICATION_REQUEST, LOAD_USER_REQUEST} from "../reducers/user";
-import {LOAD_USER_POSTS_REQUEST} from "../reducers/post";
-import User from "./user";
+import {
+    LOAD_NEW_NOTIFICATION_REQUEST,
+    LOAD_NOTIFICATION_REQUEST,
+    LOAD_READ_NOTIFICATION_REQUEST
+} from "../reducers/user";
 import {useSelector} from "react-redux";
-import AvartarCustom from "../components/profile/AvartarCustom";
 import NotificationList from "../components/NotificationList";
 
 const Notification = () => {
@@ -58,15 +59,9 @@ Notification.getInitialProps = async (context) => {
         (context.isServer && context.req.headers.cookie && context.req.headers.cookie.replace(/(token=)(.+)/, "$2"));
 
     context.store.dispatch({
-        type: LOAD_NEW_NOTIFICATION_REQUEST,
+        type: LOAD_NOTIFICATION_REQUEST,
         data: token,
-    });
-
-    context.store.dispatch({
-        type: LOAD_READ_NOTIFICATION_REQUEST,
-        data: token,
-    });
-
+    })
 };
 
 export default Notification;

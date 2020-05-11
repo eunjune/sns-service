@@ -42,13 +42,9 @@ export const LOAD_FOLLOWER_REQUEST = 'LOAD_FOLLOWER_REQUEST';
 export const LOAD_FOLLOWER_SUCCESS = 'LOAD_FOLLOWER_SUCCESS';
 export const LOAD_FOLLOWER_FAILURE = 'LOAD_FOLLOWER_FAILURE';
 
-export const LOAD_NEW_NOTIFICATION_REQUEST = 'LOAD_NEW_NOTIFICATION_REQUEST';
-export const LOAD_NEW_NOTIFICATION_SUCCESS = 'LOAD_NEW_NOTIFICATION_SUCCESS';
-export const LOAD_NEW_NOTIFICATION_FAILURE = 'LOAD_NEW_NOTIFICATION_FAILURE';
-
-export const LOAD_READ_NOTIFICATION_REQUEST = 'LOAD_READ_NOTIFICATION_REQUEST';
-export const LOAD_READ_NOTIFICATION_SUCCESS = 'LOAD_READ_NOTIFICATION_SUCCESS';
-export const LOAD_READ_NOTIFICATION_FAILURE = 'LOAD_READ_NOTIFICATION_FAILURE';
+export const LOAD_NOTIFICATION_REQUEST = 'LOAD_NOTIFICATION_REQUEST';
+export const LOAD_NOTIFICATION_SUCCESS = 'LOAD_NOTIFICATION_SUCCESS';
+export const LOAD_NOTIFICATION_FAILURE = 'LOAD_NOTIFICATION_FAILURE';
 
 export const EMAIL_CHECK_REQUEST = 'EMAIL_CHECK_REQUEST';
 export const EMAIL_CHECK_SUCCESS = 'EMAIL_CHECK_SUCCESS';
@@ -176,32 +172,18 @@ const reducer = (state = initialState, action) => {
                 break;
             }
 
-            case LOAD_NEW_NOTIFICATION_REQUEST: {
+            case LOAD_NOTIFICATION_REQUEST: {
                 draft.newNotifications = [];
                 break;
             }
 
-            case LOAD_NEW_NOTIFICATION_SUCCESS: {
-                draft.newNotifications = action.data;
+            case LOAD_NOTIFICATION_SUCCESS: {
+                draft.newNotifications = action.data.filter(v => !v.readMark);
+                draft.readNotifications = action.data.filter(v => v.readMark);
                 break;
             }
 
-            case LOAD_NEW_NOTIFICATION_FAILURE: {
-                console.error(action.error);
-                break;
-            }
-
-            case LOAD_READ_NOTIFICATION_REQUEST: {
-                draft.readNotifications = [];
-                break;
-            }
-
-            case LOAD_READ_NOTIFICATION_SUCCESS: {
-                draft.readNotifications = action.data;
-                break;
-            }
-
-            case LOAD_READ_NOTIFICATION_FAILURE: {
+            case LOAD_NOTIFICATION_FAILURE: {
                 console.error(action.error);
                 break;
             }

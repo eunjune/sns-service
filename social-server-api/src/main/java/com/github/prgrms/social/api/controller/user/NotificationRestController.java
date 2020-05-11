@@ -27,24 +27,14 @@ public class NotificationRestController {
 
     private final DtoUtils dtoUtils;
 
-    @GetMapping("user/notification/new")
-    @ApiOperation(value = "새로운 알림 데이터 가져오기")
-    public ApiResult<List<NotificationResponse>> newNotification(@AuthenticationPrincipal JwtAuthentication authentication) {
-        return OK(notificationService.getNewNotification(authentication.id.getValue())
+    @GetMapping("user/notification")
+    @ApiOperation(value = "알림 데이터 가져오기")
+    public ApiResult<List<NotificationResponse>> notification(@AuthenticationPrincipal JwtAuthentication authentication) {
+        return OK(notificationService.getNotification(authentication.id.getValue())
                 .stream()
                 .map(dtoUtils::convertNotificationResponse)
                 .collect(Collectors.toList()));
     }
-
-    @GetMapping("user/notification/read")
-    @ApiOperation(value = "읽은 알림 데이터 가져오기")
-    public ApiResult<List<NotificationResponse>> readedNotification(@AuthenticationPrincipal JwtAuthentication authentication) {
-        return OK(notificationService.getReadNotification(authentication.id.getValue())
-                .stream()
-                .map(dtoUtils::convertNotificationResponse)
-                .collect(Collectors.toList()));
-    }
-
 
     @PatchMapping("user/notification/{id}")
     @ApiOperation(value = "알림 읽음")

@@ -18,17 +18,10 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
-    public List<Notification> getNewNotification(Long userId) {
+    public List<Notification> getNotification(Long userId) {
         checkNotNull(userId, "userId must be provided.");
 
-        return notificationRepository.findByUser_IdAndReadMarkFalseOrderByIdDesc(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Notification> getReadNotification(Long userId) {
-        checkNotNull(userId, "userId must be provided.");
-
-        return notificationRepository.findByUser_IdAndReadMarkTrueOrderByIdDesc(userId);
+        return notificationRepository.findByUser_IdOrderByIdDesc(userId);
     }
 
     @Transactional

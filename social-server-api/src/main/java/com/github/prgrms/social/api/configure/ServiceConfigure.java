@@ -121,6 +121,7 @@ public class ServiceConfigure {
 
             return definition;
         };
+
         Converter<Set<Post>, Integer> toPostCount = context -> context.getSource().size();
         Converter<Set<Notification>, Integer> toNotificationCount = context -> {
 
@@ -132,6 +133,7 @@ public class ServiceConfigure {
             }
             return count;
         };
+
         Converter<Set<LikeInfo>, Integer> toLikeCount = context -> context.getSource().size();
         Converter<Set<Comment>, Integer> toCommentCount = context -> context.getSource().size();
         Converter<Set<Image>, Set<String>> setImages = context -> {

@@ -21,7 +21,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"followings","followers","posts"})
+@ToString(exclude = {"followings","followers","posts","notifications"})
 @Entity(name = "users")
 public class User extends BaseTimeEntity{
 

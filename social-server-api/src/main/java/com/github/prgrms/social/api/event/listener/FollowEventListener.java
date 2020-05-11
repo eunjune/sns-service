@@ -29,7 +29,7 @@ public class FollowEventListener {
         log.info("user{} follow user{}", followEvent.getMe().getId(), followEvent.getTargetUser().getId());
 
         Notification notification = Notification.builder()
-                .message(followEvent.getMe().getName() + "님이 팔로우 하셨습니다.")
+                .message(followEvent.getMe().getName() + "님이 팔로잉 하셨습니다.")
                 .sender(followEvent.getMe().getId())
                 .senderProfileImage(followEvent.getMe().getProfileImageUrl())
                 .notificationType(NotificationType.FOLLOW)

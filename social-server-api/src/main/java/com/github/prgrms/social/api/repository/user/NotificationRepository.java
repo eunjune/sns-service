@@ -14,9 +14,7 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 
     Notification save(Notification notification);
 
-    List<Notification> findByUser_IdAndReadMarkFalseOrderByIdDesc(Long id);
-
-    List<Notification> findByUser_IdAndReadMarkTrueOrderByIdDesc(Long id);
+    List<Notification> findByUser_IdOrderByIdDesc(Long userId);
 
     Optional<Notification> findById(Long id);
 

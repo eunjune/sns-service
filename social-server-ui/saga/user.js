@@ -59,7 +59,11 @@ import {
     READ_NOTIFICATION_SUCCESS,
     READ_NOTIFICATION_FAILURE,
     REMOVE_NOTIFICATION_REQUEST,
-    REMOVE_NOTIFICATION_FAILURE, REMOVE_NOTIFICATION_SUCCESS
+    REMOVE_NOTIFICATION_FAILURE,
+    REMOVE_NOTIFICATION_SUCCESS,
+    LOAD_NOTIFICATION_REQUEST,
+    LOAD_NOTIFICATION_SUCCESS,
+    LOAD_NOTIFICATION_FAILURE
 } from '../reducers/user';
 import {call, fork, takeEvery, takeLatest, delay, put, all} from 'redux-saga/effects';
 
@@ -189,26 +193,26 @@ function* watchLoadfollower() {
     yield takeLatest(LOAD_FOLLOWER_REQUEST, loadFollower,);
 }
 
-function loadNewNotificationAPI(token) {
+function loadNotificationAPI(token) {
 
-    return axios.get(`user/notification/new`, {
+    return axios.get(`user/notification`, {
         headers: {
             'api_key': 'Bearer ' + token,
         },
     });
 }
 
-function* loadNewNotification(action) {
+function* loadNotification(action) {
 
     try {
-        const result = yield call(loadNewNotificationAPI, action.data);
+        const result = yield call(loadNotificationAPI, action.data);
         yield put({
-            type: LOAD_NEW_NOTIFICATION_SUCCESS,
+            type: LOAD_NOTIFICATION_SUCCESS,
             data: result.data.response,
         });
     } catch (e) { // 실패
         yield put({
-            type: LOAD_NEW_NOTIFICATION_FAILURE,
+            type: LOAD_NOTIFICATION_FAILURE,
             error: {
                 status: e.response.data.error.status,
                 message: e.response.data.error.message,
@@ -217,42 +221,9 @@ function* loadNewNotification(action) {
     }
 }
 
-function* watchLoadNewNotification() {
-    yield takeLatest(LOAD_NEW_NOTIFICATION_REQUEST, loadNewNotification);
+function* watchLoadNotification() {
+    yield takeLatest(LOAD_NOTIFICATION_REQUEST, loadNotification);
 }
-
-function loadReadNotificationAPI(token) {
-
-    return axios.get(`user/notification/read`, {
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
-}
-
-function* loadReadNotification(action) {
-
-    try {
-        const result = yield call(loadReadNotificationAPI, action.data);
-        yield put({
-            type: LOAD_READ_NOTIFICATION_SUCCESS,
-            data: result.data.response,
-        });
-    } catch (e) { // 실패
-        yield put({
-            type: LOAD_READ_NOTIFICATION_FAILURE,
-            error: {
-                status: e.response.data.error.status,
-                message: e.response.data.error.message,
-            }
-        });
-    }
-}
-
-function* watchLoadReadNotification() {
-    yield takeLatest(LOAD_READ_NOTIFICATION_REQUEST, loadReadNotification);
-}
-
 
 function resendEmailAPI(token) {
     return axios.get('user/resend-email', {
@@ -686,8 +657,7 @@ export default function* userSaga() {
         fork(watchLoadfollowing),
         fork(watchLoadfollower),
         fork(watchResendEmail),
-        fork(watchLoadNewNotification),
-        fork(watchLoadReadNotification),
+        fork(watchLoadNotification),
 
         //POST
         fork(watchEmailCheck),
