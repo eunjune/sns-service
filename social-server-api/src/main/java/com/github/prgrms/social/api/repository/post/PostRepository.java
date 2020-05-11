@@ -18,7 +18,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
     @Transactional(readOnly = true)
     @EntityGraph(attributePaths = {"images","comments","likeInfos"})
-    Optional<Post> findById(Long id);
+    Optional<Post> findByIdAndUser_IdAndUser_IsPrivateFalse(Long id, Long userId);
 
     @Transactional(readOnly = true)
     Optional<Post> findByIdAndUser_Id(Long id, Long userId);

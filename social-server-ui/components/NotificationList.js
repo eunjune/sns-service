@@ -8,13 +8,14 @@ import {
     REMOVE_NOTIFICATION_REQUEST
 } from "../reducers/user";
 import cookie from "react-cookies";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
 import moment from "moment";
 
 moment.locale('ko');
 
 const NotificationList = ({notifications, isRead}) => {
+    const {me} = useSelector(state => state.user);
     const { Panel } = Collapse;
     const dispatch = useDispatch();
     const token = cookie.load('token');
@@ -93,7 +94,8 @@ const NotificationList = ({notifications, isRead}) => {
                                     <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage} id={v.sender}/>
                                     <span style={{marginLeft: 10}}>{v.message.substr(0, v.message.indexOf('님'))}님의 댓글 : {v.subMessage.split(',')[0]}</span>
                                     <span style={{marginLeft: 10}}>
-                                        <Link href={{pathname: '/post', query: {id: v.subMessage.split(',')[1]}}} as={`/post/${v.subMessage.split(',')[1]}`}>
+                                        <Link href={{pathname: '/post', query: {postId: v.subMessage.split(',')[1], userId: me.id}}}
+                                            as={`/user/${me.id}/post/${v.subMessage.split(',')[1]}`}>
                                             <a target='_blank'>게시글 이동</a>
                                         </Link>
                                     </span>
@@ -107,7 +109,8 @@ const NotificationList = ({notifications, isRead}) => {
                                     <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage} id={v.sender}/>
                                     <span style={{marginLeft: 10}}>{v.message}</span>
                                     <span style={{marginLeft: 10}}>
-                                        <Link href={{pathname: '/post', query: {id: v.subMessage}}} as={`/post/${v.subMessage}`}>
+                                        <Link href={{pathname: '/post', query: {postId: v.subMessage, userId: me.id}}}
+                                              as={`/user/${me.id}/post/${v.subMessage}`}>
                                             <a target='_blank'>게시글 이동</a>
                                         </Link>
                                     </span>
@@ -121,7 +124,8 @@ const NotificationList = ({notifications, isRead}) => {
                                     <AvartarCustom shape={"circle"} size={"default"} profileImageUrl={v.senderProfileImage} id={v.sender}/>
                                     <span style={{marginLeft: 10}}>{v.message}</span>
                                     <span style={{marginLeft: 10}}>
-                                        <Link href={{pathname: '/post', query: {id: v.subMessage}}} as={`/post/${v.subMessage}`}>
+                                        <Link href={{pathname: '/post', query: {postId: v.subMessage, userId: me.id}}}
+                                              as={`/user/${me.id}/post/${v.subMessage}`}>
                                             <a target='_blank'>게시글 이동</a>
                                         </Link>
                                     </span>

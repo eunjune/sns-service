@@ -227,12 +227,8 @@ function* watchLoadComments() {
     yield takeLatest(LOAD_COMMENTS_REQUEST, loadComments);
 }
 
-function loadPostAPI({postId,token}) {
-    return axios.get(`/post/${postId}`, {
-        headers: {
-            'api_key': 'Bearer ' + token,
-        },
-    });
+function loadPostAPI({userId,postId}) {
+    return axios.get(`/user/${userId}/post/${postId}`);
 }
 
 function* loadPost(action) {

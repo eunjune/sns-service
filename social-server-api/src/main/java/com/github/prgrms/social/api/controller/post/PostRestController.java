@@ -40,14 +40,14 @@ public class PostRestController {
 
     private final HashTagService hashTagService;
 
-    @GetMapping(path="post/{postId}")
-    @ApiOperation(value = "특정 ID 포스트 조회")
+    @GetMapping(path="/user/{userId}/post/{postId}")
+    @ApiOperation(value = "특정 유저 개별 포스트 조회")
     public ApiResult<MyPostResponse> post(
-            @AuthenticationPrincipal JwtAuthentication authentication,
+            @ApiParam(value = "공개 유저 PK", example = "1", required = true) @PathVariable Long userId,
             @ApiParam(value = "포스트 PK", example = "1", required = true) @PathVariable Long postId
     ) {
         return OK(
-                dtoUtils.convertMyPostResponse(postService.getPost(postId))
+                dtoUtils.convertMyPostResponse(postService.getPost(postId,userId))
         );
     }
 
