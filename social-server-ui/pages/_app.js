@@ -29,6 +29,10 @@ const Root = ({Component, store, pageProps}) => (
                 }, {
                     name: 'description', content: 'SNS 페이지'
                 }, {
+                    name: 'og:title', content: 'SNS',
+                }, {
+                    name: 'og:description', content: 'SNS 페이지'
+                }, {
                     property: 'og:type', content: 'website',
                 }]}
                 link={[{}, {
