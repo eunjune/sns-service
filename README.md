@@ -21,6 +21,7 @@ http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com/
 - 댓글 조회,작성
 - 포스트 좋아요, 좋아요 취소
 - 이미지 처리(프로필, 포스트)
+- 알림 기능
 - 해시태그
 - 포스트 검색
 - 리트윗
@@ -30,10 +31,6 @@ http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com/
 - 테스트 코드 작성
 - 예외처리
 
-### 개발 예정
-- 배포
-- Notification
-- 이벤트
 
 
 ### 서버 API
