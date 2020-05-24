@@ -47,7 +47,9 @@ public class CommentService {
                 comment.setUser(user);
                 Comment saveComment = commentRepository.save(comment);
 
-                applicationEventPublisher.publishEvent(new CommentEvent(user, post, comment.getContent()));
+                if(!userId.equals(postWriterId)) {
+                    applicationEventPublisher.publishEvent(new CommentEvent(user, post, comment.getContent()));
+                }
                 return saveComment;
             }).orElseThrow(() -> new NotFoundException(Post.class, postId, userId));
     }

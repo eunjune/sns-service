@@ -30,5 +30,4 @@ public abstract class  ServiceRuntimeException extends RuntimeException {
         return params;
     }
 
-
 }

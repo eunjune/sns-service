@@ -1,5 +1,7 @@
 */src/main/resources/application.yml
 */src/main/resources/application-prod.yml
+*/src/main/resources/application-prod1.yml
+*/src/main/resources/application-prod2.yml
 */src/main/resources/banner.txt
 */src/test/resources/test_profile.jpg
 */src/test/resources/application.yml

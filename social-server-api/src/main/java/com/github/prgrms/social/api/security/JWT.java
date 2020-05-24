@@ -34,8 +34,8 @@ public final class JWT {
         this.expirySeconds = expirySeconds;
         this.algorithm = Algorithm.HMAC512(clientSecret);
         this.jwtVerifier = com.auth0.jwt.JWT.require(algorithm)
-                .withIssuer(issuer)
-                .build();
+                    .withIssuer(issuer)
+                    .build();
     }
 
     // Verify Signature 생성하고 Header,Payload,Verify Signature를 인코딩하여 토큰 문자열 생성

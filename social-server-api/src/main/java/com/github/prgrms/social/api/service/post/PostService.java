@@ -190,7 +190,9 @@ public class PostService {
                     post.incrementAndGetLikes(likeInfo);
                     likeInfo.setUser(user);
 
-                    applicationEventPublisher.publishEvent(new LikeEvent(user,post));
+                    if(!userId.equals(postWriterId)) {
+                        applicationEventPublisher.publishEvent(new LikeEvent(user,post));
+                    }
                 }
                 return post;
             })

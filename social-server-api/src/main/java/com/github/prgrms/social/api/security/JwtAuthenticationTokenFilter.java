@@ -88,8 +88,6 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
                     SecurityContextHolder.getContext().getAuthentication());
         }
 
-        /*System.out.println("테스트 필터 : " + request == null);
-        System.out.println("테스트 필터 : " + response == null);*/
         chain.doFilter(request, response);
     }
 
