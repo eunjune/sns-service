@@ -33,7 +33,7 @@ const CommentForm = ({post}) => {
                 comment: commentText,
                 token,
             }
-        })
+        });
     }, [me && me.id, commentText]);
 
     return (

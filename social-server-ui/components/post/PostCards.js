@@ -24,10 +24,6 @@ import AvartarCustom from "../profile/AvartarCustom";
 
 moment.locale('ko');
 
-const CardWrapper = styled.div`
-  margin-bottom: 100px;
-`;
-
 const PostCards = memo(({post, keyword}) => {
     const {isEditPost, editPostId} = useSelector(state => state.post);
     const [commentFormOpened, setCommentFormOpened] = useState(false);
@@ -142,7 +138,7 @@ const PostCards = memo(({post, keyword}) => {
 
 
     return (
-        <CardWrapper>
+        <div style={{marginBottom: '100px'}}>
             <Card
                 type="inner"
                 cover={post.images[0] && <PostImages images={post.images}/>}
@@ -235,7 +231,7 @@ const PostCards = memo(({post, keyword}) => {
                     />
                 </>
             )}
-        </CardWrapper>
+        </div>
     );
 });
 

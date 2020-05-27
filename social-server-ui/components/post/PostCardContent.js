@@ -9,7 +9,6 @@ const PostCardContent = ({postData, keyword}) => {
         <div>
             {
                 keyword ?
-
                     postData.split(new RegExp('(' + keyword + ')'))
                         .map(v => {
                             if (v.match(new RegExp(keyword))) {
