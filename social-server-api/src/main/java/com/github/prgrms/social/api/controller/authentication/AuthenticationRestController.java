@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import static com.github.prgrms.social.api.model.api.response.ApiResult.OK;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @RestController
 @RequestMapping("api/auth")
@@ -39,7 +41,7 @@ public class AuthenticationRestController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             AuthenticationResult authenticationResult = (AuthenticationResult) authentication.getDetails();
 
-            if(authRequest.getPassword() == null) {
+            if(isEmpty(authRequest.getPassword())) {
                 emailService.sendEmailLoginLinkMessage(authenticationResult.getUser(), authenticationResult.getToken());
             }
 

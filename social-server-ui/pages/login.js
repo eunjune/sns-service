@@ -24,6 +24,8 @@ const Login = () => {
     const onSubmitForm = useCallback((e) => {
         e.preventDefault();
 
+        console.log('forgotPassword');
+        console.log(forgotPassword);
         if (forgotPassword) {
             dispatch({
                 type: EMAIL_LOG_IN_REQUEST,
@@ -43,17 +45,18 @@ const Login = () => {
 
     }, [email, password]);
 
-    const onChangeEmail = (e) => {
+    const onChangeEmail = useCallback((e) => {
         setEmail(e.target.value);
-    };
+    },[email]);
 
-    const onChangePassword = (e) => {
+    const onChangePassword = useCallback((e) => {
         setPassword(e.target.value);
-    };
+    },[password]);
 
-    const onClickForgotPassword = (e) => {
+    const onClickForgotPassword = useCallback((e) => {
         setForgotPassword(true);
-    };
+        setEmail('');
+    }, [forgotPassword, email]);
 
     return (
         <DivWrap>
