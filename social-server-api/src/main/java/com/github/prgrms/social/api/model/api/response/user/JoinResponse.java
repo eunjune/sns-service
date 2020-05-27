@@ -15,6 +15,6 @@ public class JoinResponse {
 
     private final String token;
 
-    private final MeResponse meResponse;
+    private final MeResponse user;
 
 }
