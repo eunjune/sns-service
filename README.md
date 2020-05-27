@@ -11,7 +11,7 @@ http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com
 ### 사용 스텍
 - 백엔드 : Spring Boot, Spring MVC, Spring Security, Spring Data JPA, Spring AOP, JWT, JUnit, Lombok, Swagger, MySql, MariaDB
 - 프론트엔드 : React, React-Hooks, Redux, Redux-Saga, Next.js(SSR), Webpack, Axios, Ant design, styled-component, ESLint
-- 인프라 : Git, AWS(EC2, RDS, S3, CodeDeploy), Travis CI, Nginx
+- 인프라 : Git, AWS(EC2, RDS, S3, CodeDeploy), Travis CI
 
 
 ### 개발 내용
@@ -34,7 +34,7 @@ http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com
 
 
 ### 서버 API
-http://ec2-13-125-116-71.ap-northeast-2.compute.amazonaws.com/swagger-ui.html
+http://ec2-13-125-116-71.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui.html
 
 
 
