@@ -4,7 +4,7 @@
 ### 간단 소개
 트위터 클론 프로젝트
 
-http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com:8080
+http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com
 (크롬,웨일 접속 가능)
 
 
