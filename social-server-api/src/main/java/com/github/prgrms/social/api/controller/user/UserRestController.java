@@ -185,7 +185,7 @@ public class UserRestController {
 
         String apiToken = user.newApiToken(jwt, new String[]{Role.USER.getValue()});
 
-        return OK(new JoinResponse(apiToken, user));
+        return OK(new JoinResponse(apiToken, dtoUtils.convertMeResponse(user)));
     }
 
     @PostMapping("check-email-token")
