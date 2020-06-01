@@ -20,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"retweetPost","postsRetweetedMe","images","likeInfos"})
+@ToString(exclude = {"retweetPost","postsRetweetedMe","images","likeInfos","hashTags"})
 @Entity
 public class Post extends BaseTimeEntity {
 

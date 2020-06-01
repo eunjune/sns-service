@@ -150,14 +150,7 @@ public class PostService {
                 })
                 .map(savedPost -> {
 
-                    List<HashTag> hashTagList = savedPost.findHashTag();
-                    for(HashTag item : hashTagList) {
-                        HashTag hashTag = hashTagRepository.findByName(item.getName()).orElse(null);
-                        if(hashTag == null) {
-                            hashTag = hashTagRepository.save(item);
-                        }
-                        hashTag.getPosts().add(savedPost);
-                    }
+                    addHashtag(savedPost);
 
                     for(String imagePath : imagePaths) {
                         Image image = Image.builder().path(imagePath).build();
@@ -289,6 +282,10 @@ public class PostService {
                     }
                     return post;
                 })
+                .map(updatedPost -> {
+                    addHashtag(updatedPost);
+                    return updatedPost;
+                })
                 .orElseThrow(() -> new NotFoundException(Post.class, postId));
     }
 
@@ -305,6 +302,7 @@ public class PostService {
                     for(Image image : post.getImages()) {
                         fileService.deleteFile(image.getPath());
                     }
+                    removeHashtag(post);
                     postRepository.deleteById(postId);
                     return post.getId();
                 })
@@ -325,5 +323,24 @@ public class PostService {
         }
 
         return result;
+    }
+
+    private void addHashtag(Post post) {
+        List<HashTag> hashTagList = post.findHashTag();
+        for(HashTag item : hashTagList) {
+            HashTag hashTag = hashTagRepository.findByName(item.getName()).orElse(null);
+            if(hashTag == null) {
+                hashTag = hashTagRepository.save(item);
+            }
+            hashTag.getPosts().add(post);
+        }
+    }
+
+    private void removeHashtag(Post post) {
+        List<HashTag> hashTagList = post.findHashTag();
+        for(HashTag item : hashTagList) {
+            HashTag hashTag = hashTagRepository.findByName(item.getName()).orElse(null);
+            hashTag.getPosts().remove(post);
+        }
     }
 }
