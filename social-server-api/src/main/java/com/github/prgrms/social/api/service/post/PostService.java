@@ -211,8 +211,11 @@ public class PostService {
         return getPostWithLike(postId, postWriterId,userId)
                 .map(post -> {
                     if (post.isLikesOfMe()) {
+                        likeInfo.setPost(null);
                         likeInfo.setUser(null);
                         post.removeLikes(likeInfo);
+
+                        postLikeRepository.deleteById(likeInfo.getId());
                     }
 
                     return post;

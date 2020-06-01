@@ -487,6 +487,8 @@ const reducer = (state = initialState, action) => {
                 draft.editError= null,
                 draft.nameCheckingError= null,
                 draft.emailCheckingError= null
+
+                break;
             }
 
             default: {

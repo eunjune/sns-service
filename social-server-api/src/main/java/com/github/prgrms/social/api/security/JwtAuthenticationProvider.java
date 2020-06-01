@@ -40,7 +40,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         try {
             User user = isNotEmpty(request.getPassword()) ?
                     userService.login(new Email(request.getAddress()), request.getPassword()) :
-                    userService.getUser(new Email(request.getAddress())).orElseThrow(() -> new NotFoundException(User.class, request.getAddress()));
+                    userService.getUser(new Email(request.getAddress())).orElseThrow(() -> new NotFoundException(User.class, "이메일이 존재하지 않습니다"));
             JwtAuthenticationToken authenticated =
                     new JwtAuthenticationToken(user.getId(), null, createAuthorityList(Role.USER.getValue()));
             String apiToken = user.newApiToken(jwt, new String[]{Role.USER.getValue()});
