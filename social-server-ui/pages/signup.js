@@ -1,7 +1,7 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {Form, Button, Input, Checkbox} from 'antd';
 import {
-    EMAIL_CHECK_REQUEST, NAME_CHECK_REQUEST,
+    EMAIL_CHECK_REQUEST, NAME_CHECK_REQUEST, RESET,
     SIGN_UP_REQUEST,
 } from '../reducers/user';
 import {useDispatch, useSelector} from 'react-redux';
@@ -106,6 +106,7 @@ const Signup = () => {
 
 
     return (
+        <>
         <DivWrap>
             <CenterAlignment children={
                 <Form onSubmit={onSubmit} style={{padding: 50}}>
@@ -175,6 +176,7 @@ const Signup = () => {
                 </Form>
             }/>
         </DivWrap>
+        </>
     )
 };
 

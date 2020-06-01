@@ -44,7 +44,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmailLoginLinkMessage(User user, String apiToken) {
         EmailHtmlMessage emailHtmlMessage = EmailHtmlMessage.builder()
-                .link("/login-link?token=" + user.getEmailCertificationToken() + "&email=" + user.getEmail().getAddress())
+                .link("/login-link?apiToken=" + apiToken)
                 .name(user.getName())
                 .linkName("이메일 로그인")
                 .message("이메일 로그인을 위해 링크를 클릭하세요.")

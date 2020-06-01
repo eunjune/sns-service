@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import {EMAIL_CERTIFICATION_REQUEST} from "../reducers/user";
+import {EMAIL_CERTIFICATION_REQUEST, RESET} from "../reducers/user";
 import {useSelector} from "react-redux";
 import React, {useEffect} from "react";
 import {Spin} from "antd";
@@ -14,6 +14,9 @@ const Certification = ({emailToken, email}) => {
         if (me.isEmailCertification === true) {
             alert('인증 되었습니다.');
             Router.push('/');
+            dispatch({
+                type: RESET
+            });
         }
 
     }, [me]);

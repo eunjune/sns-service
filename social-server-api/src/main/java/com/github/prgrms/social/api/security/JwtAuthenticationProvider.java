@@ -14,6 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import static org.apache.commons.lang3.ClassUtils.isAssignable;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 
 public class JwtAuthenticationProvider implements AuthenticationProvider {
@@ -37,7 +38,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     // 로그인 인증 확인 후 JWT 토큰 생성
     private Authentication processUserAuthentication(AuthenticationRequest request) {
         try {
-            User user = userService.login(new Email(request.getAddress()), request.getPassword());
+            User user = isNotEmpty(request.getPassword()) ?
+                    userService.login(new Email(request.getAddress()), request.getPassword()) :
+                    userService.getUser(new Email(request.getAddress())).orElseThrow(() -> new NotFoundException(User.class, request.getAddress()));
             JwtAuthenticationToken authenticated =
                     new JwtAuthenticationToken(user.getId(), null, createAuthorityList(Role.USER.getValue()));
             String apiToken = user.newApiToken(jwt, new String[]{Role.USER.getValue()});

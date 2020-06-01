@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {EMAIL_LOG_IN_REQUEST, LOG_IN_REQUEST} from "../reducers/user";
+import {EMAIL_LOG_IN_REQUEST, LOG_IN_REQUEST, RESET} from "../reducers/user";
 import {Button, Form, Input} from "antd";
 import Router from "next/router";
 import {DivWrap} from "../components/styles/ContainerStyle";
@@ -59,6 +59,7 @@ const Login = () => {
     }, [forgotPassword, email]);
 
     return (
+        <>
         <DivWrap>
             <CenterAlignment children={
 
@@ -111,7 +112,7 @@ const Login = () => {
             }/>
 
         </DivWrap>
-
+        </>
     );
 };
 

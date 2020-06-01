@@ -10,7 +10,7 @@ import reducer from '../reducers';
 import AppLayout from '../components/AppLayout';
 import rootSaga from '../saga';
 import cookie from 'react-cookies';
-import {LOAD_ME_REQUEST} from '../reducers/user';
+import {EMAIL_LOGIN_FINISH, LOAD_ME_REQUEST} from '../reducers/user';
 import {Container} from 'next/app';
 
 const Root = ({Component, store, pageProps}) => (
@@ -69,6 +69,13 @@ Root.getInitialProps = async (context) => {
         ctx.query.token ||
         (ctx.isServer && ctx.req.headers.cookie && ctx.req.headers.cookie.replace(/(token=)(.+)/, "$2"));
 
+
+    if(ctx.query.token) {
+        cookie.save('token', token, {path: '/'});
+        ctx.store.dispatch({
+            type: EMAIL_LOGIN_FINISH
+        });
+    }
 
     if (!state.user.me && token && state.user.isEmailLogInWaiting === false) {
         ctx.store.dispatch({

@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback} from 'react';
+import React, {useEffect, useCallback, useState} from 'react';
 import PostCards from "../components/post/PostCards";
 import PostForm from "../components/post/PostForm";
 import {useDispatch, useSelector} from "react-redux";
@@ -6,10 +6,10 @@ import {LOAD_MAIN_POSTS_REQUEST} from '../reducers/post';
 import CenterAlignment from "../components/CenterAlignment";
 import {Alert} from "antd";
 import cookie from "react-cookies";
-import {EMAIL_RESEND_REQUEST} from "../reducers/user";
+import {EMAIL_RESEND_REQUEST, LOG_OUT} from "../reducers/user";
 
-const Home = ({isEmailLogin, usedLastIds}) => {
-    const {me, isEmailLogInWaiting} = useSelector(state => state.user);
+const Home = ({usedLastIds}) => {
+    const {me, isEmailLogInWaiting, isEmailLogin} = useSelector(state => state.user);
     const {posts, hasMorePost, retweetError} = useSelector(state => state.post);
     const dispatch = useDispatch();
     const token = cookie.load('token');
@@ -83,9 +83,10 @@ const Home = ({isEmailLogin, usedLastIds}) => {
 };
 
 Home.getInitialProps = async (context) => {
-    const isEmailLogin = !!context.query.token;
     const token = cookie.load('token') ||
+        context.query.token ||
         (context.isServer && context.req.headers.cookie && context.req.headers.cookie.replace(/(token=)(.+)/, "$2"));
+
 
     context.store.dispatch({
         type: LOAD_MAIN_POSTS_REQUEST,
@@ -95,7 +96,7 @@ Home.getInitialProps = async (context) => {
         }
     });
 
-    return {isEmailLogin, usedLastIds: []};
+    return {isEmailLoginProp: !!context.query.token, usedLastIds: []};
 };
 
 export default Home;

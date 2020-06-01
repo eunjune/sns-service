@@ -7,7 +7,7 @@ import {
     LOAD_FOLLOWING_REQUEST,
     UNFOLLOW_USER_REQUEST,
     REMOVE_FOLLOWER_REQUEST,
-    UPLOAD_IMAGE_REQUEST
+    UPLOAD_IMAGE_REQUEST, RESET
 } from '../reducers/user';
 import {
     LOAD_MY_POSTS_REQUEST
@@ -45,6 +45,9 @@ const Profile = () => {
         if (me && me.isEmailCertification === false) {
             alert('이메일 인증 후에 이용할 수 있습니다.');
             Router.push("/");
+            dispatch({
+                type: RESET
+            });
             return;
         }
 

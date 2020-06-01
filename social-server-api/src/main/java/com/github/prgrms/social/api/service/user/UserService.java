@@ -113,11 +113,12 @@ public class UserService {
     @Transactional
     public User login(Email email, String password) {
         checkNotNull(email, "email must be provided.");
+        checkArgument(isNotEmpty(password), "password must be provided.");
 
         return getUser(email)
                 .map(user -> {
 
-                    if (isNotEmpty(password) && !passwordEncoder.matches(password, user.getPassword())){
+                    if (!passwordEncoder.matches(password, user.getPassword())){
                         throw new IllegalArgumentException("비밀번호가 틀립니다");
                     }
 

@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import Router from 'next/router';
-import {LOG_OUT} from "../reducers/user";
+import {LOG_OUT, RESET} from "../reducers/user";
 import {DownOutlined, BellOutlined} from '@ant-design/icons';
 import {MenuItem} from "./styles/MenuItemStyle";
 import AvartarCustom from "./profile/AvartarCustom";
@@ -23,13 +23,24 @@ const AppLayout = ({children}) => {
         dispatch({
             type: LOG_OUT,
         });
+
+        dispatch({
+            type: RESET
+        });
+    }, []);
+
+    const onReset = useCallback(() => {
+        Router.push('/');
+        dispatch({
+            type: RESET
+        });
     }, []);
 
     return (
         <div>
             <Menu mode="horizontal" theme="dark">
 
-                <MenuItem key="home"><Link href="/"><a>SNS</a></Link></MenuItem>
+                <MenuItem key="home"><a onClick={onReset}>SNS</a></MenuItem>
                 <MenuItem key="mail">
                     <Input.Search
                         style={{width: 400, verticalAlign: 'middle'}}

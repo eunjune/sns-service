@@ -14,6 +14,7 @@ export const initialState = {
     isNameOk: false,
     isLoggingIn: false,
     isEmailLogInWaiting: false,
+    isEmailLogin: false,
     isSigningUp: false,
     isEditing: false,
     hasMoreFollower: false,
@@ -102,6 +103,8 @@ export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST';
 export const REMOVE_FOLLOWER_SUCCESS = 'REMOVE_FOLLOWER_SUCCESS';
 export const REMOVE_FOLLOWER_FAILURE = 'REMOVE_FOLLOWER_FAILURE';
 
+export const RESET = 'RESET';
+export const EMAIL_LOGIN_FINISH = 'EMAIL_LOGIN_FINISH';
 export const LOG_OUT = 'LOG_OUT';
 export const ADD_POST = 'ADD_POST';
 export const REMOVE_POST = 'REMOVE_POST';
@@ -295,7 +298,6 @@ const reducer = (state = initialState, action) => {
 
                 draft.isLoggingIn = false;
                 draft.me = me;
-                draft.isEmailLogin = true;
                 break;
             }
 
@@ -316,10 +318,6 @@ const reducer = (state = initialState, action) => {
             }
 
             case EMAIL_LOG_IN_SUCCESS: {
-                const token = action.data.response.token;
-
-                cookie.save('token', token, {path: '/'});
-
                 draft.isLoggingIn = false;
                 draft.isEmailLogInWaiting = true;
                 draft.loginError = null;
@@ -457,13 +455,38 @@ const reducer = (state = initialState, action) => {
                 break;
             }
 
+            case EMAIL_LOGIN_FINISH: {
+                draft.isEmailLogin = true;
+                break;
+            }
+
             case LOG_OUT: {
                 cookie.remove('token', {path: '/'});
                 draft.me = null;
                 draft.followings = [];
                 draft.followers = [];
+                draft.isEmailLogin = false;
 
                 break;
+            }
+
+            case RESET: {
+                draft.isEmailOk= false,
+                draft.isCertificated= false,
+                draft.isNameOk= false,
+                draft.isLoggingIn= false,
+                draft.isEmailLogInWaiting= false,
+                draft.isEmailLogin= false,
+                draft.isSigningUp= false,
+                draft.isEditing= false,
+                draft.hasMoreFollower= false,
+                draft.hasMoreFollowing= false,
+
+                draft.signUpError= null,
+                draft.loginError= null,
+                draft.editError= null,
+                draft.nameCheckingError= null,
+                draft.emailCheckingError= null
             }
 
             default: {

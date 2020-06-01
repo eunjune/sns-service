@@ -101,9 +101,6 @@ const Post = ({postId,userId}) => {
 
 Post.getInitialProps = async (context) => {
 
-    console.log(context.query.postId);
-    console.log(context.query.userId);
-
     context.store.dispatch({
        type: LOAD_POST_REQUEST,
        data: {
