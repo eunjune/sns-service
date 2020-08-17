@@ -31,6 +31,11 @@ http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com
 - 테스트 코드 작성
 - 예외처리
 
+[![Video Label](http://img.youtube.com/vi/gP6ryS6jsIY/0.jpg)](https://www.youtube.com/watch?v=gP6ryS6jsIY?t=0s)
+[![Video Label](http://img.youtube.com/vi/NyP_vJ3X104/0.jpg)](https://www.youtube.com/watch?v=NyP_vJ3X104?t=0s)
+[![Video Label](http://img.youtube.com/vi/YMbqy_DLXzc/0.jpg)](https://www.youtube.com/watch?v=YMbqy_DLXzc?t=0s)
+[![Video Label](http://img.youtube.com/vi/IdWm4SQVXvw/0.jpg)](https://www.youtube.com/watch?v=IdWm4SQVXvw?t=0s)
+[![Video Label](http://img.youtube.com/vi/3YvBHRZGTt0/0.jpg)](https://www.youtube.com/watch?v=3YvBHRZGTt0?t=0s)
 
 
 ### 서버 API
