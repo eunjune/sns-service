@@ -4,7 +4,7 @@
 ### 간단 소개
 트위터 클론 프로젝트
 
-http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com
+http://ec2-52-78-79-231.ap-northeast-2.compute.amazonaws.com
 (크롬,웨일 접속 가능)
 
 
@@ -39,7 +39,7 @@ http://ec2-15-165-223-244.ap-northeast-2.compute.amazonaws.com
 
 
 ### 서버 API
-http://ec2-13-125-116-71.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui.html
+http://ec2-13-209-191-19.ap-northeast-2.compute.amazonaws.com:8080/swagger-ui.html
 
 
 
