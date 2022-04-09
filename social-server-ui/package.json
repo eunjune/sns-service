@@ -23,7 +23,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "immer": "^6.0.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "morgan": "^1.9.1",
     "next": "^9.2.2",
     "next-redux-saga": "^4.1.2",
