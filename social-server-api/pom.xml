@@ -20,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <undertow.version>2.0.29.Final</undertow.version>
         <springfox.swagger2.version>2.9.2</springfox.swagger2.version>
-        <aws.sdk.version>1.11.380</aws.sdk.version>
+        <aws.sdk.version>1.12.261</aws.sdk.version>
         <java.jwt.version>3.8.0</java.jwt.version>
         <guava.version>27.1-jre</guava.version>
         <h2.version>1.4.199</h2.version>
